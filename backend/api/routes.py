@@ -63,3 +63,14 @@ def create_questionnaire():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api_blueprint.route('/cuestionarios', methods=['GET'])
+def get_cuestionarios():
+    # Datos de ejemplo
+    cuestionarios = [
+        {"nombre": "Cuestionario 1", "estado": "en_construccion"},
+        {"nombre": "Cuestionario 2", "estado": "preparado"},
+        {"nombre": "Cuestionario 3", "estado": "en_construccion"}
+    ]
+    return jsonify(cuestionarios=cuestionarios)

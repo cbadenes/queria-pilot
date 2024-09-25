@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StyledDropzone from './StyledDropzone';
-import { AppBar, Toolbar, Typography, Button, CssBaseline, Drawer, List, ListItem, ListItemIcon, Box, TextField, MenuItem, Grid, Snackbar } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, CssBaseline, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Grid, Snackbar, TextField, MenuItem } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import MuiAlert from '@mui/material/Alert';
 import API_BASE_URL from './config';  // Importar la URL base desde config.js
+import BuildIcon from '@mui/icons-material/Build';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 
 const drawerWidth = 240;
 
@@ -21,6 +24,22 @@ const Dashboard = () => {
   const [difficulty, setDifficulty] = useState('Medium');
   const [percentageFreeResponse, setPercentageFreeResponse] = useState(50);
   const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para el Snackbar
+  const [cuestionarios, setCuestionarios] = useState([]);
+
+  useEffect(() => {
+          fetchCuestionarios();
+  }, []);
+
+  const fetchCuestionarios = async () => {
+          try {
+              const response = await fetch(`${API_BASE_URL}/api/cuestionarios`);
+              if (!response.ok) throw new Error('Network response was not ok.');
+              const data = await response.json();
+              setCuestionarios(data.cuestionarios);  // Asumiendo que el backend devuelve un objeto con una propiedad cuestionarios
+          } catch (error) {
+              console.error('Failed to fetch cuestionarios:', error);
+          }
+  };
 
   const handleLogout = () => {
     navigate('/');
@@ -90,23 +109,28 @@ const Dashboard = () => {
         </Toolbar>
       </AppBar>
       <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="permanent"
-        anchor="left"
+          sx={{
+              width: drawerWidth,
+              flexShrink: 0,
+              '& .MuiDrawer-paper': {
+                  width: drawerWidth,
+                  boxSizing: 'border-box',
+              },
+          }}
+          variant="permanent"
+          anchor="left"
       >
-        <Toolbar />
-        <List>
-          <ListItem button>
-            <ListItemIcon><CloudUploadIcon /></ListItemIcon>
-          </ListItem>
-        </List>
+          <Toolbar />
+          <List>
+              {cuestionarios.map((cuestionario, index) => (
+                  <ListItem button="true" key={index}>
+                      <ListItemIcon>
+                          {cuestionario.estado === 'en_construccion' ? <BuildIcon /> : <CheckCircleIcon />}
+                      </ListItemIcon>
+                      <ListItemText primary={cuestionario.nombre} />
+                  </ListItem>
+              ))}
+          </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
         <Toolbar />
