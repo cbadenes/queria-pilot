@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StyledDropzone from './StyledDropzone';
-import { AppBar, Toolbar, Typography, Button, CssBaseline, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, TextField, MenuItem, Grid } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, CssBaseline, Drawer, List, ListItem, ListItemIcon, Box, TextField, MenuItem, Grid, Snackbar } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import MuiAlert from '@mui/material/Alert';
+import API_BASE_URL from './config';  // Importar la URL base desde config.js
 
 const drawerWidth = 240;
+
+// Snackbar de éxito personalizado
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,34 +20,60 @@ const Dashboard = () => {
   const [numQuestions, setNumQuestions] = useState(10);
   const [difficulty, setDifficulty] = useState('Medium');
   const [percentageFreeResponse, setPercentageFreeResponse] = useState(50);
+  const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para el Snackbar
 
   const handleLogout = () => {
     navigate('/');
   };
 
+  // Manejar la solicitud de generación del cuestionario
   const handleGenerate = async () => {
+    if (!file) {
+      alert('Please upload a PDF file');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('pdf', file);
+    console.log(file);
+    formData.append('pdf', file);  // Enviar el archivo PDF
     formData.append('numQuestions', numQuestions);
     formData.append('difficulty', difficulty);
     formData.append('percentageFreeResponse', percentageFreeResponse);
 
     try {
-      const response = await fetch('http://localhost:3000/generate-questions', {
+      const response = await fetch(`${API_BASE_URL}/api/createQuestionnaire`, {  // Usar la URL base configurada
         method: 'POST',
-        body: formData, // Envía el formulario con el archivo y datos
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Questions received:', data.questions);
-        // Aquí puedes actualizar el estado para mostrar las preguntas en el UI
+        console.log('Questions received:', data);  // Verifica la respuesta del backend
+        setOpenSnackbar(true);
+
+        // Resetear los valores del formulario y el archivo
+        setFile(null);
+        setNumQuestions(10);
+        setDifficulty('Medium');
+        setPercentageFreeResponse(50);
+
       } else {
-        throw new Error('Failed to generate questions');
+        const errorData = await response.json();  // Verifica la respuesta de error
+        console.error('Error response:', errorData);
+        throw new Error(errorData.error || 'Failed to generate questionnaire');
       }
     } catch (error) {
-      console.error('Error generating questions:', error);
+      console.error('Error generating questionnaire:', error);  // Depurar errores
+      alert('There was an error generating the questionnaire.');
     }
+  };
+
+  // Cerrar el Snackbar después de mostrarlo
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -116,11 +149,23 @@ const Dashboard = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" color="primary" fullWidth onClick={handleGenerate}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleGenerate}
+              disabled={!file}  // Deshabilitar hasta que se cargue un PDF
+            >
               Generate Questionnaire
             </Button>
           </Grid>
         </Grid>
+        {/* Snackbar de éxito */}
+        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity="success">
+            Questionnaire generation requested successfully!
+          </Alert>
+        </Snackbar>
       </Box>
     </Box>
   );

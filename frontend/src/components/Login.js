@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Container, CssBaseline } from '@mui/material';
 import logo from '../assets/images/queria-logo.png'; // Asegúrate de que la ruta sea correcta
+import API_BASE_URL from './config';  // Importar la URL base desde config.js
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +16,7 @@ const Login = () => {
     console.log('Datos de login:', loginData);
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/login', {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)

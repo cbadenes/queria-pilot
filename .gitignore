@@ -5,7 +5,8 @@ __pycache__/
 node_modules/
 # C extensions
 *.so
-
+.idea/
+.DS_Store
 # Distribution / packaging
 .Python
 build/
