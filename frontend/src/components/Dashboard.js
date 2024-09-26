@@ -101,7 +101,7 @@ const Dashboard = () => {
       <CssBaseline />
 
       {/* Logout icon at the top-right corner */}
-      <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+      <Box sx={{ position: 'absolute', top: 56, right: 16 }}>
         <IconButton color="inherit" onClick={() => navigate('/')} sx={{ color: darkGrayColor }}>
           <LogoutIcon />
         </IconButton>
