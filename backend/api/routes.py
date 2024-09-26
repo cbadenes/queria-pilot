@@ -36,12 +36,66 @@ def login():
 def get_questionnaires():
     # Datos de ejemplo
     questionnaires = [
-        {"name": "Datos Abiertos", "status": "scheduled", "id":"q1"},
-        {"name": "FIS", "status": "in_progress", "id":"q2"},
-        {"name": "DCDC", "status": "completed", "id":"q3"}
+        {"name": "Datos Abiertos", "status": "scheduled", "id":"Q1"},
+        {"name": "Diagramas de Clase", "status": "in_progress", "id":"Q2"},
+        {"name": "Datos Complejos", "status": "completed", "id":"Q3"}
     ]
     return jsonify(questionnaires=questionnaires)
 
+@api_blueprint.route('/questionnaires/<id>', methods=['GET'])
+def get_questionnaire_details(id):
+    # Data for example purposes (replace with actual database query logic)
+    questionnaires = {
+        "Q1": [],
+        "Q3": [
+            {
+                "id": "q1.1",
+                "date": "2024-09-20",
+                "questionnerId": "q1",
+                "type": "multi",
+                "question": "What is AI?",
+                "available_answers": ["A type of software", "A new technology", "A robot"],
+                "valid_answer": "A type of software"
+            },
+            {
+                "id": "q1.2",
+                "date": "2024-09-20",
+                "questionnerId": "q1",
+                "type": "multi",
+                "question": "What is AI?",
+                "available_answers": ["A type of software", "A new technology", "A robot"],
+                "valid_answer": "A type of software"
+            }
+        ],
+        "Q2": [
+            {
+                "id": "q2.1",
+                "date": "2024-09-21",
+                "questionnerId": "q2",
+                "type": "open",
+                "question": "Explain how machine learning works.",
+                "available_answers": [],
+                "valid_answer": ""
+            },
+            {
+                "id": "q2.2",
+                "date": "2024-09-21",
+                "questionnerId": "q2",
+                "type": "open",
+                "question": "Explain how machine learning works.",
+                "available_answers": [],
+                "valid_answer": ""
+            }
+        ]
+    }
+
+    # Find the questionnaire by id
+    questionnaire = questionnaires.get(id)
+
+    if questionnaire:
+        return jsonify(questionnaire), 200
+    else:
+        return jsonify({"error": "Questionnaire not found"}), 404
 
 @api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
