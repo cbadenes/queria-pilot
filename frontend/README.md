@@ -59,6 +59,10 @@ Sigue los pasos a continuación para configurar el entorno de desarrollo y ejecu
     npm install @react-pdf-viewer/core @react-pdf-viewer/default-layout 
     npm install pdfjs-dist@^2.16.105
     npm install @mui/material @emotion/react @emotion/styled
+    npm install react-router-dom
+    npm install @mui/material @emotion/react @emotion/styled
+
+
 
 
     ```

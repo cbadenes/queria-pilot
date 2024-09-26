@@ -1,29 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
-const StyledDropzone = ({ setFile }) => {
-    const [file, setLocalFile] = useState(null);
+const StyledDropzone = ({ file, setFile }) => {
+    const [fileUrl, setFileUrl] = useState(null);
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
     const onDrop = (acceptedFiles) => {
         const file = acceptedFiles[0];
         if (file && file.type === 'application/pdf') {
-            const fileUrl = URL.createObjectURL(file);
-            setLocalFile(fileUrl);
-            //setFile(fileUrl);
-            setFile(acceptedFiles[0]);
+            setFile(file);  // Almacenar el archivo en el estado principal
         } else {
-            alert('Please drop a PDF file.');
+            alert('Por favor, sube un archivo PDF.');
         }
     };
 
-    const discardFile = () => {
-        setLocalFile(null);
-        setFile(null); // Informar al componente padre que el archivo ha sido descartado
-    };
+    useEffect(() => {
+        // Crear la URL del blob solo cuando el archivo cambie
+        if (file) {
+            const fileBlobUrl = URL.createObjectURL(file);
+            setFileUrl(fileBlobUrl);
+
+            // Liberar la URL del blob cuando se desmonte o cambie el archivo
+            return () => {
+                URL.revokeObjectURL(fileBlobUrl);
+            };
+        }
+    }, [file]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -38,21 +43,18 @@ const StyledDropzone = ({ setFile }) => {
             {!file && (
                 <div style={{ border: '2px dashed #007bff', padding: '20px', textAlign: 'center', marginBottom: '20px' }}>
                     {isDragActive ?
-                        <p>Drop the PDF here ...</p> :
-                        <p>Drag 'n' drop a PDF here, or click to select a PDF</p>
+                        <p>Suelte el PDF aquí ...</p> :
+                        <p>Arrastre y suelte un PDF aquí, o haga clic para seleccionar un PDF</p>
                     }
                 </div>
             )}
-            {file && (
+            {file && fileUrl && (
                 <div>
                     <div style={{ height: '500px', marginTop: '20px' }}>
                         <Worker workerUrl={`https://unpkg.com/pdfjs-dist@2.16.105/build/pdf.worker.min.js`}>
-                            <Viewer fileUrl={file} plugins={[defaultLayoutPluginInstance]} />
+                            <Viewer fileUrl={fileUrl} plugins={[defaultLayoutPluginInstance]} />
                         </Worker>
                     </div>
-                    <button onClick={discardFile} style={{ marginTop: '10px' }}>
-                        Discard PDF
-                    </button>
                 </div>
             )}
         </div>

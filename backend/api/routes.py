@@ -5,8 +5,13 @@ import os
 from .utils import extract_questions
 from .models import User
 import bcrypt
+import uuid
+import logging  # Añadir logs para ayudar en la depuración
 
 api_blueprint = Blueprint('api', __name__)
+
+# Configurar logging para depuración
+logging.basicConfig(level=logging.DEBUG)
 
 @api_blueprint.route('/login', methods=['POST'])
 def login():
@@ -27,50 +32,85 @@ def login():
     else:
         return jsonify({"message": "User not found"}), 401
 
-# Ruta para generar el cuestionario
-@api_blueprint.route('/createQuestionnaire', methods=['POST'])
+@api_blueprint.route('/questionnaires', methods=['GET'])
+def get_questionnaires():
+    # Datos de ejemplo
+    questionnaires = [
+        {"name": "Datos Abiertos", "status": "scheduled", "id":"q1"},
+        {"name": "FIS", "status": "in_progress", "id":"q2"},
+        {"name": "DCDC", "status": "completed", "id":"q3"}
+    ]
+    return jsonify(questionnaires=questionnaires)
+
+
+@api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
-    # Obtener el archivo PDF
-    if 'pdf' not in request.files:
-        return jsonify({"error": "No PDF file provided"}), 400
-
-    pdf_file = request.files['pdf']
-    if pdf_file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    # Guardar el archivo PDF en una ubicación temporal
-    filename = secure_filename(pdf_file.filename)
-    pdf_path = os.path.join('/tmp', filename)
-    pdf_file.save(pdf_path)
-
-    # Extraer los datos enviados en la solicitud
-    num_questions = request.form.get('numQuestions', type=int)
-    difficulty = request.form.get('difficulty')
-    percentage_free_response = request.form.get('percentageFreeResponse', type=int)
-
-    # Procesar el archivo PDF y extraer preguntas (función que debes tener en utils.py)
     try:
-        questions = extract_questions(pdf_path)
+        # Verificar si el archivo PDF fue enviado
+        if 'pdf' not in request.files:
+            logging.error("No PDF file provided")
+            return jsonify({"error": "No PDF file provided"}), 400
 
-        # Aquí podrías hacer alguna lógica adicional para generar el cuestionario
-        # basándote en el número de preguntas, dificultad, etc.
+        pdf_file = request.files['pdf']
+        if pdf_file.filename == '':
+            logging.error("No selected file")
+            return jsonify({"error": "No selected file"}), 400
 
-        # Eliminar el archivo temporal después de su uso
-        os.remove(pdf_path)
+        # Guardar el archivo PDF en una ubicación temporal
+        filename = secure_filename(pdf_file.filename)
+        pdf_path = os.path.join('/tmp', filename)
+        pdf_file.save(pdf_path)
+        logging.info(f"Archivo PDF guardado temporalmente en: {pdf_path}")
 
-        # Devolver una respuesta exitosa
-        return jsonify({"message": "Questionnaire generation requested successfully", "questions": questions}), 200
+        # Extraer los datos enviados en la solicitud
+        num_questions = request.form.get('numQuestions', type=int)
+        difficulty = request.form.get('difficulty')
+        percentage_free_response = request.form.get('percentageFreeResponse', type=int)
+        questionnaire_name = request.form.get('name')
+        user_email = request.form.get('email')
+
+        logging.debug(f"Datos recibidos: numQuestions={num_questions}, difficulty={difficulty}, percentageFreeResponse={percentage_free_response}, name={questionnaire_name}, email={user_email}")
+
+        # Verificar que todos los campos sean válidos
+        if not all([num_questions, difficulty, percentage_free_response, questionnaire_name, user_email]):
+            logging.error("Faltan datos en la solicitud")
+            return jsonify({"error": "Missing form data"}), 400
+
+        # Generar un identificador único para el cuestionario
+        questionnaire_id = str(uuid.uuid4())
+
+        # Procesar el archivo PDF y extraer preguntas (esta función debe estar en utils.py)
+        try:
+            questions = extract_questions(pdf_path)
+            logging.info(f"Preguntas extraídas del PDF: {questions}")
+
+            # Aquí puedes añadir lógica adicional para construir el cuestionario
+            questionnaire = {
+                "id": questionnaire_id,
+                "name": questionnaire_name,
+                "num_questions": num_questions,
+                "difficulty": difficulty,
+                "percentage_free_response": percentage_free_response,
+                "email": user_email,
+                "status": "en_construccion",  # Estado inicial del cuestionario
+                "questions": questions
+            }
+
+            # Eliminar el archivo temporal después de su uso
+            os.remove(pdf_path)
+            logging.info(f"Archivo PDF temporal eliminado: {pdf_path}")
+
+            # Respuesta exitosa
+            return jsonify({
+                "id": questionnaire_id,
+                "name": questionnaire_name,
+                "status": "en_construccion"  # Estado inicial
+            }), 200
+
+        except Exception as e:
+            logging.error(f"Error procesando el archivo PDF: {str(e)}")
+            return jsonify({"error": str(e)}), 500
 
     except Exception as e:
+        logging.error(f"Error general en la creación del cuestionario: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
-
-@api_blueprint.route('/cuestionarios', methods=['GET'])
-def get_cuestionarios():
-    # Datos de ejemplo
-    cuestionarios = [
-        {"nombre": "Cuestionario 1", "estado": "en_construccion"},
-        {"nombre": "Cuestionario 2", "estado": "preparado"},
-        {"nombre": "Cuestionario 3", "estado": "en_construccion"}
-    ]
-    return jsonify(cuestionarios=cuestionarios)

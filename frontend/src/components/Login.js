@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Container, CssBaseline } from '@mui/material';
-import logo from '../assets/images/queria-logo.png'; // Asegúrate de que la ruta sea correcta
+import logo from '../assets/images/queria-logo.png';  // Asegúrate de que la ruta sea correcta
 import API_BASE_URL from './config';  // Importar la URL base desde config.js
 
+const orangeColor = '#FFD5B4';  // Color anaranjado
+const darkGrayColor = '#333333';  // Color gris oscuro para el texto
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,9 +23,11 @@ const Login = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)
       });
+
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('userToken', data.access_token);
+        localStorage.setItem('userEmail', email);  // Guardar el email del usuario en localStorage
         navigate('/dashboard');
       } else {
         const errorData = await response.json();
@@ -46,40 +50,68 @@ const Login = () => {
         }}
       >
         <img src={logo} alt="QuerIA Logo" style={{ maxWidth: '150px', marginBottom: '20px' }} />
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            fontFamily: '"Poppins", sans-serif',
+            fontWeight: 'bold',
+            color: darkGrayColor,
+            mb: 3
+          }}
+        >
+          QuerIA
+        </Typography>
         <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
           <TextField
-            variant="outlined"
+            variant="filled"
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Correo Electrónico"
             name="email"
             autoComplete="email"
             autoFocus
             value={email}
             onChange={e => setEmail(e.target.value)}
+            InputProps={{
+              style: { backgroundColor: '#E6B895' }  // Color ligeramente más oscuro
+            }}
           />
           <TextField
-            variant="outlined"
+            variant="filled"
             margin="normal"
             required
             fullWidth
             name="password"
-            label="Password"
+            label="Contraseña"
             type="password"
             id="password"
             autoComplete="current-password"
             value={password}
             onChange={e => setPassword(e.target.value)}
+            InputProps={{
+              style: { backgroundColor: '#E6B895' }  // Color ligeramente más oscuro
+            }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{
+              mt: 3,
+              mb: 2,
+              backgroundColor: orangeColor,
+              color: darkGrayColor,
+              fontWeight: 'bold',
+              fontFamily: '"Poppins", sans-serif',
+              '&:hover': {
+                backgroundColor: '#e6b28e',  // Un poco más oscuro al hacer hover
+              }
+            }}
           >
-            Login
+            Iniciar Sesión
           </Button>
         </Box>
       </Box>
