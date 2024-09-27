@@ -191,7 +191,7 @@ const Dashboard = () => {
                   <strong>Type:</strong> {question.type}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>Available Answers:</strong> {question.available_answers.join(', ')}
+                  <strong>Available Answers:</strong> {question.answers.join(', ')}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   <strong>Valid Answer:</strong> {question.valid_answer || 'N/A'}

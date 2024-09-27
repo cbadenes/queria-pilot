@@ -16,15 +16,11 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 # Simulación de datos de cuestionarios
-file_path = 'questionnaires.json'  # Asegúrate de actualizar la ruta al fichero correctamente
-
-# Cargar el contenido del fichero JSON en una variable
-with open(file_path, 'r', encoding='utf-8') as file:
+with open('api/questionnaires.json', 'r', encoding='utf-8') as file:
     questionnaires = json.load(file)
 
-preguntas = [
-
-]
+with open('api/questions.json', 'r', encoding='utf-8') as file:
+    questions = json.load(file)
 
 @api_blueprint.route('/login', methods=['POST'])
 def login():
@@ -59,56 +55,13 @@ def get_questionnaires():
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
 def get_questionnaire_details(id):
-    # Data for example purposes (replace with actual database query logic)
-    questionnaires = {
-        "Q1": [],
-        "Q3": [
-            {
-                "id": "q1.1",
-                "date": "2024-09-20",
-                "questionnerId": "q1",
-                "type": "multi",
-                "question": "What is AI?",
-                "available_answers": ["A type of software", "A new technology", "A robot"],
-                "valid_answer": "A type of software"
-            },
-            {
-                "id": "q1.2",
-                "date": "2024-09-20",
-                "questionnerId": "q1",
-                "type": "multi",
-                "question": "What is AI?",
-                "available_answers": ["A type of software", "A new technology", "A robot"],
-                "valid_answer": "A type of software"
-            }
-        ],
-        "Q2": [
-            {
-                "id": "q2.1",
-                "date": "2024-09-21",
-                "questionnerId": "q2",
-                "type": "open",
-                "question": "Explain how machine learning works.",
-                "available_answers": [],
-                "valid_answer": ""
-            },
-            {
-                "id": "q2.2",
-                "date": "2024-09-21",
-                "questionnerId": "q2",
-                "type": "open",
-                "question": "Explain how machine learning works.",
-                "available_answers": [],
-                "valid_answer": ""
-            }
-        ]
-    }
 
-    # Find the questionnaire by id
-    questionnaire = questionnaires.get(id)
-
-    if questionnaire:
-        return jsonify(questionnaire), 200
+    # Filtrar cuestionarios basándose en el email
+    filtered_questions = [q for q in questions if q['qid'] == int(id)]
+    print("Questions:", questions)
+    print("Filtered Questions: ", filtered_questions)
+    if filtered_questions:
+        return jsonify(filtered_questions), 200
     else:
         return jsonify({"error": "Questionnaire not found"}), 404
 
