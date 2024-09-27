@@ -1,0 +1,102 @@
+[
+  {
+    "id": "1",
+    "name": "Cuestionario 1",
+    "date": "2024-08-27",
+    "status": "in_progress",
+    "email": "user1@example.com",
+    "difficulty": "medium",
+    "num_questions": 12,
+    "ratio": 20
+  },
+  {
+    "id": "2",
+    "name": "Cuestionario 2",
+    "date": "2024-09-06",
+    "status": "completed",
+    "email": "carlos.badenes@upm.es",
+    "difficulty": "easy",
+    "num_questions": 10,
+    "ratio": 40
+  },
+  {
+    "id": "3",
+    "name": "Cuestionario 3",
+    "date": "2024-09-11",
+    "status": "scheduled",
+    "email": "user2@example.com",
+    "difficulty": "hard",
+    "num_questions": 15,
+    "ratio": 70
+  },
+  {
+    "id": "4",
+    "name": "Cuestionario 4",
+    "date": "2024-09-05",
+    "status": "in_progress",
+    "email": "carlos.badenes@upm.es",
+    "difficulty": "medium",
+    "num_questions": 8,
+    "ratio": 30
+  },
+  {
+    "id": "5",
+    "name": "Cuestionario 5",
+    "date": "2024-09-15",
+    "status": "completed",
+    "email": "user1@example.com",
+    "difficulty": "easy",
+    "num_questions": 6,
+    "ratio": 50
+  },
+  {
+    "id": "6",
+    "name": "Cuestionario 6",
+    "date": "2024-09-01",
+    "status": "scheduled",
+    "email": "user2@example.com",
+    "difficulty": "hard",
+    "num_questions": 17,
+    "ratio": 60
+  },
+  {
+    "id": "7",
+    "name": "Cuestionario 7",
+    "date": "2024-08-31",
+    "status": "in_progress",
+    "email": "user1@example.com",
+    "difficulty": "medium",
+    "num_questions": 15,
+    "ratio": 85
+  },
+  {
+    "id": "8",
+    "name": "Cuestionario 8",
+    "date": "2024-08-30",
+    "status": "completed",
+    "email": "user2@example.com",
+    "difficulty": "easy",
+    "num_questions": 5,
+    "ratio": 45
+  },
+  {
+    "id": "9",
+    "name": "Cuestionario 9",
+    "date": "2024-09-20",
+    "status": "scheduled",
+    "email": "user1@example.com",
+    "difficulty": "hard",
+    "num_questions": 18,
+    "ratio": 55
+  },
+  {
+    "id": "10",
+    "name": "Cuestionario 10",
+    "date": "2024-09-18",
+    "status": "in_progress",
+    "email": "user2@example.com",
+    "difficulty": "medium",
+    "num_questions": 11,
+    "ratio": 65
+  }
+]

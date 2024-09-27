@@ -21,8 +21,9 @@ const Dashboard = () => {
   // Fetch questionnaires from the backend
   useEffect(() => {
     const fetchQuestionnaires = async () => {
+      const userEmail = localStorage.getItem('userEmail'); // Asume que el email está almacenado en localStorage
       try {
-        const response = await fetch(`${API_BASE_URL}/api/questionnaires`);
+        const response = await fetch(`${API_BASE_URL}/api/questionnaires?email=${encodeURIComponent(userEmail)}`);
         if (response.ok) {
           const data = await response.json();
           setQuestionnaires(data.questionnaires);

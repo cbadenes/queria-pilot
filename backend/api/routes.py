@@ -7,11 +7,24 @@ from .models import User
 import bcrypt
 import uuid
 import logging  # Añadir logs para ayudar en la depuración
+import json
 
 api_blueprint = Blueprint('api', __name__)
 
 # Configurar logging para depuración
 logging.basicConfig(level=logging.DEBUG)
+
+
+# Simulación de datos de cuestionarios
+file_path = 'questionnaires.json'  # Asegúrate de actualizar la ruta al fichero correctamente
+
+# Cargar el contenido del fichero JSON en una variable
+with open(file_path, 'r', encoding='utf-8') as file:
+    questionnaires = json.load(file)
+
+preguntas = [
+
+]
 
 @api_blueprint.route('/login', methods=['POST'])
 def login():
@@ -34,13 +47,15 @@ def login():
 
 @api_blueprint.route('/questionnaires', methods=['GET'])
 def get_questionnaires():
-    # Datos de ejemplo
-    questionnaires = [
-        {"name": "Datos Abiertos", "status": "scheduled", "id":"Q1"},
-        {"name": "Diagramas de Clase", "status": "in_progress", "id":"Q2"},
-        {"name": "Datos Complejos", "status": "completed", "id":"Q3"}
-    ]
-    return jsonify(questionnaires=questionnaires)
+    email = request.args.get('email')  # Obtener el email del parámetro de la consulta
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Filtrar cuestionarios basándose en el email
+    filtered_questionnaires = [q for q in questionnaires if q['email'] == email]
+
+    # Devolver los cuestionarios filtrados
+    return jsonify({"questionnaires": filtered_questionnaires}), 200
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
 def get_questionnaire_details(id):
