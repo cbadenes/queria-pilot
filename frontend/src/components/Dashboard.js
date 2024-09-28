@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import MuiAlert from '@mui/material/Alert';  // Componente para mostrar alertas
 import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, MenuItem, TextFields, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+import ErrorIcon from '@mui/icons-material/Error';
+import HelpIcon from '@mui/icons-material/Help';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -37,6 +39,8 @@ const Dashboard = () => {
   const [comment, setComment] = useState('');
   const [likeDislike, setLikeDislike] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);  // Estado para la pregunta actual
+  const [evaluationResult, setEvaluationResult] = useState({});
+
 
 
 
@@ -136,34 +140,26 @@ const Dashboard = () => {
     }
   };
 
-  const handleValidate = async (question) => {
-      console.log("Validating question:", question); // Verificar que la función se llama
-      const response = selectedAnswer[question.id] || "";  // Obtiene la respuesta guardada en el estado
-      console.log("Selected response:", response); // Ver qué respuesta se seleccionó
-      const newResponse = {
-        date: new Date().toISOString().split('T')[0],  // Fecha actual en formato 'YYYY-MM-DD'
-        response: response,
-        score: null,  // Aquí puedes incluir la lógica para calcular el puntaje si es necesario
-        feedback: ""  // Aquí puedes incluir la lógica para generar feedback automático si es necesario
-      };
-
-      // Agrega la nueva respuesta a las existentes
-      question.responses.push(newResponse);
-
-      // POST al backend
-      try {
-        const result = await fetch(`${API_BASE_URL}/api/evaluate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({question: question})  // Envía la pregunta como parte del cuerpo de la solicitud
+  const handleValidate = (question) => {
+    if (question.type === 'multi') {
+      const selected = selectedAnswer[question.id];
+      if (selected === question.valid_answer) {
+        setEvaluationResult({
+          ...evaluationResult,
+          [question.id]: { correct: true, color: 'green' }
         });
-        const data = await result.json();
-        setOpenSnackbar(true);  // Abre el Snackbar cuando la respuesta es recibida
-        console.log("Mensaje del servidor:", data.message);
-      } catch (error) {
-        console.error("Error en la petición al backend:", error);
+        setSnackbarMessage('Respuesta correcta!');
+        setOpenSnackbar(true);
+      } else {
+        setEvaluationResult({
+          ...evaluationResult,
+          [question.id]: { correct: false, color: 'red' }
+        });
+        setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
+        setOpenSnackbar(true);
       }
-    };
+    }
+  };
 
   // Función para cerrar el Snackbar
     const handleCloseSnackbar = (event, reason) => {
@@ -291,13 +287,20 @@ const Dashboard = () => {
                     variant="outlined"
                     fullWidth
                     sx={{ mb: 2 }}
-                    onChange={(e) => setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value })}
+                    onChange={(e) => {
+                      setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value });
+                      setEvaluationResult({ ...evaluationResult, [question.id]: { color: 'default' } });  // Reset color to default when answer changes
+                    }}
                   />
                 ) : (
                   <FormControl component="fieldset" sx={{ mb: 2 }}>
                     <FormLabel component="legend">Elige una respuesta</FormLabel>
                     <RadioGroup
-                      onChange={(e) => setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value })}
+                      value={selectedAnswer[question.id]}  // Ensure the RadioGroup is controlled
+                      onChange={(e) => {
+                        setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value });
+                        setEvaluationResult({ ...evaluationResult, [question.id]: { color: 'default' } });  // Reset color to default when answer changes
+                      }}
                     >
                       {question.answers.map((answer, idx) => (
                         <FormControlLabel key={idx} value={answer} control={<Radio />} label={answer} />
@@ -309,10 +312,7 @@ const Dashboard = () => {
                   <IconButton
                     aria-label="validate"
                     onClick={() => handleValidate(question)}
-                    disabled={!selectedAnswer[question.id]}
-                    sx={{
-                      color: selectedAnswer[question.id] ? green[500] : grey[400]
-                    }}
+                    sx={{ color: evaluationResult[question.id]?.color || 'default' }}  // Use color based on evaluation result
                   >
                     <CheckIcon />
                   </IconButton>
