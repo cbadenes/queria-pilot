@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { CssBaseline, Drawer, List, ListItem, Box, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';  // Componente para mostrar alertas
+import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, MenuItem, TextFields, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import CommentIcon from '@mui/icons-material/Comment';
+import SendIcon from '@mui/icons-material/Send';
+import { TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
+import { green, grey } from '@mui/material/colors';  // Importa los colores
 import API_BASE_URL from './config';  // Base URL for API requests
 import logo from '../assets/images/queria-logo.png';  // Logo
 
@@ -13,10 +21,63 @@ const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
 const lightBackground = '#fafafa';  // Lighter background for the questionnaire list
 
+// Definir el componente de alerta para el Snackbar
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [questionnaires, setQuestionnaires] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);  // Store the list of questions for the selected questionnaire
+  const [selectedAnswer, setSelectedAnswer] = useState({});  // Almacena las respuestas seleccionadas por el usuario
+  const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para controlar el Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState('');  // Almacena el mensaje a mostrar en el Snackbar
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [comment, setComment] = useState('');
+  const [likeDislike, setLikeDislike] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(null);  // Estado para la pregunta actual
+
+
+
+  const handleCommentIconClick = (event, question) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentQuestion(question);  // Guarda la referencia a la pregunta actual
+  };
+
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+      setLikeDislike(null);
+      setComment('');
+    };
+
+   // Esta función se llama cuando se presiona el botón de enviar en el menú de comentarios
+   const handleSendComment = async () => {
+     const dataToSend = {
+       question: currentQuestion,
+       comment: comment,
+       likeDislike: likeDislike
+     };
+
+     try {
+       const result = await fetch(`${API_BASE_URL}/api/comments`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(dataToSend)
+       });
+       if (result.ok) {
+         const response = await result.json();
+         console.log("Comentario enviado con éxito:", response.message);
+         setOpenSnackbar(true);  // Abre el Snackbar con el mensaje de confirmación
+         setSnackbarMessage(response.message);  // Configura el mensaje del Snackbar
+         handleCloseMenu();  // Cierra el menú de comentarios
+       } else {
+         console.error("Error al enviar el comentario:", result.statusText);
+       }
+     } catch (error) {
+       console.error("Error en la petición al backend:", error);
+     }
+   };
 
   // Fetch questionnaires from the backend
   useEffect(() => {
@@ -75,6 +136,43 @@ const Dashboard = () => {
     }
   };
 
+  const handleValidate = async (question) => {
+      console.log("Validating question:", question); // Verificar que la función se llama
+      const response = selectedAnswer[question.id] || "";  // Obtiene la respuesta guardada en el estado
+      console.log("Selected response:", response); // Ver qué respuesta se seleccionó
+      const newResponse = {
+        date: new Date().toISOString().split('T')[0],  // Fecha actual en formato 'YYYY-MM-DD'
+        response: response,
+        score: null,  // Aquí puedes incluir la lógica para calcular el puntaje si es necesario
+        feedback: ""  // Aquí puedes incluir la lógica para generar feedback automático si es necesario
+      };
+
+      // Agrega la nueva respuesta a las existentes
+      question.responses.push(newResponse);
+
+      // POST al backend
+      try {
+        const result = await fetch(`${API_BASE_URL}/api/evaluate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({question: question})  // Envía la pregunta como parte del cuerpo de la solicitud
+        });
+        const data = await result.json();
+        setOpenSnackbar(true);  // Abre el Snackbar cuando la respuesta es recibida
+        console.log("Mensaje del servidor:", data.message);
+      } catch (error) {
+        console.error("Error en la petición al backend:", error);
+      }
+    };
+
+  // Función para cerrar el Snackbar
+    const handleCloseSnackbar = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpenSnackbar(false);
+    };
+
   // Get the button style based on the status of the questionnaire
   const getButtonStyle = (status) => {
     let hoverColor = '#F0F0F0';  // Default hover color
@@ -98,7 +196,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', width: '100%' }}>
       <CssBaseline />
 
       {/* Logout icon at the top-right corner */}
@@ -187,18 +285,90 @@ const Dashboard = () => {
                 <Typography variant="h6" sx={{ mb: 1 }}>
                   {question.question}
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>Type:</strong> {question.type}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>Available Answers:</strong> {question.answers.join(', ')}
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  <strong>Valid Answer:</strong> {question.valid_answer || 'N/A'}
-                </Typography>
-                <Divider sx={{ mt: 2, mb: 2 }} />
+                {question.type === 'open' ? (
+                  <TextField
+                    label="Tu respuesta"
+                    variant="outlined"
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    onChange={(e) => setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value })}
+                  />
+                ) : (
+                  <FormControl component="fieldset" sx={{ mb: 2 }}>
+                    <FormLabel component="legend">Elige una respuesta</FormLabel>
+                    <RadioGroup
+                      onChange={(e) => setSelectedAnswer({ ...selectedAnswer, [question.id]: e.target.value })}
+                    >
+                      {question.answers.map((answer, idx) => (
+                        <FormControlLabel key={idx} value={answer} control={<Radio />} label={answer} />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                  <IconButton
+                    aria-label="validate"
+                    onClick={() => handleValidate(question)}
+                    disabled={!selectedAnswer[question.id]}
+                    sx={{
+                      color: selectedAnswer[question.id] ? green[500] : grey[400]
+                    }}
+                  >
+                    <CheckIcon />
+                  </IconButton>
+                  <IconButton onClick={(event) => handleCommentIconClick(event, question)}>
+                    <CommentIcon />
+                  </IconButton>
+                  {currentQuestion && currentQuestion.id === question.id && (
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={handleCloseMenu}
+                    >
+                      <MenuItem>
+                        <TextField
+                          fullWidth
+                          label="Escribe un comentario"
+                          variant="outlined"
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                        />
+                      </MenuItem>
+                      <MenuItem>
+                        <IconButton
+                          color={likeDislike === 'like' ? 'primary' : 'default'}
+                          onClick={() => setLikeDislike('like')}
+                        >
+                          <ThumbUpIcon />
+                        </IconButton>
+                        <IconButton
+                          color={likeDislike === 'dislike' ? 'primary' : 'default'}
+                          onClick={() => setLikeDislike('dislike')}
+                        >
+                          <ThumbDownIcon />
+                        </IconButton>
+                      </MenuItem>
+                      <MenuItem>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          endIcon={<SendIcon />}
+                          onClick={handleSendComment}
+                        >
+                          Enviar
+                        </Button>
+                      </MenuItem>
+                    </Menu>
+                  )}
+                </Box>
               </Box>
             ))}
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={6000}
+              onClose={handleCloseSnackbar}
+              message={snackbarMessage}
+            />
           </Box>
         ) : (
           <Typography variant="h6" sx={{ color: '#888' }}>

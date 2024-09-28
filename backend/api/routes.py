@@ -136,3 +136,17 @@ def create_questionnaire():
     except Exception as e:
         logging.error(f"Error general en la creación del cuestionario: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@api_blueprint.route('/evaluate', methods=['POST'])
+def evaluate():
+    # Aquí simplemente devolvemos una confirmación de que la solicitud ha sido recibida
+    return jsonify({"message": "Evaluación en proceso..."}), 200
+
+@api_blueprint.route('/comments', methods=['POST'])
+def handle_comments():
+    data = request.get_json()
+    print("Comentario recibido:", data)  # Imprime el comentario para fines de depuración
+    # Aquí puedes agregar código para procesar y almacenar el comentario en tu base de datos o sistema de archivos
+
+    # Devuelve un mensaje de confirmación
+    return jsonify({"message": "Tu comentario ha quedado registrado"}), 200
