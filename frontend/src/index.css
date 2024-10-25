@@ -1,7 +1,13 @@
 /* index.css */
-body {
+html, body, #root {
+  height: 100%; /* Establece la altura al 100% de la ventana del navegador */
   margin: 0;
   padding: 0;
+  overflow-y: auto; /* Permite el desplazamiento vertical si el contenido lo requiere */
+}
+
+
+body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
