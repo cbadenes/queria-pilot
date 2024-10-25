@@ -23,7 +23,7 @@ import logo from '../assets/images/queria-logo.png';  // Logo
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import axios from 'axios';
-
+import BuildIcon from '@mui/icons-material/Build';
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -191,11 +191,11 @@ const Dashboard = () => {
       case 'scheduled':
         return <ScheduleIcon />;
       case 'in_progress':
-        return <PlayCircleOutlineIcon />;
+        return <BuildIcon />;
       case 'completed':
         return <CheckCircleOutlineIcon />;
       default:
-        return <ScheduleIcon />;
+        return <HelpIcon />;
     }
   };
 
@@ -230,25 +230,30 @@ const Dashboard = () => {
 
   // Get the button style based on the status of the questionnaire
   const getButtonStyle = (status) => {
-    let hoverColor = '#F0F0F0';  // Default hover color
-    if (status === 'scheduled') hoverColor = '#ECEFF1';  // Light gray for scheduled
-    if (status === 'in_progress') hoverColor = '#E3F2FD';  // Light blue for in-progress
-    if (status === 'completed') hoverColor = '#E8F5E9';  // Light green for completed
-
-    return {
-      backgroundColor: '#FFFFFF',  // White background for all buttons
-      color: darkGrayColor,  // Dark text color
+    let buttonStyle = {
+      backgroundColor: '#FFFFFF', // Fondo blanco para todos los botones
+      color: darkGrayColor, // Color de texto oscuro
       textTransform: 'none',
       fontWeight: 'bold',
-      borderRadius: '8px',  // Rounded corners for a softer look
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',  // Light shadow for a floating effect
+      borderRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
       transition: 'all 0.3s ease',
       '&:hover': {
-        backgroundColor: hoverColor,  // Change background color on hover based on status
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',  // Stronger shadow on hover
+        backgroundColor: '#F0F0F0', // Gris claro para el hover
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
       }
     };
+
+    if (status === 'in_progress') {
+      buttonStyle.backgroundColor = '#e0e0e0'; // Gris para in_progress
+      buttonStyle.color = '#a0a0a0'; // Texto en gris para in_progress
+      buttonStyle.pointerEvents = 'none'; // Deshabilita la interacción
+      buttonStyle.opacity = 0.5; // Semi-transparencia
+    }
+
+    return buttonStyle;
   };
+
 
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
@@ -298,9 +303,9 @@ const Dashboard = () => {
               <Button
                 fullWidth
                 onClick={() => handleQuestionnaireClick(questionnaire.id)}
-                sx={getButtonStyle(questionnaire.status)}  // Apply refined button styles
-                startIcon={renderIcon(questionnaire.status)}  // Icon for each status
-                style={{ justifyContent: 'flex-start' }}  // Justify icon to the left
+                sx={getButtonStyle(questionnaire.status)} // Aplica estilos refinados
+                startIcon={renderIcon(questionnaire.status)} // Icono para cada estado
+                style={{ justifyContent: 'flex-start' }} // Justifica el icono a la izquierda
               >
                 {questionnaire.name}
               </Button>
