@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MuiAlert from '@mui/material/Alert';  // Componente para mostrar alertas
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ImportExportIcon from '@mui/icons-material/ImportExport'; // Icono para exportar a Moodle
 import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, MenuItem, TextFields, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -21,6 +22,8 @@ import API_BASE_URL from './config';  // Base URL for API requests
 import logo from '../assets/images/queria-logo.png';  // Logo
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import axios from 'axios';
+
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -35,6 +38,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [questionnaires, setQuestionnaires] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);  // Store the list of questions for the selected questionnaire
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState({});  // Almacena las respuestas seleccionadas por el usuario
   const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para controlar el Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState('');  // Almacena el mensaje a mostrar en el Snackbar
@@ -45,7 +49,10 @@ const Dashboard = () => {
   const [evaluationResult, setEvaluationResult] = useState({});
 
 
-
+  // Función para seleccionar un cuestionario
+  const selectQuestionnaire = (id) => {
+   setSelectedQuestionnaireId(id);
+  };
 
   const handleCommentIconClick = (event, question) => {
     setAnchorEl(event.currentTarget);
@@ -121,6 +128,7 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setSelectedQuestions(data);  // Store the list of questions
+        setSelectedQuestionnaireId(`${id}`);
       } else {
         console.error('Failed to fetch questionnaire details:', response.statusText);
       }
@@ -160,7 +168,22 @@ const Dashboard = () => {
   };
 
 
-
+  const exportToMoodleXML = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/export/moodle`, { questionnaireId: selectedQuestionnaireId });
+      const xmlData = response.data; // Suponiendo que el backend responde con el XML en el cuerpo de la respuesta
+      const blob = new Blob([xmlData], { type: 'application/xml' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', 'cuestionario_moodle.xml'); // Nombre del archivo XML
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Error exporting to Moodle XML:', error);
+    }
+  };
 
   // Function to render the icon based on the status of the questionnaire
   const renderIcon = (status) => {
@@ -400,13 +423,12 @@ const Dashboard = () => {
               </Box>
             ))}
             {/* Icono para exportar a PDF, colocado a la derecha */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                <IconButton
-                  id="pdfIcon"
-                  onClick={exportPDF}
-                  sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}
-                >
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '80%', mt: 2 }}>
+                <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
                   <PictureAsPdfIcon />
+                </IconButton>
+                <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' } }}>
+                  <ImportExportIcon />
                 </IconButton>
               </Box>
             <Snackbar

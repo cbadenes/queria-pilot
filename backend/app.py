@@ -9,7 +9,8 @@ def create_app():
     app.config.from_object('instance.config.Config')
     app.config['JWT_SECRET_KEY'] = 'super-secret'  # Cambia esto por una clave real en producción
 
-    CORS(app)  # Enable CORS
+    # Aplica CORS a todas las rutas
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
     JWTManager(app)  # Inicializa JWT
 
     with app.app_context():

@@ -63,6 +63,7 @@ Sigue los pasos a continuación para configurar el entorno de desarrollo y ejecu
     npm install @mui/material @emotion/react @emotion/styled
     npm install cors
     npm install jspdf html2canvas
+    npm install axios
 
 
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Flask, Blueprint, request, jsonify, make_response
 from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
 import os
@@ -8,12 +8,15 @@ import bcrypt
 import uuid
 import logging  # Añadir logs para ayudar en la depuración
 import json
+import dicttoxml
 
 api_blueprint = Blueprint('api', __name__)
 
 # Configurar logging para depuración
 logging.basicConfig(level=logging.DEBUG)
 
+# CORS
+headers = {'Access-Control-Allow-Origin': '*'}
 
 # Simulación de datos de cuestionarios
 with open('api/questionnaires.json', 'r', encoding='utf-8') as file:
@@ -35,35 +38,42 @@ def login():
         if bcrypt.checkpw(password_encoded, hashed_password):
             print("Login successful for:", user['email'])
             access_token = create_access_token(identity=user['email'])
-            return jsonify(access_token=access_token), 200
+            return jsonify(access_token=access_token), 200, headers
         else:
             print("Invalid password for:", user['email'])
     else:
-        return jsonify({"message": "User not found"}), 401
+        return jsonify({"message": "User not found"}), 401, headers
 
 @api_blueprint.route('/questionnaires', methods=['GET'])
 def get_questionnaires():
     email = request.args.get('email')  # Obtener el email del parámetro de la consulta
     if not email:
-        return jsonify({"error": "Email is required"}), 400
+        return jsonify({"error": "Email is required"}), 400, headers
 
     # Filtrar cuestionarios basándose en el email
     filtered_questionnaires = [q for q in questionnaires if q['email'] == email]
 
     # Devolver los cuestionarios filtrados
-    return jsonify({"questionnaires": filtered_questionnaires}), 200
+    return jsonify({"questionnaires": filtered_questionnaires}), 200, headers
+
+
+def getQuestionnaire(id):
+    # Filtrar cuestionarios basándose en el email
+    filtered_questions = [q for q in questions if q['qid'] == int(id)]
+    if filtered_questions:
+        return filtered_questions
+    else:
+        return []
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
 def get_questionnaire_details(id):
-
     # Filtrar cuestionarios basándose en el email
-    filtered_questions = [q for q in questions if q['qid'] == int(id)]
-    print("Questions:", questions)
-    print("Filtered Questions: ", filtered_questions)
-    if filtered_questions:
-        return jsonify(filtered_questions), 200
+    questionnaire_questions = getQuestionnaire(id)
+    print("Questionnaire: ", questionnaire_questions)
+    if len(questionnaire_questions)>1:
+        return jsonify(questionnaire_questions), 200, headers
     else:
-        return jsonify({"error": "Questionnaire not found"}), 404
+        return jsonify({"error": "Questionnaire not found"}), 404, headers
 
 @api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
@@ -71,12 +81,12 @@ def create_questionnaire():
         # Verificar si el archivo PDF fue enviado
         if 'pdf' not in request.files:
             logging.error("No PDF file provided")
-            return jsonify({"error": "No PDF file provided"}), 400
+            return jsonify({"error": "No PDF file provided"}), 400, headers
 
         pdf_file = request.files['pdf']
         if pdf_file.filename == '':
             logging.error("No selected file")
-            return jsonify({"error": "No selected file"}), 400
+            return jsonify({"error": "No selected file"}), 400, headers
 
         # Guardar el archivo PDF en una ubicación temporal
         filename = secure_filename(pdf_file.filename)
@@ -96,7 +106,7 @@ def create_questionnaire():
         # Verificar que todos los campos sean válidos
         if not all([num_questions, difficulty, percentage_free_response, questionnaire_name, user_email]):
             logging.error("Faltan datos en la solicitud")
-            return jsonify({"error": "Missing form data"}), 400
+            return jsonify({"error": "Missing form data"}), 400, headers
 
         # Generar un identificador único para el cuestionario
         questionnaire_id = str(uuid.uuid4())
@@ -127,20 +137,20 @@ def create_questionnaire():
                 "id": questionnaire_id,
                 "name": questionnaire_name,
                 "status": "en_construccion"  # Estado inicial
-            }), 200
+            }), 200, headers
 
         except Exception as e:
             logging.error(f"Error procesando el archivo PDF: {str(e)}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 500, headers
 
     except Exception as e:
         logging.error(f"Error general en la creación del cuestionario: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/evaluate', methods=['POST'])
 def evaluate():
     # Aquí simplemente devolvemos una confirmación de que la solicitud ha sido recibida
-    return jsonify({"message": "Evaluación en proceso..."}), 200
+    return jsonify({"message": "Evaluación en proceso..."}), 200, headers
 
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():
@@ -149,4 +159,20 @@ def handle_comments():
     # Aquí puedes agregar código para procesar y almacenar el comentario en tu base de datos o sistema de archivos
 
     # Devuelve un mensaje de confirmación
-    return jsonify({"message": "Tu comentario ha quedado registrado"}), 200
+    return jsonify({"message": "Tu comentario ha quedado registrado"}), 200, headers
+
+@api_blueprint.route('/export/moodle', methods=['POST'])
+def export_moodle():
+    data = request.json
+    questionnaire_id = data.get('questionnaireId')
+    questionnaire = getQuestionnaire(str(questionnaire_id))
+    # Buscar el cuestionario y sus preguntas
+    # Supongamos que questionnaire_data es un dict que contiene los datos
+    print("Questionnaire Info:", questionnaire)
+    xml = dicttoxml.dicttoxml(questionnaire)
+    print("Xml: ", xml)
+    response = make_response(xml)
+    print("Response: ", response)
+    response.headers['Content-Type'] = 'application/xml'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response

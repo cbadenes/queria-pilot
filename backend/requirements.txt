@@ -6,3 +6,4 @@ PyPDF2==3.0.1
 python-dotenv==0.19.2
 flask-jwt-extended==4.3.1
 bcrypt==3.2.0
+dicttoxml==1.7.16
