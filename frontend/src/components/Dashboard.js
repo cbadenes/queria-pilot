@@ -423,7 +423,7 @@ const Dashboard = () => {
               </Box>
             ))}
             {/* Icono para exportar a PDF, colocado a la derecha */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '80%', mt: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
                   <PictureAsPdfIcon />
                 </IconButton>
