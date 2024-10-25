@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MuiAlert from '@mui/material/Alert';  // Componente para mostrar alertas
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, MenuItem, TextFields, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -18,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { green, grey } from '@mui/material/colors';  // Importa los colores
 import API_BASE_URL from './config';  // Base URL for API requests
 import logo from '../assets/images/queria-logo.png';  // Logo
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -125,6 +128,39 @@ const Dashboard = () => {
       console.error('Error fetching questionnaire details:', error);
     }
   };
+
+  const exportPDF = async () => {
+    const input = document.getElementById("questionsContainer");
+    const pdfIcon = document.getElementById("pdfIcon");
+
+    // Guardar el estilo actual del icono
+    const originalDisplay = pdfIcon.style.display;
+
+    // Aplica estilos temporales para la exportación
+    pdfIcon.style.display = 'none';  // Ocultar el icono durante la captura
+
+    const canvas = await html2canvas(input, {
+      backgroundColor: null,  // Asegúrate de que html2canvas no use un fondo por defecto
+      logging: true,
+      scale: 2,  // Aumenta la escala para mejorar la calidad de la imagen
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save("cuestionario.pdf");
+
+    // Restaurar el estilo original del icono
+    pdfIcon.style.display = originalDisplay;
+  };
+
+
+
 
   // Function to render the icon based on the status of the questionnaire
   const renderIcon = (status) => {
@@ -272,7 +308,7 @@ const Dashboard = () => {
         }}
       >
         {selectedQuestions.length > 0 ? (
-          <Box sx={{ p: 4, width: '80%', textAlign: 'left', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)' }}>
+          <Box id="questionsContainer" sx={{ p: 4, width: '80%', textAlign: 'left', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
               Preguntas del Cuestionario
             </Typography>
@@ -363,6 +399,16 @@ const Dashboard = () => {
                 </Box>
               </Box>
             ))}
+            {/* Icono para exportar a PDF, colocado a la derecha */}
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                <IconButton
+                  id="pdfIcon"
+                  onClick={exportPDF}
+                  sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}
+                >
+                  <PictureAsPdfIcon />
+                </IconButton>
+              </Box>
             <Snackbar
               open={openSnackbar}
               autoHideDuration={6000}
