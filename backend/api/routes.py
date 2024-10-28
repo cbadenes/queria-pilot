@@ -158,11 +158,9 @@ def handle_comments():
 def export_moodle():
     data = request.json
     questionnaire_id = data.get('questionnaireId')
-    questionnaire = getQuestionnaire(str(questionnaire_id))
-    # Buscar el cuestionario y sus preguntas
-    # Supongamos que questionnaire_data es un dict que contiene los datos
-    print("Questionnaire Info:", questionnaire)
-    xml = dicttoxml.dicttoxml(questionnaire)
+    questions = Question.get_questions(questionnaire_id)
+    print("Questionnaire Info:", questions)
+    xml = dicttoxml.dicttoxml(questions)
     print("Xml: ", xml)
     response = make_response(xml)
     print("Response: ", response)
