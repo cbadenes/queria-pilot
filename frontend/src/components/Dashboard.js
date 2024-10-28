@@ -134,6 +134,8 @@ const Dashboard = () => {
 
   // Fetch questionnaires from the backend
   useEffect(() => {
+    let intervalId;
+
     const fetchQuestionnaires = async () => {
       const userEmail = localStorage.getItem('userEmail'); // Asume que el email está almacenado en localStorage
       try {
@@ -141,6 +143,17 @@ const Dashboard = () => {
         if (response.ok) {
           const data = await response.json();
           setQuestionnaires(data.questionnaires);
+          // Verificar si hay cuestionarios en 'in_progress' para decidir si seguir con el intervalo
+          if (data.questionnaires.some(q => q.status === 'scheduled')) {
+            if (!intervalId) {
+              intervalId = setInterval(fetchQuestionnaires, 2000);
+            }
+          } else {
+            if (intervalId) {
+              clearInterval(intervalId);
+              intervalId = null;
+            }
+          }
         } else {
           console.error('Failed to fetch questionnaires:', response.statusText);
         }
@@ -149,8 +162,15 @@ const Dashboard = () => {
       }
     };
 
-    fetchQuestionnaires();
-  }, []);
+    fetchQuestionnaires(); // Llamar inicialmente al cargar el componente
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); // Asegurarse de limpiar el intervalo cuando el componente se desmonte
+      }
+    };
+  }, []);  // Dependencias vacías para que se ejecute solo una vez al montar el componente
+
 
   // Disable scrolling on page
   useEffect(() => {
