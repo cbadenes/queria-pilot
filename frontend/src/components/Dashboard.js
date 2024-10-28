@@ -52,7 +52,11 @@ const Dashboard = () => {
   const [evaluationResult, setEvaluationResult] = useState({});
   const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
   const [textRating, setTextRating] = useState('');
-  const [rating, setRating] = useState({});
+  const [rating, setRating] = useState({
+    writing: 2,  // Valor inicial definido
+    difficulty: 2,  // Valor inicial definido
+    relevance: 2  // Valor inicial definido
+  });
   const [ratingSubmitted, setRatingSubmitted] = useState({});
 
 
@@ -173,34 +177,37 @@ const Dashboard = () => {
   };
 
   const exportPDF = async () => {
-    const input = document.getElementById("questionsContainer");
-    const pdfIcon = document.getElementById("pdfIcon");
+      const input = document.getElementById("questionsContainer");
+      const iconsContainer = document.getElementById("iconsContainer");
 
-    // Guardar el estilo actual del icono
-    const originalDisplay = pdfIcon.style.display;
+      if (!input || !iconsContainer) {
+          console.error("Elementos necesarios no están disponibles.");
+          return;
+      }
 
-    // Aplica estilos temporales para la exportación
-    pdfIcon.style.display = 'none';  // Ocultar el icono durante la captura
+      // Guardar el estilo actual del contenedor y ocultarlo
+      const originalDisplay = iconsContainer.style.display;
+      iconsContainer.style.display = 'none';
 
-    const canvas = await html2canvas(input, {
-      backgroundColor: null,  // Asegúrate de que html2canvas no use un fondo por defecto
-      logging: true,
-      scale: 2,  // Aumenta la escala para mejorar la calidad de la imagen
-    });
+      const canvas = await html2canvas(input, {
+          backgroundColor: null,
+          scale: 2
+      });
 
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
-    });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'px',
+          format: [canvas.width, canvas.height]
+      });
 
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-    pdf.save("cuestionario.pdf");
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save("cuestionario.pdf");
 
-    // Restaurar el estilo original del icono
-    pdfIcon.style.display = originalDisplay;
+      // Restaurar el estilo original del contenedor de íconos
+      iconsContainer.style.display = originalDisplay;
   };
+
 
 
   const exportToMoodleXML = async () => {
@@ -471,7 +478,7 @@ const Dashboard = () => {
                     <Typography component="div" gutterBottom>
                       Redacción:
                       <Slider
-                        value={rating.writing}
+                        value={rating.writing || 2}
                         onChange={(event, newValue) => setRating({...rating, writing: newValue})}
                         aria-labelledby="writing-slider"
                         valueLabelDisplay="auto"
@@ -487,7 +494,7 @@ const Dashboard = () => {
                     <Typography component="div" gutterBottom>
                       Dificultad:
                       <Slider
-                        value={rating.difficulty}
+                        value={rating.difficulty || 2}
                         onChange={(event, newValue) => setRating({...rating, difficulty: newValue})}
                         aria-labelledby="difficulty-slider"
                         valueLabelDisplay="auto"
@@ -503,7 +510,7 @@ const Dashboard = () => {
                     <Typography component="div" gutterBottom>
                       Relevancia:
                       <Slider
-                        value={rating.relevance}
+                        value={rating.relevance ||2}
                         onChange={(event, newValue) => setRating({...rating, relevance: newValue})}
                         aria-labelledby="relevance-slider"
                         valueLabelDisplay="auto"
@@ -544,13 +551,13 @@ const Dashboard = () => {
               </Box>
             ))}
             {/* Icono para exportar a PDF, colocado a la derecha */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
-                <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
-                  <PictureAsPdfIcon />
-                </IconButton>
-                <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' } }}>
-                  <ImportExportIcon />
-                </IconButton>
+              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
+                  <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
+                      <PictureAsPdfIcon />
+                  </IconButton>
+                  <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' } }}>
+                      <ImportExportIcon />
+                  </IconButton>
               </Box>
             <Snackbar
               open={openSnackbar}
