@@ -11,10 +11,11 @@ def create_app():
 
     # Aplica CORS a todas las rutas
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-    JWTManager(app)  # Inicializa JWT
+
+    JWTManager(app)
 
     with app.app_context():
-        mongo_db.init_app()  # Inicializa MongoDB dentro del contexto de la aplicación
+        mongo_db.init_app()
 
     app.register_blueprint(api_blueprint, url_prefix='/api')
 

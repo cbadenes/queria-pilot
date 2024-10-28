@@ -32,3 +32,24 @@ class User:
             return None
         # Si no existe, crea un nuevo usuario
         return mongo_db.db.users.insert_one(user_data)
+
+class Questionnaire:
+
+    @staticmethod
+    def get_questionnaires(email):
+        # Buscar cuestionarios por email
+        res = list(mongo_db.db.questionnaires.find({"email": email}, {'_id': 0}))
+        return res
+
+    @staticmethod
+    def get_questionnaire(email, id):
+        # Buscar cuestionarios por email
+        return list(mongo_db.db.questionnaires.find({"email": email, "id":id}, {'_id': 0}))
+
+class Question:
+
+    @staticmethod
+    def get_questions(qid):
+        # Buscar preguntas por cuestionario y email
+        res = list(mongo_db.db.questions.find({"qid":qid}, {'_id': 0}))
+        return res

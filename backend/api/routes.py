@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
 import os
 from .utils import extract_questions
-from .models import User
+from .models import User, Questionnaire, Question
 import bcrypt
 import uuid
 import logging  # Añadir logs para ayudar en la depuración
@@ -18,13 +18,12 @@ logging.basicConfig(level=logging.DEBUG)
 # CORS
 headers = {'Access-Control-Allow-Origin': '*'}
 
-
 @api_blueprint.route('/login', methods=['POST'])
 def login():
     print("login input")
     user_data = request.get_json()
     user = User.find_user_by_email(user_data['email'])
-    # Asegúrate de que 'user' es un diccionario y accede a 'password_hash' como una clave
+
     if user and 'password' in user:
         password_encoded = user_data['password'].encode('utf-8')
         hashed_password = user['password'].encode('utf-8')
@@ -43,35 +42,19 @@ def get_questionnaires():
     email = request.args.get('email')  # Obtener el email del parámetro de la consulta
     if not email:
         return jsonify({"error": "Email is required"}), 400, headers
-    # Simulación de datos de cuestionarios
-    with open('api/questionnaires.json', 'r', encoding='utf-8') as file:
-        questionnaires = json.load(file)
 
-    # Filtrar cuestionarios basándose en el email
-    filtered_questionnaires = [q for q in questionnaires if q['email'] == email]
+    questionnaires = Questionnaire.get_questionnaires(email)
 
-    # Devolver los cuestionarios filtrados
-    return jsonify({"questionnaires": filtered_questionnaires}), 200, headers
-
-
-def getQuestionnaire(id):
-    # Filtrar cuestionarios basándose en el email
-    with open('api/questions.json', 'r', encoding='utf-8') as file:
-        questions = json.load(file)
-
-    filtered_questions = [q for q in questions if int(q['qid']) == int(id)]
-    if filtered_questions:
-        return filtered_questions
+    if (len(questionnaires)>0):
+        return jsonify({"questionnaires": questionnaires}), 200, headers
     else:
-        return []
+        return jsonify({"questionnaires": []}), 200, headers
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
-def get_questionnaire_details(id):
-    # Filtrar cuestionarios basándose en el email
-    questionnaire_questions = getQuestionnaire(id)
-    print("Questionnaire: ", questionnaire_questions)
-    if len(questionnaire_questions)>0:
-        return jsonify(questionnaire_questions), 200, headers
+def get_questions(id):
+    questions = Question.get_questions(id)
+    if len(questions)>0:
+        return jsonify(questions), 200, headers
     else:
         return jsonify({"error": "Questionnaire not found"}), 404, headers
 
