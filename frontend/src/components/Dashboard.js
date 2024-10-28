@@ -27,6 +27,8 @@ import BuildIcon from '@mui/icons-material/Build';
 import EditIcon from '@mui/icons-material/Edit';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Slider } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -58,7 +60,16 @@ const Dashboard = () => {
     relevance: 2  // Valor inicial definido
   });
   const [ratingSubmitted, setRatingSubmitted] = useState({});
+  const [allValidated, setAllValidated] = useState(false);
 
+
+  useEffect(() => {
+    const allValid = selectedQuestions.every(question => {
+      const result = evaluationResult[question.id];
+      return result && (result.correct === true || result.correct === false);
+    });
+    setAllValidated(allValid);
+  }, [selectedQuestions, evaluationResult]);
 
 
    const handleOpenRatingMenu = (event, question) => {
@@ -261,26 +272,88 @@ const Dashboard = () => {
     }
   };
 
-  const handleValidate = (question) => {
-    if (question.type === 'multi') {
-      const selected = selectedAnswer[question.id];
-      if (selected === question.valid_answer) {
-        setEvaluationResult({
-          ...evaluationResult,
-          [question.id]: { correct: true, color: 'green' }
-        });
-        setSnackbarMessage('Respuesta correcta!');
+  const handleSubmitResults = async () => {
+    const payload = {
+      questionnaireId: selectedQuestionnaireId,
+      answers: selectedAnswer
+    };
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/results`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSnackbarMessage(data.message);
         setOpenSnackbar(true);
+        // Actualizar el estado en el frontend si es necesario
+        const updatedQuestionnaires = questionnaires.map(q =>
+          q.id === selectedQuestionnaireId ? { ...q, status: 'completed' } : q
+        );
+        setQuestionnaires(updatedQuestionnaires);
       } else {
-        setEvaluationResult({
-          ...evaluationResult,
-          [question.id]: { correct: false, color: 'red' }
-        });
-        setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
-        setOpenSnackbar(true);
+        console.error("Error al enviar los resultados:", response.statusText);
       }
+    } catch (error) {
+      console.error("Error en la petición al backend:", error);
     }
   };
+
+
+  const handleValidate = async (question) => {
+      const selected = selectedAnswer[question.id];
+
+      if (question.type === 'multi') {
+        if (selected === question.valid_answer) {
+          setEvaluationResult({
+            ...evaluationResult,
+            [question.id]: { correct: true, color: 'green' }
+          });
+          setSnackbarMessage('Respuesta correcta!');
+          setOpenSnackbar(true);
+        } else {
+          setEvaluationResult({
+            ...evaluationResult,
+            [question.id]: { correct: false, color: 'red' }
+          });
+          setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
+          setOpenSnackbar(true);
+        }
+      } else if (question.type === 'open') {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              questionId: question.id,
+              context: question.context,
+              response: selected
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const resultColor = data.score > 50 ? 'green' : 'red';
+            setEvaluationResult({
+              ...evaluationResult,
+              [question.id]: { correct: data.score > 50, color: resultColor }
+            });
+            setSnackbarMessage(`Respuesta ${resultColor === 'green' ? 'correcta' : 'incorrecta'}. Puntuación: ${data.score}`);
+            setOpenSnackbar(true);
+          } else {
+            console.error('Error al validar la respuesta:', response.statusText);
+            setSnackbarMessage('Error al validar la respuesta.');
+            setOpenSnackbar(true);
+          }
+        } catch (error) {
+          console.error('Error en la petición al backend:', error);
+          setSnackbarMessage('Error en la comunicación con el servidor.');
+          setOpenSnackbar(true);
+        }
+      }
+  };
+
 
   // Función para cerrar el Snackbar
     const handleCloseSnackbar = (event, reason) => {
@@ -571,13 +644,28 @@ const Dashboard = () => {
               </Box>
             ))}
             {/* Icono para exportar a PDF, colocado a la derecha */}
-              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
+              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+                <IconButton
+                  onClick={handleSubmitResults}
+                  disabled={!allValidated}
+                  sx={{
+                    color: allValidated ? orangeColor : grey[500],
+                    '&:hover': {
+                      backgroundColor: allValidated ? '#e6b28e' : 'inherit'
+                    },
+                    ml: 2
+                  }}
+                >
+                  <PublishedWithChangesIcon fontSize="large" />
+                </IconButton>
+                <Box>
                   <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
-                      <PictureAsPdfIcon />
+                    <PictureAsPdfIcon />
                   </IconButton>
                   <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' } }}>
-                      <ImportExportIcon />
+                    <ImportExportIcon />
                   </IconButton>
+                </Box>
               </Box>
             <Snackbar
               open={openSnackbar}

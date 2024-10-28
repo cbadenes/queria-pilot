@@ -149,8 +149,18 @@ def create_questionnaire():
 
 @api_blueprint.route('/evaluate', methods=['POST'])
 def evaluate():
-    # Aquí simplemente devolvemos una confirmación de que la solicitud ha sido recibida
-    return jsonify({"message": "Evaluación en proceso..."}), 200, headers
+    # Se reciben los datos de la pregunta y respuesta del frontend
+    data = request.json
+    question_id = data.get('questionId')
+    user_response = data.get('response')
+    context = data.get('context')
+
+    # lógica de evaluación de la respuesta
+    score = 75  # Este valor es un ejemplo
+    explanation = "Bien hecho, tu respuesta es parcialmente correcta."
+
+    # Devolver puntuación y explicación como respuesta
+    return jsonify({"score": score, "explanation": explanation, "message": "Evaluación completada."}), 200, headers
 
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():
@@ -176,3 +186,35 @@ def export_moodle():
     response.headers['Content-Type'] = 'application/xml'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+@api_blueprint.route('/results', methods=['POST'])
+def evaluate_results():
+    data = request.get_json()
+    questionnaire_id = data.get('questionnaireId')
+    answers = data.get('answers')
+    # cambiar estado de cuestionario a "completed"
+    print("QuestionnaireID: ",questionnaire_id )
+    print("Answers:", answers)
+
+
+    # Lógica para evaluar las respuestas
+    # Por ejemplo, comprobar respuestas correctas y calcular una puntuación
+    correct_answers = {
+        'question1': 'respuesta1',
+        'question2': 'respuesta2',
+        # Asumir que 'correct_answers' contiene las respuestas correctas de cada pregunta
+    }
+
+    score = 0
+    total_questions = len(answers)
+    for question_id, user_answer in answers.items():
+        if user_answer == correct_answers.get(question_id):
+            score += 1
+
+    result_score = (score / total_questions) * 100  # Calcular la puntuación como un porcentaje
+
+    # Devolver el resultado de la evaluación
+    if result_score > 50:
+        return jsonify({"message": "¡Buen trabajo! Has aprobado el cuestionario.", "score": result_score}), 200
+    else:
+        return jsonify({"message": "Necesitas mejorar. Intenta nuevamente el cuestionario.", "score": result_score}), 200
