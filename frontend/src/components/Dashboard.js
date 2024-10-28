@@ -53,6 +53,8 @@ const Dashboard = () => {
   const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
   const [textRating, setTextRating] = useState('');
   const [rating, setRating] = useState({});
+  const [ratingSubmitted, setRatingSubmitted] = useState({});
+
 
 
    const handleOpenRatingMenu = (event, question) => {
@@ -280,6 +282,7 @@ const Dashboard = () => {
           const data = await response.json();
           setSnackbarMessage(data.message);
           setOpenSnackbar(true);
+          setRatingSubmitted(prev => ({...prev, [currentQuestion.id]: true}));  // Marca como enviada para esta pregunta específica
         } else {
           console.error("Error al enviar la valoración:", response.statusText);
         }
@@ -445,9 +448,12 @@ const Dashboard = () => {
                   >
                     <CheckIcon />
                   </IconButton>
-                  <IconButton onClick={(event) => handleOpenRatingMenu(event, question)}>
-                    <RateReviewIcon />
-                  </IconButton>
+                 <IconButton
+                   onClick={(event) => handleOpenRatingMenu(event, question)}
+                   sx={{ color: ratingSubmitted[question.id] ? orangeColor : 'default' }}  // Utiliza el ID de la pregunta para verificar si ha sido valorada
+                 >
+                   <RateReviewIcon />
+                 </IconButton>
                   <Menu
                     anchorEl={ratingMenuAnchorEl}
                     open={Boolean(ratingMenuAnchorEl)}
