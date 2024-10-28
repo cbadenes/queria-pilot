@@ -25,7 +25,8 @@ import html2canvas from "html2canvas";
 import axios from 'axios';
 import BuildIcon from '@mui/icons-material/Build';
 import EditIcon from '@mui/icons-material/Edit';
-
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import { Slider } from '@mui/material';
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -49,6 +50,36 @@ const Dashboard = () => {
   const [likeDislike, setLikeDislike] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);  // Estado para la pregunta actual
   const [evaluationResult, setEvaluationResult] = useState({});
+  const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
+  const [textRating, setTextRating] = useState('');
+  const [rating, setRating] = useState({});
+
+
+   const handleOpenRatingMenu = (event, question) => {
+    setRatingMenuAnchorEl(event.currentTarget);
+    setCurrentQuestion(question);  // Establece la pregunta actual al abrir el menú
+  };
+
+  const handleCloseRatingMenu = () => {
+    setRatingMenuAnchorEl(null);
+    setTextRating('');
+  };
+
+  const QuestionRating = ({ onRatingChange }) => {
+    const [writingQuality, setWritingQuality] = useState(3);
+    const [difficultyAccuracy, setDifficultyAccuracy] = useState(false);
+    const [overallQuality, setOverallQuality] = useState(3);
+
+    useEffect(() => {
+      onRatingChange({
+        writingQuality,
+        difficultyAccuracy,
+        overallQuality
+      });
+    }, [writingQuality, difficultyAccuracy, overallQuality, onRatingChange]);
+
+    // Resto del componente
+  };
 
 
   // Función para seleccionar un cuestionario
@@ -230,6 +261,38 @@ const Dashboard = () => {
       setOpenSnackbar(false);
     };
 
+
+    const handleRatingSubmit = async () => {
+      const payload = {
+        id: currentQuestion.id,  // Asegúrate de tener acceso a currentQuestion.id
+        qid: selectedQuestionnaireId,  // Asegúrate de tener acceso a selectedQuestionnaireId
+        ratings: rating,  // Los valores del Slider
+        comment: textRating  // El comentario adicional del usuario
+      };
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setSnackbarMessage(data.message);
+          setOpenSnackbar(true);
+        } else {
+          console.error("Error al enviar la valoración:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error en la petición al backend:", error);
+      }
+
+      handleCloseRatingMenu();  // Cierra el menú emergente
+    };
+
+
+
+
   // Get the button style based on the status of the questionnaire
   const getButtonStyle = (status) => {
     let buttonStyle = {
@@ -382,50 +445,95 @@ const Dashboard = () => {
                   >
                     <CheckIcon />
                   </IconButton>
-                  <IconButton onClick={(event) => handleCommentIconClick(event, question)}>
-                    <CommentIcon />
+                  <IconButton onClick={(event) => handleOpenRatingMenu(event, question)}>
+                    <RateReviewIcon />
                   </IconButton>
-                  {currentQuestion && currentQuestion.id === question.id && (
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleCloseMenu}
+                  <Menu
+                    anchorEl={ratingMenuAnchorEl}
+                    open={Boolean(ratingMenuAnchorEl)}
+                    onClose={handleCloseRatingMenu}
+                    PaperProps={{
+                      style: {
+                        padding: '20px',
+                        width: '300px'
+                      }
+                    }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      Valorar Pregunta
+                    </Typography>
+                    <Typography component="div" gutterBottom>
+                      Redacción:
+                      <Slider
+                        value={rating.writing}
+                        onChange={(event, newValue) => setRating({...rating, writing: newValue})}
+                        aria-labelledby="writing-slider"
+                        valueLabelDisplay="auto"
+                        step={1}
+                        marks
+                        min={1}
+                        max={3}
+                        sx={{
+                            color: orangeColor, // Utiliza el color anaranjado de tu tema
+                          }}
+                      />
+                    </Typography>
+                    <Typography component="div" gutterBottom>
+                      Dificultad:
+                      <Slider
+                        value={rating.difficulty}
+                        onChange={(event, newValue) => setRating({...rating, difficulty: newValue})}
+                        aria-labelledby="difficulty-slider"
+                        valueLabelDisplay="auto"
+                        step={1}
+                        marks
+                        min={1}
+                        max={3}
+                        sx={{
+                            color: orangeColor, // Utiliza el color anaranjado de tu tema
+                          }}
+                      />
+                    </Typography>
+                    <Typography component="div" gutterBottom>
+                      Relevancia:
+                      <Slider
+                        value={rating.relevance}
+                        onChange={(event, newValue) => setRating({...rating, relevance: newValue})}
+                        aria-labelledby="relevance-slider"
+                        valueLabelDisplay="auto"
+                        step={1}
+                        marks
+                        min={1}
+                        max={3}
+                        sx={{
+                            color: orangeColor, // Utiliza el color anaranjado de tu tema
+                          }}
+                      />
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      label="Comentarios adicionales"
+                      variant="outlined"
+                      multiline
+                      rows={3}
+                      value={textRating}
+                      onChange={(e) => setTextRating(e.target.value)}
+                      sx={{ mt: 2 }}
+                    />
+                    <IconButton
+                      onClick={handleRatingSubmit}
+                      sx={{
+                        color: 'primary',
+                        backgroundColor: orangeColor, // Asume que orangeColor es el color de tus otros botones
+                        '&:hover': {
+                          backgroundColor: '#e6b28e', // Un color más claro en hover
+                        },
+                        mt: 2
+                      }}
                     >
-                      <MenuItem>
-                        <TextField
-                          fullWidth
-                          label="Escribe un comentario"
-                          variant="outlined"
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                        />
-                      </MenuItem>
-                      <MenuItem>
-                        <IconButton
-                          color={likeDislike === 'like' ? 'primary' : 'default'}
-                          onClick={() => setLikeDislike('like')}
-                        >
-                          <ThumbUpIcon />
-                        </IconButton>
-                        <IconButton
-                          color={likeDislike === 'dislike' ? 'primary' : 'default'}
-                          onClick={() => setLikeDislike('dislike')}
-                        >
-                          <ThumbDownIcon />
-                        </IconButton>
-                      </MenuItem>
-                      <MenuItem>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          endIcon={<SendIcon />}
-                          onClick={handleSendComment}
-                        >
-                          Enviar
-                        </Button>
-                      </MenuItem>
-                    </Menu>
-                  )}
+                      <SendIcon />
+                    </IconButton>
+                  </Menu>
                 </Box>
               </Box>
             ))}
