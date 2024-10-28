@@ -59,7 +59,7 @@ def get_questionnaires():
 
 def getQuestionnaire(id):
     # Filtrar cuestionarios basándose en el email
-    filtered_questions = [q for q in questions if q['qid'] == int(id)]
+    filtered_questions = [q for q in questions if int(q['qid']) == int(id)]
     if filtered_questions:
         return filtered_questions
     else:
@@ -70,7 +70,7 @@ def get_questionnaire_details(id):
     # Filtrar cuestionarios basándose en el email
     questionnaire_questions = getQuestionnaire(id)
     print("Questionnaire: ", questionnaire_questions)
-    if len(questionnaire_questions)>1:
+    if len(questionnaire_questions)>0:
         return jsonify(questionnaire_questions), 200, headers
     else:
         return jsonify({"error": "Questionnaire not found"}), 404, headers

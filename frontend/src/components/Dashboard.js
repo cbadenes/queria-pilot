@@ -24,6 +24,8 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import axios from 'axios';
 import BuildIcon from '@mui/icons-material/Build';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -191,7 +193,7 @@ const Dashboard = () => {
       case 'scheduled':
         return <ScheduleIcon />;
       case 'in_progress':
-        return <BuildIcon />;
+        return <EditIcon />;
       case 'completed':
         return <CheckCircleOutlineIcon />;
       default:
@@ -244,7 +246,7 @@ const Dashboard = () => {
       }
     };
 
-    if (status === 'in_progress') {
+    if (status === 'scheduled') {
       buttonStyle.backgroundColor = '#e0e0e0'; // Gris para in_progress
       buttonStyle.color = '#a0a0a0'; // Texto en gris para in_progress
       buttonStyle.pointerEvents = 'none'; // Deshabilita la interacción

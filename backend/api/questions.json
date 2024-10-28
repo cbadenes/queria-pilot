@@ -1,133 +1,561 @@
 [
   {
-    "id": "1",
-    "qid": 2,
-    "date": "2024-08-29",
-    "difficulty": "medium",
-    "context": "context",
+    "id": 1,
+    "qid": "1",
+    "date": "2022-12-18",
+    "difficulty": "hard",
     "type": "multi",
-    "question": "What is the answer to question 1?",
-    "answers": ["Option 2", "Option 1", "Option 3"],
-    "valid_answer": "Option 2",
+    "question": "What is the capital of France?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Paris",
+      "London",
+      "Berlin",
+      "Madrid"
+    ],
+    "valid_answer": "Paris",
     "responses": [
       {
-        "date": "2024-09-25",
-        "score": 22,
-        "feedback": "Incorrect",
-        "response": "Response C"
+        "date": "2023-01-13",
+        "score": 58,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       },
       {
-        "date": "2024-09-10",
-        "score": 64,
-        "feedback": "Partially correct",
-        "response": "Response B"
-      }
-    ]
-  },
-  {
-    "id": "11",
-    "qid": 2,
-    "date": "2024-08-29",
-    "difficulty": "medium",
-    "context": "context",
-    "type": "multi",
-    "question": "What is the answer to question 1?",
-    "answers": ["Option 2", "Option 1", "Option 3"],
-    "valid_answer": "Option 2",
-    "responses": [
-      {
-        "date": "2024-09-25",
-        "score": 22,
-        "feedback": "Incorrect",
-        "response": "Response C"
+        "date": "2023-01-07",
+        "score": 30,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       },
       {
-        "date": "2024-09-10",
-        "score": 64,
-        "feedback": "Partially correct",
-        "response": "Response B"
-      }
-    ]
-  },
-  {
-    "id": "12",
-    "qid": 2,
-    "date": "2024-08-29",
-    "difficulty": "medium",
-    "context": "context",
-    "type": "multi",
-    "question": "What is the answer to question 1?",
-    "answers": ["Option 2", "Option 1", "Option 3"],
-    "valid_answer": "Option 2",
-    "responses": [
-      {
-        "date": "2024-09-25",
-        "score": 22,
-        "feedback": "Incorrect",
-        "response": "Response C"
+        "date": "2023-01-27",
+        "score": 55,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       },
       {
-        "date": "2024-09-10",
-        "score": 64,
-        "feedback": "Partially correct",
-        "response": "Response B"
+        "date": "2023-09-02",
+        "score": 42,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       }
     ]
   },
   {
-    "id": "2",
-    "qid": 4,
-    "date": "2024-08-27",
-    "difficulty": "easy",
-    "context": "context",
+    "id": 2,
+    "qid": "1",
+    "date": "2022-08-09",
+    "difficulty": "medium",
     "type": "open",
-    "question": "What is the answer to question 2?",
+    "question": "Define the term 'biodiversity'.",
+    "context": "This is a sample context paragraph providing background information.",
     "answers": [],
-    "valid_answer": null,
+    "valid_answer": "valid answer",
     "responses": [
       {
-        "date": "2024-09-24",
-        "score": 73,
-        "feedback": "Well done",
-        "response": "Response A"
+        "date": "2023-12-19",
+        "score": 97,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-08-26",
+        "score": 4,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-05-23",
+        "score": 47,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-07-03",
+        "score": 94,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       }
     ]
   },
   {
-    "id": "21",
-    "qid": 4,
-    "date": "2024-08-27",
-    "difficulty": "easy",
-    "context": "context",
-    "type": "open",
-    "question": "What is the answer to question 2?",
-    "answers": [],
-    "valid_answer": null,
+    "id": 3,
+    "qid": "1",
+    "date": "2022-11-21",
+    "difficulty": "medium",
+    "type": "multi",
+    "question": "What is the largest ocean on Earth?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Atlantic",
+      "Indian",
+      "Arctic",
+      "Pacific"
+    ],
+    "valid_answer": "Pacific",
     "responses": [
       {
-        "date": "2024-09-24",
-        "score": 73,
-        "feedback": "Well done",
-        "response": "Response A"
+        "date": "2023-04-23",
+        "score": 69,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-01-18",
+        "score": 98,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       }
     ]
   },
   {
-    "id": "22",
-    "qid": 4,
-    "date": "2024-08-27",
-    "difficulty": "easy",
-    "context": "context",
+    "id": 4,
+    "qid": "1",
+    "date": "2022-03-22",
+    "difficulty": "hard",
     "type": "open",
-    "question": "What is the answer to question 2?",
+    "question": "How does globalization affect economies?",
+    "context": "This is a sample context paragraph providing background information.",
     "answers": [],
-    "valid_answer": null,
+    "valid_answer": "",
     "responses": [
       {
-        "date": "2024-09-24",
+        "date": "2023-06-26",
+        "score": 62,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-08-19",
+        "score": 83,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-05-13",
         "score": 73,
-        "feedback": "Well done",
-        "response": "Response A"
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "qid": "2",
+    "date": "2022-01-27",
+    "difficulty": "easy",
+    "type": "multi",
+    "question": "What year did the first man land on the moon?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "1965",
+      "1969",
+      "1972",
+      "1980"
+    ],
+    "valid_answer": "1969",
+    "responses": [
+      {
+        "date": "2023-10-28",
+        "score": 73,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-03-13",
+        "score": 51,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-04-28",
+        "score": 22,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-05-10",
+        "score": 32,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "qid": "2",
+    "date": "2022-02-14",
+    "difficulty": "hard",
+    "type": "open",
+    "question": "Explain the process of photosynthesis.",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-06-27",
+        "score": 19,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-01-10",
+        "score": 4,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-01-21",
+        "score": 89,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-06-04",
+        "score": 80,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "qid": "2",
+    "date": "2022-09-14",
+    "difficulty": "easy",
+    "type": "multi",
+    "question": "Which element has the atomic number 8?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Oxygen",
+      "Hydrogen",
+      "Nitrogen",
+      "Carbon"
+    ],
+    "valid_answer": "Oxygen",
+    "responses": [
+      {
+        "date": "2023-04-06",
+        "score": 67,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-11-24",
+        "score": 23,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-10-11",
+        "score": 42,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-08-13",
+        "score": 34,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "qid": "2",
+    "date": "2022-01-28",
+    "difficulty": "easy",
+    "type": "open",
+    "question": "What are the primary benefits of renewable energy?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-03-14",
+        "score": 65,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-11-09",
+        "score": 61,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "qid": "3",
+    "date": "2022-10-07",
+    "difficulty": "easy",
+    "type": "multi",
+    "question": "Who wrote 'Macbeth'?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Shakespeare",
+      "Marlowe",
+      "Chaucer",
+      "Austen"
+    ],
+    "valid_answer": "Shakespeare",
+    "responses": [
+      {
+        "date": "2023-10-07",
+        "score": 0,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-10-24",
+        "score": 21,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-12-28",
+        "score": 34,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-11-17",
+        "score": 99,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "qid": "3",
+    "date": "2022-10-10",
+    "difficulty": "easy",
+    "type": "open",
+    "question": "Describe the theory of relativity.",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-09-12",
+        "score": 17,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-06-07",
+        "score": 35,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "qid": "3",
+    "date": "2022-12-04",
+    "difficulty": "easy",
+    "type": "multi",
+    "question": "What is the main language spoken in Brazil?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Spanish",
+      "Portuguese",
+      "French",
+      "English"
+    ],
+    "valid_answer": "Portuguese",
+    "responses": [
+      {
+        "date": "2023-06-07",
+        "score": 10,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-10-24",
+        "score": 50,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-09-01",
+        "score": 90,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "qid": "3",
+    "date": "2022-03-22",
+    "difficulty": "hard",
+    "type": "open",
+    "question": "Describe the impact of technology on communication.",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-10-13",
+        "score": 85,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-12-27",
+        "score": 63,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-03-15",
+        "score": 47,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-01-24",
+        "score": 45,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-10-21",
+        "score": 65,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "qid": "4",
+    "date": "2022-04-25",
+    "difficulty": "hard",
+    "type": "multi",
+    "question": "What is the chemical formula for water?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "H2O",
+      "CO2",
+      "NaCl",
+      "O2"
+    ],
+    "valid_answer": "H2O",
+    "responses": [
+      {
+        "date": "2023-11-17",
+        "score": 89,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-12-09",
+        "score": 10,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-02-22",
+        "score": 12,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "qid": "4",
+    "date": "2022-12-24",
+    "difficulty": "medium",
+    "type": "open",
+    "question": "Discuss the economic impacts of climate change.",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-07-16",
+        "score": 89,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-02-18",
+        "score": 50,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-05-24",
+        "score": 69,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-12-01",
+        "score": 89,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-06-12",
+        "score": 93,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "qid": "4",
+    "date": "2022-04-06",
+    "difficulty": "hard",
+    "type": "multi",
+    "question": "What vitamin is predominantly found in citrus fruits?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [
+      "Vitamin A",
+      "Vitamin B",
+      "Vitamin C",
+      "Vitamin D"
+    ],
+    "valid_answer": "Vitamin C",
+    "responses": [
+      {
+        "date": "2023-01-27",
+        "score": 44,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "qid": "4",
+    "date": "2022-07-01",
+    "difficulty": "medium",
+    "type": "open",
+    "question": "What strategies are effective for water conservation?",
+    "context": "This is a sample context paragraph providing background information.",
+    "answers": [],
+    "valid_answer": "",
+    "responses": [
+      {
+        "date": "2023-11-20",
+        "score": 50,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
+      },
+      {
+        "date": "2023-04-07",
+        "score": 2,
+        "feedback": "This is a sample feedback based on the evaluation.",
+        "response": "Sample user response text."
       }
     ]
   }
