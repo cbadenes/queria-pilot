@@ -21,8 +21,7 @@ def init_routes(app):
         # Genera un identificador único para la solicitud y guárdalo en el contexto de la solicitud
         g.request_id = str(uuid.uuid4())
         app.logger.info('[%s] Received request: %s %s', g.request_id, request.method, request.url)
-        app.logger.debug('[%s] Headers: %s', g.request_id, request.headers)
-        app.logger.debug('[%s] Body: %s', g.request_id, request.get_data(as_text=True))
+        #app.logger.debug('[%s] Body: %s', g.request_id, request.get_data(as_text=True))
 
 
     @app.after_request
@@ -34,6 +33,7 @@ def init_routes(app):
 
 @api_blueprint.route('/login', methods=['POST'])
 def login():
+    app.logger.info('[%s] Headers: %s', g.request_id, request.headers)
     user_data = request.get_json()
     user = User.find_user_by_email(user_data['email'])
 
@@ -56,11 +56,7 @@ def get_questionnaires():
         return jsonify({"error": "Email is required"}), 400, headers
 
     questionnaires = Questionnaire.get_questionnaires(email)
-
-    if (len(questionnaires)>0):
-        return jsonify(questionnaires), 200, headers
-    else:
-        return jsonify([]), 200, headers
+    return jsonify(questionnaires), 200, headers
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
 def get_questions(id):

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Container, CssBaseline } from '@mui/material';
-import logo from '../assets/images/queria-logo.png';  // Asegúrate de que la ruta sea correcta
-import API_BASE_URL from './config';  // Importar la URL base desde config.js
+import logo from '../assets/images/queria-logo.png';
+import API_BASE_URL from './config';
 
-const orangeColor = '#FFD5B4';  // Color anaranjado
-const darkGrayColor = '#333333';  // Color gris oscuro para el texto
+const orangeColor = '#FFD5B4';
+const darkGrayColor = '#333333';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');  // Nuevo estado para el mensaje de error
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -27,14 +28,15 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('userToken', data.access_token);
-        localStorage.setItem('userEmail', email);  // Guardar el email del usuario en localStorage
+        localStorage.setItem('userEmail', email);
         navigate('/dashboard');
+        setErrorMessage('');  // Limpia el mensaje de error si el login es exitoso
       } else {
         const errorData = await response.json();
-        alert('Login failed: ' + errorData.message);
+        setErrorMessage(errorData.message || 'Credenciales incorrectas');  // Actualiza el mensaje de error
       }
     } catch (error) {
-      alert('Login failed: ' + error.message);
+      setErrorMessage('Error al intentar iniciar sesión. Por favor, inténtelo de nuevo.');
     }
   };
 
@@ -76,7 +78,7 @@ const Login = () => {
             value={email}
             onChange={e => setEmail(e.target.value)}
             InputProps={{
-              style: { backgroundColor: '#E6B895' }  // Color ligeramente más oscuro
+              style: { backgroundColor: '#E6B895' }
             }}
           />
           <TextField
@@ -92,7 +94,7 @@ const Login = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             InputProps={{
-              style: { backgroundColor: '#E6B895' }  // Color ligeramente más oscuro
+              style: { backgroundColor: '#E6B895' }
             }}
           />
           <Button
@@ -107,12 +109,26 @@ const Login = () => {
               fontWeight: 'bold',
               fontFamily: '"Poppins", sans-serif',
               '&:hover': {
-                backgroundColor: '#e6b28e',  // Un poco más oscuro al hacer hover
+                backgroundColor: '#e6b28e',
               }
             }}
           >
             Iniciar Sesión
           </Button>
+          {errorMessage && (  // Mostrar el mensaje de error si existe
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{
+                mt: 2,
+                textAlign: 'center',
+                fontFamily: '"Poppins", sans-serif',
+                fontWeight: 'bold',
+              }}
+            >
+              {errorMessage}
+            </Typography>
+          )}
         </Box>
       </Box>
     </Container>

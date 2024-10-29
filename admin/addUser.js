@@ -44,7 +44,9 @@ async function main() {
     try {
         const userData = {
             email: "carlos.badenes@upm.es",
+            //email: "demo@queria.es",
             password: "upm2024",
+            //password: "demo2024",
             name: "Carlos Badenes-Olmedo"
         };
         await addUser(client, userData);
