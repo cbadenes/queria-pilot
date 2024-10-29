@@ -1,6 +1,9 @@
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
 from flask import current_app as app
 from pymongo.errors import ConnectionFailure
+from datetime import datetime
+import hashlib
 
 class MongoDB:
     def __init__(self):
@@ -45,6 +48,32 @@ class Questionnaire:
     def get_questionnaire(email, id):
         # Buscar cuestionarios por email
         return list(mongo_db.db.questionnaires.find({"email": email, "id":id}, {'_id': 0}))
+
+    @staticmethod
+    def create_questionnaire(name, email, filename, difficulty, num_questions, ratio):
+        # Generar un identificador único para el cuestionario
+        unique_string = f"{name}_{email}".encode('utf-8')
+        questionnaire_id = hashlib.md5(unique_string).hexdigest()
+
+        questionnaire_data = {
+            "_id": questionnaire_id,
+            "name": name,
+            "filename": filename,
+            "date": datetime.now(),
+            "status": "scheduled",
+            "email": email,
+            "difficulty": difficulty,
+            "num_questions": num_questions,
+            "ratio": ratio
+        }
+        try:
+            result = mongo_db.db.questionnaires.insert_one(questionnaire_data)
+            questionnaire_data["id"] = str(questionnaire_data["_id"])
+            app.logger.info("New questionnaire created : ", questionnaire_data)
+            return questionnaire_data
+        except DuplicateKeyError:
+            app.logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
+            return {}
 
 class Question:
 

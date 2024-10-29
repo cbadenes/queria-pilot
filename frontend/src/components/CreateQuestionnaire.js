@@ -53,10 +53,10 @@ const CreateQuestionnaire = () => {
         }, 2000);  // Espera de 2 segundos para que se vea el mensaje antes de redirigir
       } else {
         const errorData = await response.json();
-        alert('Error creando el cuestionario: ' + errorData.message);
+        alert('Error creando el cuestionario: ' + errorData.error);
       }
     } catch (error) {
-      alert('Error creando el cuestionario: ' + error.message);
+      alert('Error creando el cuestionario: ' + error.error);
     }
   };
 

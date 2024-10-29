@@ -5,10 +5,16 @@ from werkzeug.utils import secure_filename
 import os
 from .utils import extract_questions
 from .models import User, Questionnaire, Question
+from .events import Ticket
 import bcrypt
 import uuid
 import json
 import dicttoxml
+from PyPDF2 import PdfReader
+import random
+from pika import BlockingConnection, ConnectionParameters
+
+
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -47,7 +53,7 @@ def login():
         else:
             app.logger.info("Invalid password for:", user_data)
     else:
-        return jsonify({"message": "User not found"}), 401, headers
+        return jsonify({"message": "Usuario Desconocido"}), 401, headers
 
 @api_blueprint.route('/questionnaires', methods=['GET'])
 def get_questionnaires():
@@ -64,7 +70,7 @@ def get_questions(id):
     if len(questions)>0:
         return jsonify(questions), 200, headers
     else:
-        return jsonify({"error": "Questionnaire not found"}), 404, headers
+        return jsonify({"error": "Cuestionario Inválido"}), 404, headers
 
 @api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
@@ -72,12 +78,12 @@ def create_questionnaire():
         # Verificar si el archivo PDF fue enviado
         if 'pdf' not in request.files:
             app.logger.error("No PDF file provided")
-            return jsonify({"error": "No PDF file provided"}), 400, headers
+            return jsonify({"error": "No se ha adjuntado ningún PDF"}), 400, headers
 
         pdf_file = request.files['pdf']
         if pdf_file.filename == '':
             app.logger.error("No selected file")
-            return jsonify({"error": "No selected file"}), 400, headers
+            return jsonify({"error": "Nombre de archivo incorrecto"}), 400, headers
 
         # Guardar el archivo PDF en una ubicación temporal
         filename = secure_filename(pdf_file.filename)
@@ -97,45 +103,47 @@ def create_questionnaire():
         # Verificar que todos los campos sean válidos
         if not all([num_questions, difficulty, percentage_free_response, questionnaire_name, user_email]):
             app.logger.error("Faltan datos en la solicitud")
-            return jsonify({"error": "Missing form data"}), 400, headers
+            return jsonify({"error": "Faltan datos obligatorios del cuestionario"}), 400, headers
 
-        # Generar un identificador único para el cuestionario
-        questionnaire_id = str(uuid.uuid4())
-
-        # Procesar el archivo PDF y extraer preguntas (esta función debe estar en utils.py)
+        # Almacenar cuestionario en BBDD
+        questionnaire = Questionnaire.create_questionnaire(questionnaire_name, user_email, pdf_file.filename, difficulty, num_questions, percentage_free_response)
+        if 'id' not in questionnaire:
+            return jsonify({"error": "el nombre del cuestionario ya existe"}), 400, headers
+        # Procesar el archivo PDF
+        parts = []
         try:
-            questions = extract_questions(pdf_path)
-            app.logger.info(f"Preguntas extraídas del PDF: {questions}")
+            reader = PdfReader(pdf_path)
+            text = ''
+            for page in reader.pages:
+                text += page.extract_text() if page.extract_text() else ''
 
-            # Aquí puedes añadir lógica adicional para construir el cuestionario
-            questionnaire = {
-                "id": questionnaire_id,
-                "name": questionnaire_name,
-                "num_questions": num_questions,
-                "difficulty": difficulty,
-                "percentage_free_response": percentage_free_response,
-                "email": user_email,
-                "status": "en_construccion",  # Estado inicial del cuestionario
-                "questions": questions
-            }
-
-            # Eliminar el archivo temporal después de su uso
-            os.remove(pdf_path)
-            app.logger.info(f"Archivo PDF temporal eliminado: {pdf_path}")
-
-            # Respuesta exitosa
-            return jsonify({
-                "id": questionnaire_id,
-                "name": questionnaire_name,
-                "status": "en_construccion"  # Estado inicial
-            }), 200, headers
-
+            # Dividir el texto en partes de 512 caracteres
+            parts = [text[i:i+512] for i in range(0, len(text), 512)]
         except Exception as e:
-            app.logger.error(f"Error procesando el archivo PDF: {str(e)}")
-            return jsonify({"error": str(e)}), 500, headers
+            app.logger.error(f"Error procesando el PDF: {e}")
+            return jsonify({"error": "No se pudo procesar el PDF"}), 500, headers
+
+        app.logger.debug(len(parts)," parts created")
+
+        # Seleccionar aleatoriamente `num_questions` partes de texto
+        selected_parts = random.sample(parts, k=num_questions)
+        app.logger.debug("Parts selected: ", selected_parts)
+
+        # Enviar eventos a ActiveMQ
+        for part in selected_parts:
+            Ticket.create_question_event(
+                context=part,
+                difficulty=questionnaire['difficulty'],
+                percentage_free_response=questionnaire['ratio'],
+                id=questionnaire['id'],
+                email=questionnaire['email']
+            )
+
+        return jsonify(questionnaire), 200, headers
 
     except Exception as e:
-        app.logger.error(f"Error general en la creación del cuestionario: {str(e)}")
+        app.logger.error(f"Error durante la creación del cuestionario: {str(e)}")
+        app.logger.error("Detalles del error:\n" + traceback.format_exc())
         return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/evaluate', methods=['POST'])

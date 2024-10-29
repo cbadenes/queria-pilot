@@ -11,5 +11,6 @@ db.createUser({
   ]
 });
 
+db.createCollection('users');
 db.createCollection('questionnaires');
 db.createCollection('questions');
