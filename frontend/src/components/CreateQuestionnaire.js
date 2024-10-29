@@ -18,8 +18,11 @@ const CreateQuestionnaire = () => {
   const [difficulty, setDifficulty] = useState('Medio');
   const [percentageFreeResponse, setPercentageFreeResponse] = useState(50);
   const [questionnaireName, setQuestionnaireName] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para controlar el Snackbar
   const userEmail = localStorage.getItem('userEmail');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info'); // Agregar estado para la severidad del snackbar
+
 
   const handleDiscard = () => {
     setFile(null);
@@ -27,8 +30,10 @@ const CreateQuestionnaire = () => {
 
   const handleGenerate = async () => {
     if (!file || !questionnaireName || !numQuestions || !difficulty || !percentageFreeResponse || !userEmail) {
-      alert('Por favor, completa todos los campos y selecciona un archivo PDF.');
-      return;
+        setSnackbarMessage('Por favor, completa todos los campos y selecciona un archivo PDF.');
+        setSnackbarSeverity('error'); // Configurar la severidad a error
+        setOpenSnackbar(true);
+        return;
     }
 
     const formData = new FormData();
@@ -46,19 +51,31 @@ const CreateQuestionnaire = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setOpenSnackbar(true);  // Mostrar el Snackbar
+        setSnackbarMessage('Cuestionario creado con éxito.');
+        setSnackbarSeverity('success');
+        setOpenSnackbar(true);
         setTimeout(() => {
-          navigate('/dashboard');  // Navegar de vuelta al Dashboard después de un tiempo
-        }, 2000);  // Espera de 2 segundos para que se vea el mensaje antes de redirigir
+          navigate('/dashboard');
+        }, 2000);
       } else {
         const errorData = await response.json();
-        alert('Error creando el cuestionario: ' + errorData.error);
+        setSnackbarMessage('Error creando el cuestionario: ' + errorData.error);
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       }
     } catch (error) {
-      alert('Error creando el cuestionario: ' + error.error);
+        setSnackbarMessage('Error de conexión al servidor.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
     }
   };
+
+  const handleCloseSnackbar = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpenSnackbar(false);
+    };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: grayColor }}>
@@ -170,15 +187,14 @@ const CreateQuestionnaire = () => {
           </Grid>
         </Grid>
 
-        {/* Snackbar para mostrar el mensaje de confirmación */}
         <Snackbar
           open={openSnackbar}
-          autoHideDuration={5000}  // El mensaje desaparecerá automáticamente después de 2 segundos
-          onClose={() => setOpenSnackbar(false)}  // Cerrar el Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}  // Ubicación del Snackbar
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} // Mover el Snackbar abajo a la izquierda
         >
-          <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
-            Cuestionario creado con éxito
+          <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {snackbarMessage}
           </Alert>
         </Snackbar>
       </Paper>
