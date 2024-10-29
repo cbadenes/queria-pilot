@@ -58,7 +58,7 @@ def get_questionnaires():
     questionnaires = Questionnaire.get_questionnaires(email)
     return jsonify(questionnaires), 200, headers
 
-@api_blueprint.route('/questionnaires/<id>', methods=['GET'])
+@api_blueprint.route('/questionnaires/<id>/questions', methods=['GET'])
 def get_questions(id):
     questions = Question.get_questions(id)
     if len(questions)>0:

@@ -194,7 +194,7 @@ const Dashboard = () => {
   // Function to handle questionnaire selection and fetch its details
   const handleQuestionnaireClick = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/questionnaires/${id}`);
+      const response = await fetch(`${API_BASE_URL}/api/questionnaires/${id}/questions`);
       if (response.ok) {
         const data = await response.json();
         setSelectedQuestions(data);  // Store the list of questions
