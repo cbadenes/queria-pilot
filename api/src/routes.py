@@ -51,7 +51,7 @@ def login():
             access_token = create_access_token(identity=user['email'])
             return jsonify(access_token=access_token), 200, headers
         else:
-            app.logger.info("Invalid password for:", user_data)
+            app.logger.info(f"Invalid password for: {user_data}")
     else:
         return jsonify({"message": "Usuario Desconocido"}), 401, headers
 
@@ -127,7 +127,7 @@ def create_questionnaire():
 
         # Seleccionar aleatoriamente `num_questions` partes de texto
         selected_parts = random.sample(parts, k=num_questions)
-        app.logger.debug("Parts selected: ", selected_parts)
+        app.logger.debug(f"Parts selected: {selected_parts}")
 
         # Enviar eventos a ActiveMQ
         for part in selected_parts:
@@ -143,7 +143,8 @@ def create_questionnaire():
 
     except Exception as e:
         app.logger.error(f"Error durante la creación del cuestionario: {str(e)}")
-        app.logger.error("Detalles del error:\n" + traceback.format_exc())
+        app.logger.error(f"Detalles del error:\n {traceback.format_exc()}")
+        # eliminar cuestionario en bbdd
         return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/evaluate', methods=['POST'])
@@ -164,7 +165,7 @@ def evaluate():
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():
     data = request.get_json()
-    app.logger.debug("Comentario recibido:", data)  # Imprime el comentario para fines de depuración
+    app.logger.debug(f"Comentario recibido: {data}")  # Imprime el comentario para fines de depuración
     # Aquí puedes agregar código para procesar y almacenar el comentario en tu base de datos o sistema de archivos
 
     # Devuelve un mensaje de confirmación
@@ -175,11 +176,8 @@ def export_moodle():
     data = request.json
     questionnaire_id = data.get('questionnaireId')
     questions = Question.get_questions(questionnaire_id)
-    app.logger.debug("Questionnaire Info:", questions)
     xml = dicttoxml.dicttoxml(questions)
-    app.logger.debug("Xml: ", xml)
     response = make_response(xml)
-    app.logger.debug("Response: ", response)
     response.headers['Content-Type'] = 'application/xml'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
@@ -190,8 +188,8 @@ def evaluate_results():
     questionnaire_id = data.get('questionnaireId')
     answers = data.get('answers')
     # cambiar estado de cuestionario a "completed"
-    app.logger.debug("QuestionnaireID: ",questionnaire_id )
-    app.logger.debug("Answers:", answers)
+    app.logger.debug(f"QuestionnaireID: {questionnaire_id}" )
+    app.logger.debug(f"Answers: {answers}")
 
 
     # Lógica para evaluar las respuestas

@@ -7,17 +7,17 @@ class RabbitMQ:
     def __init__(self):
         self.connection = None
         self.channel = None
-        self.queue_name = 'queria_queue'
 
     def connect(self):
         try:
             credentials = pika.PlainCredentials(app.config['RABBITMQ_USER'], app.config['RABBITMQ_PASSWORD'])
             parameters = pika.ConnectionParameters(host=app.config['RABBITMQ_HOST'],
                                                    port=app.config['RABBITMQ_PORT'],
-                                                   credentials=credentials)
+                                                   credentials=credentials,
+                                                   heartbeat=600)
             self.connection = pika.BlockingConnection(parameters)
             self.channel = self.connection.channel()
-            self.channel.queue_declare(queue=self.queue_name, durable=True)
+            self.channel.queue_declare(queue=app.config['RABBITMQ_QUEUE'], durable=True)
             app.logger.info("Conexión con RabbitMQ establecida.")
         except AMQPConnectionError as e:
             app.logger.error(f"Error al conectar a RabbitMQ: {e}")
@@ -36,11 +36,11 @@ class RabbitMQ:
         try:
             self.channel.basic_publish(
                 exchange='',
-                routing_key=self.queue_name,
+                routing_key=app.config['RABBITMQ_QUEUE'],
                 body=json.dumps(message),
                 properties=pika.BasicProperties(delivery_mode=2)  # Hacer mensajes persistentes
             )
-            app.logger.debug(f"Mensaje enviado a la cola '{self.queue_name}': {message}")
+            app.logger.debug(f"Mensaje enviado a la cola '{app.config['RABBITMQ_QUEUE']}': {message}")
         except (ChannelClosedByBroker, StreamLostError) as e:
             app.logger.error(f"Error al enviar mensaje a RabbitMQ: {e}")
             self.close()  # Cerrar la conexión y reintentar puede ser una estrategia aquí

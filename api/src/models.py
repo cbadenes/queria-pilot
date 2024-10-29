@@ -69,7 +69,7 @@ class Questionnaire:
         try:
             result = mongo_db.db.questionnaires.insert_one(questionnaire_data)
             questionnaire_data["id"] = str(questionnaire_data["_id"])
-            app.logger.info("New questionnaire created : ", questionnaire_data)
+            app.logger.info(f"New questionnaire created : {questionnaire_data}")
             return questionnaire_data
         except DuplicateKeyError:
             app.logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")

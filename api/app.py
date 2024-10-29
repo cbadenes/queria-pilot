@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
-from api.routes import api_blueprint
-from api.models import mongo_db
-from api.events import rabbitmq
+from src.routes import api_blueprint
+from src.models import mongo_db
+from src.events import rabbitmq
 from flask_jwt_extended import JWTManager
 import logging
 from logging.handlers import RotatingFileHandler
@@ -27,7 +27,7 @@ def create_app():
     console_handler.setFormatter(console_formatter)
 
 
-    app.logger = logging.getLogger('MyAPI')
+    app.logger = logging.getLogger('queriaApi')
     app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
     app.logger.addHandler(file_handler)
     app.logger.addHandler(console_handler)
@@ -38,7 +38,7 @@ def create_app():
     print(f"Logger level is set to: {app.logger.getEffectiveLevel()}")
     print(f"Logger level name is: {logging.getLevelName(app.logger.getEffectiveLevel())}")
 
-    from api.routes import init_routes
+    from src.routes import init_routes
     init_routes(app)
 
     # Aplica CORS a todas las rutas
