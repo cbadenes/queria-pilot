@@ -652,7 +652,7 @@ const Dashboard = () => {
               </Box>
             ))}
             {/* Icono para exportar a PDF, colocado a la derecha */}
-              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2 }}>
+              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2 }}>
                 <IconButton
                   onClick={handleSubmitResults}
                   disabled={!allValidated}
@@ -664,16 +664,14 @@ const Dashboard = () => {
                     ml: 2
                   }}
                 >
-                  <PublishedWithChangesIcon fontSize="large" />
+                  <PublishedWithChangesIcon fontSize="normal" />
                 </IconButton>
-                <Box>
-                  <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' } }}>
+                  <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
                     <PictureAsPdfIcon />
                   </IconButton>
-                  <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' } }}>
+                  <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
                     <ImportExportIcon />
                   </IconButton>
-                </Box>
               </Box>
             <Snackbar
               open={openSnackbar}
