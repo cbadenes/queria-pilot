@@ -50,7 +50,15 @@ class Questionnaire:
     @staticmethod
     def get_questionnaire(email, id):
         # Buscar cuestionarios por email
-        return list(mongo_db.db.questionnaires.find({"email": email, "id":id}, {'_id': 0}))
+        return list(mongo_db.db.questionnaires.find({"email": email, "_id":id}, {'_id': 0}))
+
+    @staticmethod
+    def update_status(qid, new_status):
+        result = mongo_db.db.questionnaires.update_one(
+            {'_id': qid},  # Asegúrate de que '_id' es el campo correcto usado para identificar el cuestionario
+            {'$set': {'status': new_status}}
+        )
+        return result.modified_count
 
     @staticmethod
     def create_questionnaire(name, email, filename, difficulty, num_questions, ratio):
@@ -82,7 +90,7 @@ class Question:
 
     @staticmethod
     def get_questions(qid):
-        # Buscar preguntas por cuestionario y email
+        # Buscar preguntas por cuestionario
         res = list(mongo_db.db.questions.find({"qid":qid}, {'_id': 0}))
         return res
 

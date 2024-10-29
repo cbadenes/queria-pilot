@@ -1,11 +1,25 @@
 import pika
 import logging
 import threading
-from .models import Question
+from .models import Question, Questionnaire
 import json
 from datetime import datetime
+import random
+import string
+import time
 
 logger = logging.getLogger('queriaWorker')
+
+
+def generate_random_text(length):
+    letters = string.ascii_letters + string.digits + string.punctuation + ' '
+    return ''.join(random.choice(letters) for _ in range(length))
+
+def random_delay(min_seconds, max_seconds):
+    delay = random.uniform(min_seconds, max_seconds)
+    print(f"Delaying for {delay:.2f} seconds")
+    time.sleep(delay)
+
 
 def start_consumer(config):
     connection = pika.BlockingConnection(
@@ -24,13 +38,31 @@ def start_consumer(config):
         logger.debug(f"Received {body}")
         data = json.loads(body)
         try:
-            question_txt = "sample"
+            random_delay(0.5, 2.5)
+            question_txt = generate_random_text(100)
             type = "multi"
             answers = []
-            valid_answer = "valid response"
+            valid_answer = generate_random_text(50)
             question = Question.create_question(data['id'], question_txt, data['difficulty'], type, data['context'], answers, valid_answer)
             logger.info(f"Question created with ID {question['id']}")
             ch.basic_ack(delivery_tag=method.delivery_tag)
+
+            # Comprobar si se han creado todas las preguntas de un cuestionario
+            questions = Question.get_questions(data['id'])
+            logger.info(f"Questions: {questions}")
+
+            questionnaires = Questionnaire.get_questionnaire(data['email'],data['id'])
+            if (len(questionnaires)>0):
+                questionnaire = questionnaires[0]
+                logger.info(f"Questionnaire: {questionnaire}")
+                logger.info(f"Num Questions in DB: {len(questions)}")
+                logger.info(f"Num Questions in Questionnaire: {questionnaire}")
+                if (len(questions) == questionnaire['num_questions']):
+                    logger.info("Updating questionnaire ..")
+                    Questionnaire.update_status(data['id'], "in_progress")
+                    logger.info("questionnaire updated")
+
+
         except Exception as e:
             logger.error(f"Failed to create question: {e}")
             # Rechazar el mensaje sin reencolar
