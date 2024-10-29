@@ -145,42 +145,30 @@ const Dashboard = () => {
 
   // Fetch questionnaires from the backend
   useEffect(() => {
-    let intervalId;
-
     const fetchQuestionnaires = async () => {
       const userEmail = localStorage.getItem('userEmail'); // Asume que el email está almacenado en localStorage
       try {
         const response = await fetch(`${API_BASE_URL}/api/questionnaires?email=${encodeURIComponent(userEmail)}`);
         if (response.ok) {
-          const data = await response.json();
-          setQuestionnaires(data);
-          // Verificar si hay cuestionarios en 'in_progress' para decidir si seguir con el intervalo
-          if (data.questionnaires.some(q => q.status === 'scheduled')) {
-            if (!intervalId) {
-              intervalId = setInterval(fetchQuestionnaires, 2000);
-            }
+            const fetchedQuestionnaires = await response.json();
+
+          // Aquí actualizas el estado con la nueva lista de cuestionarios
+              setQuestionnaires(fetchedQuestionnaires);
           } else {
-            if (intervalId) {
-              clearInterval(intervalId);
-              intervalId = null;
-            }
+              console.error('Failed to fetch questionnaires:', response.statusText);
           }
-        } else {
-          console.error('Failed to fetch questionnaires:', response.statusText);
-        }
       } catch (error) {
-        console.error('Error fetching questionnaires:', error);
+          console.error('Error fetching questionnaires:', error);
       }
     };
 
-    fetchQuestionnaires(); // Llamar inicialmente al cargar el componente
+    // Establecer un intervalo para actualizar los cuestionarios
+    const intervalId = setInterval(fetchQuestionnaires, 10000);
+    fetchQuestionnaires(); // Llamar también inmediatamente para cargar inicialmente los datos
 
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId); // Asegurarse de limpiar el intervalo cuando el componente se desmonte
-      }
-    };
-  }, []);  // Dependencias vacías para que se ejecute solo una vez al montar el componente
+    // Función de limpieza para asegurar que el intervalo se limpie correctamente
+    return () => clearInterval(intervalId);
+    }, []);
 
 
   // Disable scrolling on page
