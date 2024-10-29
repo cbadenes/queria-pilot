@@ -42,11 +42,10 @@ def login():
         hashed_password = user['password'].encode('utf-8')
 
         if bcrypt.checkpw(password_encoded, hashed_password):
-            print("Login successful for:", user['email'])
             access_token = create_access_token(identity=user['email'])
             return jsonify(access_token=access_token), 200, headers
         else:
-            print("Invalid password for:", user['email'])
+            app.logger.info("Invalid password for:", user_data)
     else:
         return jsonify({"message": "User not found"}), 401, headers
 
@@ -59,9 +58,9 @@ def get_questionnaires():
     questionnaires = Questionnaire.get_questionnaires(email)
 
     if (len(questionnaires)>0):
-        return jsonify({"questionnaires": questionnaires}), 200, headers
+        return jsonify(questionnaires), 200, headers
     else:
-        return jsonify({"questionnaires": []}), 200, headers
+        return jsonify([]), 200, headers
 
 @api_blueprint.route('/questionnaires/<id>', methods=['GET'])
 def get_questions(id):
@@ -161,7 +160,7 @@ def evaluate():
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():
     data = request.get_json()
-    print("Comentario recibido:", data)  # Imprime el comentario para fines de depuración
+    app.logger.debug("Comentario recibido:", data)  # Imprime el comentario para fines de depuración
     # Aquí puedes agregar código para procesar y almacenar el comentario en tu base de datos o sistema de archivos
 
     # Devuelve un mensaje de confirmación
@@ -172,11 +171,11 @@ def export_moodle():
     data = request.json
     questionnaire_id = data.get('questionnaireId')
     questions = Question.get_questions(questionnaire_id)
-    print("Questionnaire Info:", questions)
+    app.logger.debug("Questionnaire Info:", questions)
     xml = dicttoxml.dicttoxml(questions)
-    print("Xml: ", xml)
+    app.logger.debug("Xml: ", xml)
     response = make_response(xml)
-    print("Response: ", response)
+    app.logger.debug("Response: ", response)
     response.headers['Content-Type'] = 'application/xml'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
@@ -187,8 +186,8 @@ def evaluate_results():
     questionnaire_id = data.get('questionnaireId')
     answers = data.get('answers')
     # cambiar estado de cuestionario a "completed"
-    print("QuestionnaireID: ",questionnaire_id )
-    print("Answers:", answers)
+    app.logger.debug("QuestionnaireID: ",questionnaire_id )
+    app.logger.debug("Answers:", answers)
 
 
     # Lógica para evaluar las respuestas

@@ -153,7 +153,7 @@ const Dashboard = () => {
         const response = await fetch(`${API_BASE_URL}/api/questionnaires?email=${encodeURIComponent(userEmail)}`);
         if (response.ok) {
           const data = await response.json();
-          setQuestionnaires(data.questionnaires);
+          setQuestionnaires(data);
           // Verificar si hay cuestionarios en 'in_progress' para decidir si seguir con el intervalo
           if (data.questionnaires.some(q => q.status === 'scheduled')) {
             if (!intervalId) {
