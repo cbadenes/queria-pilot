@@ -2,33 +2,27 @@ import React, { useState, useEffect } from 'react';
 import MuiAlert from '@mui/material/Alert';  // Componente para mostrar alertas
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ImportExportIcon from '@mui/icons-material/ImportExport'; // Icono para exportar a Moodle
-import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, MenuItem, TextFields, Fab, IconButton, Typography, Button, Divider } from '@mui/material';
+import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, Fab, IconButton, Typography, Button } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import ErrorIcon from '@mui/icons-material/Error';
 import HelpIcon from '@mui/icons-material/Help';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
 import { TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
-import { green, grey } from '@mui/material/colors';  // Importa los colores
+import { grey } from '@mui/material/colors';  // Importa los colores
 import API_BASE_URL from './config';  // Base URL for API requests
 import logo from '../assets/images/queria-logo.png';  // Logo
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import axios from 'axios';
-import BuildIcon from '@mui/icons-material/Build';
 import EditIcon from '@mui/icons-material/Edit';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Slider } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
+import { deepOrange } from '@mui/material/colors';
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -416,11 +410,22 @@ const Dashboard = () => {
       <CssBaseline />
 
       {/* Logout icon at the top-right corner */}
-      <Box sx={{ position: 'absolute', top: 56, right: 16 }}>
-        <IconButton color="inherit" onClick={() => navigate('/')} sx={{ color: darkGrayColor }}>
-          <LogoutIcon />
-        </IconButton>
-      </Box>
+     <Box sx={{ position: 'fixed', top: 16, right: 20 }}>
+       <Fab
+         color="primary"
+         onClick={() => navigate('/')}
+         sx={{
+           backgroundColor: orangeColor, // Asumimos que orangeColor está definido correctamente
+           color: darkGrayColor,  // Asumimos que darkGrayColor también está definido
+           '&:hover': {
+             backgroundColor: deepOrange[700]  // Asegúrate de que este color está disponible en tu tema
+           }
+         }}
+       >
+         <LogoutIcon />
+       </Fab>
+     </Box>
+
 
       {/* Sidebar - List of Questionnaires */}
       <Drawer
@@ -470,11 +475,26 @@ const Dashboard = () => {
         </List>
 
         {/* Add new questionnaire button */}
-        <Box sx={{ p: 2, position: 'absolute', bottom: 0, left: 0, right: 0, textAlign: 'center' }}>
-          <Fab sx={{ backgroundColor: orangeColor, color: darkGrayColor }} aria-label="add" onClick={() => navigate('/create-questionnaire')}>
+        <Box sx={{
+            p: 2,
+            position: 'fixed',
+            bottom: 20,
+            right: 20,
+            pointerEvents: 'none'
+        }}>
+          <Fab
+            sx={{
+              backgroundColor: orangeColor,
+              color: darkGrayColor,
+              pointerEvents: 'auto'
+            }}
+            aria-label="add"
+            onClick={() => navigate('/create-questionnaire')}
+          >
             <AddIcon />
           </Fab>
         </Box>
+
       </Drawer>
 
       {/* Main Content - Show list of questions on the right */}
