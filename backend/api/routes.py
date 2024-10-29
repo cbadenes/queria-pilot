@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, request, jsonify, make_response
+from flask import Flask, Blueprint, request, jsonify, make_response, g
 from flask import current_app as app
 from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
@@ -18,14 +18,17 @@ headers = {'Access-Control-Allow-Origin': '*'}
 def init_routes(app):
     @app.before_request
     def before_request_logging():
-        app.logger.info('Received request: %s %s', request.method, request.url)
-        app.logger.debug('Headers: %s', request.headers)
-        app.logger.debug('Body: %s', request.get_data(as_text=True))
+        # Genera un identificador único para la solicitud y guárdalo en el contexto de la solicitud
+        g.request_id = str(uuid.uuid4())
+        app.logger.info('[%s] Received request: %s %s', g.request_id, request.method, request.url)
+        app.logger.debug('[%s] Headers: %s', g.request_id, request.headers)
+        app.logger.debug('[%s] Body: %s', g.request_id, request.get_data(as_text=True))
+
 
     @app.after_request
     def after_request_logging(response):
-        app.logger.info('Response status: %s', response.status)
-        app.logger.debug('Response data: %s', response.get_data(as_text=True))
+        app.logger.info('[%s] Response status: %s', g.request_id, response.status)
+        app.logger.debug('[%s] Response data: %s', g.request_id, response.get_data(as_text=True))
         return response
 
 
