@@ -1,4 +1,5 @@
 from flask import Flask, Blueprint, request, jsonify, make_response
+from flask import current_app as app
 from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
 import os
@@ -6,21 +7,30 @@ from .utils import extract_questions
 from .models import User, Questionnaire, Question
 import bcrypt
 import uuid
-import logging  # Añadir logs para ayudar en la depuración
 import json
 import dicttoxml
 
 api_blueprint = Blueprint('api', __name__)
 
-# Configurar logging para depuración
-logging.basicConfig(level=logging.DEBUG)
-
 # CORS
 headers = {'Access-Control-Allow-Origin': '*'}
 
+def init_routes(app):
+    @app.before_request
+    def before_request_logging():
+        app.logger.info('Received request: %s %s', request.method, request.url)
+        app.logger.debug('Headers: %s', request.headers)
+        app.logger.debug('Body: %s', request.get_data(as_text=True))
+
+    @app.after_request
+    def after_request_logging(response):
+        app.logger.info('Response status: %s', response.status)
+        app.logger.debug('Response data: %s', response.get_data(as_text=True))
+        return response
+
+
 @api_blueprint.route('/login', methods=['POST'])
 def login():
-    print("login input")
     user_data = request.get_json()
     user = User.find_user_by_email(user_data['email'])
 
@@ -63,19 +73,19 @@ def create_questionnaire():
     try:
         # Verificar si el archivo PDF fue enviado
         if 'pdf' not in request.files:
-            logging.error("No PDF file provided")
+            app.logger.error("No PDF file provided")
             return jsonify({"error": "No PDF file provided"}), 400, headers
 
         pdf_file = request.files['pdf']
         if pdf_file.filename == '':
-            logging.error("No selected file")
+            app.logger.error("No selected file")
             return jsonify({"error": "No selected file"}), 400, headers
 
         # Guardar el archivo PDF en una ubicación temporal
         filename = secure_filename(pdf_file.filename)
         pdf_path = os.path.join('/tmp', filename)
         pdf_file.save(pdf_path)
-        logging.info(f"Archivo PDF guardado temporalmente en: {pdf_path}")
+        app.logger.info(f"Archivo PDF guardado temporalmente en: {pdf_path}")
 
         # Extraer los datos enviados en la solicitud
         num_questions = request.form.get('numQuestions', type=int)
@@ -84,11 +94,11 @@ def create_questionnaire():
         questionnaire_name = request.form.get('name')
         user_email = request.form.get('email')
 
-        logging.debug(f"Datos recibidos: numQuestions={num_questions}, difficulty={difficulty}, percentageFreeResponse={percentage_free_response}, name={questionnaire_name}, email={user_email}")
+        app.logger.debug(f"Datos recibidos: numQuestions={num_questions}, difficulty={difficulty}, percentageFreeResponse={percentage_free_response}, name={questionnaire_name}, email={user_email}")
 
         # Verificar que todos los campos sean válidos
         if not all([num_questions, difficulty, percentage_free_response, questionnaire_name, user_email]):
-            logging.error("Faltan datos en la solicitud")
+            app.logger.error("Faltan datos en la solicitud")
             return jsonify({"error": "Missing form data"}), 400, headers
 
         # Generar un identificador único para el cuestionario
@@ -97,7 +107,7 @@ def create_questionnaire():
         # Procesar el archivo PDF y extraer preguntas (esta función debe estar en utils.py)
         try:
             questions = extract_questions(pdf_path)
-            logging.info(f"Preguntas extraídas del PDF: {questions}")
+            app.logger.info(f"Preguntas extraídas del PDF: {questions}")
 
             # Aquí puedes añadir lógica adicional para construir el cuestionario
             questionnaire = {
@@ -113,7 +123,7 @@ def create_questionnaire():
 
             # Eliminar el archivo temporal después de su uso
             os.remove(pdf_path)
-            logging.info(f"Archivo PDF temporal eliminado: {pdf_path}")
+            app.logger.info(f"Archivo PDF temporal eliminado: {pdf_path}")
 
             # Respuesta exitosa
             return jsonify({
@@ -123,11 +133,11 @@ def create_questionnaire():
             }), 200, headers
 
         except Exception as e:
-            logging.error(f"Error procesando el archivo PDF: {str(e)}")
+            app.logger.error(f"Error procesando el archivo PDF: {str(e)}")
             return jsonify({"error": str(e)}), 500, headers
 
     except Exception as e:
-        logging.error(f"Error general en la creación del cuestionario: {str(e)}")
+        app.logger.error(f"Error general en la creación del cuestionario: {str(e)}")
         return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/evaluate', methods=['POST'])
