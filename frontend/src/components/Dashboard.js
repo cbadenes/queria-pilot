@@ -157,7 +157,7 @@ const Dashboard = () => {
     };
 
     // Establecer un intervalo para actualizar los cuestionarios
-    const intervalId = setInterval(fetchQuestionnaires, 10000);
+    const intervalId = setInterval(fetchQuestionnaires, 120000);
     fetchQuestionnaires(); // Llamar también inmediatamente para cargar inicialmente los datos
 
     // Función de limpieza para asegurar que el intervalo se limpie correctamente

@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "_id": "1",
     "name": "Cuestionario 1",
     "filename": "sample.pdf",
     "date": "2024-08-27",
@@ -11,7 +11,7 @@
     "ratio": 20
   },
   {
-    "id": "2",
+    "_id": "2",
     "name": "Cuestionario 2",
     "filename": "sample.pdf",
     "date": "2024-09-06",
@@ -22,7 +22,7 @@
     "ratio": 40
   },
   {
-    "id": "3",
+    "_id": "3",
     "name": "Cuestionario 3",
     "filename": "sample.pdf",
     "date": "2024-09-11",
@@ -33,7 +33,7 @@
     "ratio": 70
   },
   {
-    "id": "4",
+    "_id": "4",
     "name": "Cuestionario 4",
     "filename": "sample.pdf",
     "date": "2024-09-05",
@@ -44,7 +44,7 @@
     "ratio": 30
   },
   {
-    "id": "5",
+    "_id": "5",
     "name": "Cuestionario 5",
     "filename": "sample.pdf",
     "date": "2024-09-15",
@@ -55,7 +55,7 @@
     "ratio": 50
   },
   {
-    "id": "6",
+    "_id": "6",
     "name": "Cuestionario 6",
     "filename": "sample.pdf",
     "date": "2024-09-01",
@@ -66,7 +66,7 @@
     "ratio": 60
   },
   {
-    "id": "7",
+    "_id": "7",
     "name": "Cuestionario 7",
     "filename": "sample.pdf",
     "date": "2024-08-31",
@@ -77,7 +77,7 @@
     "ratio": 85
   },
   {
-    "id": "8",
+    "_id": "8",
     "name": "Cuestionario 8",
     "filename": "sample.pdf",
     "date": "2024-08-30",
@@ -88,7 +88,7 @@
     "ratio": 45
   },
   {
-    "id": "9",
+    "_id": "9",
     "name": "Cuestionario 9",
     "filename": "sample.pdf",
     "date": "2024-09-20",
@@ -99,7 +99,7 @@
     "ratio": 55
   },
   {
-    "id": "10",
+    "_id": "10",
     "name": "Cuestionario 10",
     "filename": "sample.pdf",
     "date": "2024-09-18",

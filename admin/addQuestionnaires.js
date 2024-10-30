@@ -18,7 +18,7 @@ async function addQuestionnaire(client, questionnaireData) {
     const questionnairesCollection = client.db().collection("questionnaires");
 
     // Verificar si ya existe un cuestionario con ese ID
-    const existingQuestionnaire = await questionnairesCollection.findOne({ id: questionnaireData.id });
+    const existingQuestionnaire = await questionnairesCollection.findOne({ _id: questionnaireData._id });
     if (existingQuestionnaire) {
         console.log("Questionnaire already exists with id:", questionnaireData.id);
         return; // Termina temprano si el cuestionario ya existe

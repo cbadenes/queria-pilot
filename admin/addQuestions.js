@@ -18,7 +18,7 @@ async function addQuestion(client, questionData) {
     const questionsCollection = client.db().collection("questions");
 
     // Verificar si ya existe una pregunta con ese ID
-    const existingQuestion = await questionsCollection.findOne({ id: questionData.id });
+    const existingQuestion = await questionsCollection.findOne({ _id: questionData._id });
     if (existingQuestion) {
         console.log("Question already exists with id:", questionData.id);
         return; // Termina temprano si la pregunta ya existe

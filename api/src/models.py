@@ -41,8 +41,10 @@ class Questionnaire:
     @staticmethod
     def get_questionnaires(email):
         # Buscar cuestionarios por email
-        res = list(mongo_db.db.questionnaires.find({"email": email}, {'_id': 0}))
-        return res
+        questionnaires = list(mongo_db.db.questionnaires.find({"email": email}))
+        for q in questionnaires:
+            q['id'] = str(q.pop('_id'))
+        return questionnaires
 
     @staticmethod
     def get_questionnaire(email, id):
