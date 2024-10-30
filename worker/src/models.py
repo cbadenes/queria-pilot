@@ -44,8 +44,10 @@ class Questionnaire:
     @staticmethod
     def get_questionnaires(email):
         # Buscar cuestionarios por email
-        res = list(mongo_db.db.questionnaires.find({"email": email}, {'_id': 0}))
-        return res
+        questionnaires = list(mongo_db.db.questionnaires.find({"email": email}))
+        for q in questionnaires:
+            q['id'] = str(q.pop('_id'))
+        return questionnaires
 
     @staticmethod
     def get_questionnaire(email, id):
@@ -90,9 +92,11 @@ class Question:
 
     @staticmethod
     def get_questions(qid):
-        # Buscar preguntas por cuestionario
-        res = list(mongo_db.db.questions.find({"qid":qid}, {'_id': 0}))
-        return res
+        # Buscar preguntas por cuestionario y email
+        questions = list(mongo_db.db.questions.find({"qid":qid}))
+        for q in questions:
+            q['id'] = str(q.pop('_id'))
+        return questions
 
     @staticmethod
     def create_question(qid, question, difficulty, type, context, answers, valid_answer):

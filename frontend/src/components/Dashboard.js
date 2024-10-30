@@ -285,56 +285,47 @@ const Dashboard = () => {
 
   const handleValidate = async (question) => {
       const selected = selectedAnswer[question.id];
+      const newEvaluationResult = { ...evaluationResult };  // Copia del estado actual
 
       if (question.type === 'multi') {
-        if (selected === question.valid_answer) {
-          setEvaluationResult({
-            ...evaluationResult,
-            [question.id]: { correct: true, color: 'green' }
-          });
-          setSnackbarMessage('Respuesta correcta!');
-          setOpenSnackbar(true);
-        } else {
-          setEvaluationResult({
-            ...evaluationResult,
-            [question.id]: { correct: false, color: 'red' }
-          });
-          setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
-          setOpenSnackbar(true);
-        }
-      } else if (question.type === 'open') {
-        try {
-          const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              questionId: question.id,
-              context: question.context,
-              response: selected
-            })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const resultColor = data.score > 50 ? 'green' : 'red';
-            setEvaluationResult({
-              ...evaluationResult,
-              [question.id]: { correct: data.score > 50, color: resultColor }
-            });
-            setSnackbarMessage(`Respuesta ${resultColor === 'green' ? 'correcta' : 'incorrecta'}. Puntuación: ${data.score}`);
-            setOpenSnackbar(true);
+          if (selected === question.valid_answer) {
+              newEvaluationResult[question.id] = { correct: true, color: 'green' };
+              setSnackbarMessage('Respuesta correcta!');
           } else {
-            console.error('Error al validar la respuesta:', response.statusText);
-            setSnackbarMessage('Error al validar la respuesta.');
-            setOpenSnackbar(true);
+              newEvaluationResult[question.id] = { correct: false, color: 'red' };
+              setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
           }
-        } catch (error) {
-          console.error('Error en la petición al backend:', error);
-          setSnackbarMessage('Error en la comunicación con el servidor.');
-          setOpenSnackbar(true);
-        }
+      } else if (question.type === 'open') {
+          try {
+              const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      questionId: question.id,
+                      context: question.context,
+                      response: selected
+                  })
+              });
+
+              if (response.ok) {
+                  const data = await response.json();
+                  const resultColor = data.score > 50 ? 'green' : 'red';
+                  newEvaluationResult[question.id] = { correct: data.score > 50, color: resultColor };
+                  setSnackbarMessage(`Respuesta ${resultColor === 'green' ? 'correcta' : 'incorrecta'}. Puntuación: ${data.score}`);
+              } else {
+                  setSnackbarMessage('Error al validar la respuesta.');
+              }
+          } catch (error) {
+              console.error('Error en la petición al backend:', error);
+              setSnackbarMessage('Error en la comunicación con el servidor.');
+          }
       }
+
+      setEvaluationResult(newEvaluationResult);  // Actualiza el estado con la copia modificada
+      setOpenSnackbar(true);
   };
+
+
 
 
   // Función para cerrar el Snackbar
