@@ -4,7 +4,9 @@ from flask import current_app as app
 from pymongo.errors import ConnectionFailure
 from datetime import datetime
 import hashlib
+import logging
 
+logger = logging.getLogger('queriaWorker')
 class MongoDB:
     def __init__(self):
         self.client = None
@@ -52,6 +54,14 @@ class Questionnaire:
         return list(mongo_db.db.questionnaires.find({"email": email, "_id":id}))
 
     @staticmethod
+    def update_status(qid, new_status):
+        result = mongo_db.db.questionnaires.update_one(
+            {'_id': qid},  # Asegúrate de que '_id' es el campo correcto usado para identificar el cuestionario
+            {'$set': {'status': new_status}}
+        )
+        return result.modified_count
+
+    @staticmethod
     def create_questionnaire(name, email, filename, difficulty, num_questions, ratio):
         # Generar un identificador único para el cuestionario
         unique_string = f"{name}_{email}".encode('utf-8')
@@ -71,10 +81,10 @@ class Questionnaire:
         try:
             result = mongo_db.db.questionnaires.insert_one(questionnaire_data)
             questionnaire_data["id"] = str(questionnaire_data["_id"])
-            app.logger.info(f"New questionnaire created : {questionnaire_data}")
+            logger.info(f"New questionnaire created : {questionnaire_data}")
             return questionnaire_data
         except DuplicateKeyError:
-            app.logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
+            logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
             return {}
 
 class Question:
@@ -86,3 +96,30 @@ class Question:
         for q in questions:
             q['id'] = str(q.pop('_id'))
         return questions
+
+    @staticmethod
+    def create_question(qid, question, difficulty, type, context, answers, valid_answer):
+        # Generar un identificador único para el cuestionario
+        unique_string = f"{question}_{valid_answer}_{context}".encode('utf-8')
+        question_id = hashlib.md5(unique_string).hexdigest()
+
+        question_data = {
+            "_id": question_id,
+            "qid": qid,
+            "question": question,
+            "date": datetime.now(),
+            "difficulty": difficulty,
+            "type": type,
+            "context": context,
+            "answers": answers,
+            "valid_answer":valid_answer,
+            "responses":[]
+        }
+        try:
+            result = mongo_db.db.questions.insert_one(question_data)
+            question_data["id"] = str(question_data["_id"])
+            logger.info(f"New question created : {question_data}")
+            return question_data
+        except DuplicateKeyError:
+            logger.error(f"Error por pregunta duplicada: {question_id}")
+            return {}

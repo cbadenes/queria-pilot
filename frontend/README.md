@@ -41,7 +41,7 @@ Sigue los pasos a continuación para configurar el entorno de desarrollo y ejecu
     ```
 3. Inicia el servidor de desarrollo:
     ```bash
-    python app.py
+    python app-api.py
     ```
 
 ### Configuración del Frontend

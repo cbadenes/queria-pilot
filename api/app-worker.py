@@ -2,8 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from src.routes import api_blueprint
 from src.models import mongo_db
-from src.events import rabbitmq
-from flask_jwt_extended import JWTManager
+from src.worker import  start_consumer
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -11,10 +10,9 @@ from logging.handlers import RotatingFileHandler
 def create_app():
     app = Flask(__name__)
     app.config.from_object('instance.config.Config')
-    app.config['JWT_SECRET_KEY'] = 'super-secret'  # Cambia esto por una clave real en producción
 
     file_handler = RotatingFileHandler(
-        app.config['LOG_FILE'],
+        "queria-worker.log",
         maxBytes=app.config['LOG_MAX_BYTES'],
         backupCount=app.config['LOG_BACKUP_COUNT']
     )
@@ -27,7 +25,7 @@ def create_app():
     console_handler.setFormatter(console_formatter)
 
 
-    app.logger = logging.getLogger('queriaApi')
+    app.logger = logging.getLogger('queriaWorker')
     app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
     app.logger.addHandler(file_handler)
     app.logger.addHandler(console_handler)
@@ -42,15 +40,15 @@ def create_app():
     init_routes(app)
 
     # Aplica CORS a todas las rutas
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-
-    JWTManager(app)
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5000"}})
 
     with app.app_context():
         mongo_db.init_app()
-        rabbitmq.connect()
 
     app.register_blueprint(api_blueprint, url_prefix='/api')
+
+    # Iniciar el consumidor de RabbitMQ en un hilo separado
+    start_consumer(app.config)
 
     return app
 
