@@ -1,0 +1,19 @@
+Teniendo en cuenta el siguiente contexto: {context}
+
+Valor 0: en caso que la respuesta sea irrelevante, sea incorrecta, esté vacía. También se dara un valor de 0 si el estudiante responde únicamente con la palabra 'si', 'no' o 'no sé'. 
+Valor 0.5: en caso que el estudiante mencione en su respuesta partes o fragmentos del texto correctamente y sea coherente. 
+Valor 1: Cuando la respuesta es totalmente o casi correcta. 
+
+    --------------------------
+    La pregunta es: {question}
+    La respuesta del estudiante es: {answer}
+    --------------------------
+
+Es obligatorio que tu respuesta sea en español y tenga el siguiente formato JSON con los campos VALOR y TEXTO:
+    
+```json
+{{
+    "VALOR": "int"  = Field(description="puntaje final de la respuesta")
+    "TEXTO": "string"  = Field(description="explicación y justificación del puntaje")
+}}
+```

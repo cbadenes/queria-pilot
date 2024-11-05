@@ -1,0 +1,17 @@
+El texto que debes usar es este:
+    ---------------------
+    {context}
+    ---------------------
+        
+Es obligatorio que el resultado sea en español formateado con el siguiente esquema:
+    
+    ```json
+    {
+    	"PREGUNTA": "string"  // tu pregunta generada usando la información del contexto,
+        "OPCION1": "string"  // esta es una respuesta falsa,
+        "OPCION2": "string" // esta es una respuesta falsa,
+        "OPCION3": "string" // esta es una respuesta falsa,
+        "OPCION4": "string" // esta es la respuesta verdadera,
+        "EVIDENCIA": "string" // esta es una breve explicación de la respuesta correcta
+    }
+    ```

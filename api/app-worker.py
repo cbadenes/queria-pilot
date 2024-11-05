@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from src.routes import api_blueprint
 from src.models import mongo_db
+from src.chats import llm
 from src.worker import  start_consumer
 import logging
 from logging.handlers import RotatingFileHandler
@@ -44,6 +45,8 @@ def create_app():
 
     with app.app_context():
         mongo_db.init_app()
+        llm.init_app()
+
 
     app.register_blueprint(api_blueprint, url_prefix='/api')
 

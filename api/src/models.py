@@ -81,10 +81,10 @@ class Questionnaire:
         try:
             result = mongo_db.db.questionnaires.insert_one(questionnaire_data)
             questionnaire_data["id"] = str(questionnaire_data["_id"])
-            logger.info(f"New questionnaire created : {questionnaire_data}")
+            app.logger.info(f"New questionnaire created : {questionnaire_data}")
             return questionnaire_data
         except DuplicateKeyError:
-            logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
+            app.logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
             return {}
 
 class Question:
@@ -98,9 +98,9 @@ class Question:
         return questions
 
     @staticmethod
-    def create_question(qid, question, difficulty, type, context, answers, valid_answer):
+    def create_question(qid, question, difficulty, type, context, answers, valid_answer, evidence):
         # Generar un identificador único para el cuestionario
-        unique_string = f"{question}_{valid_answer}_{context}".encode('utf-8')
+        unique_string = f"{qid}_{question}_{valid_answer}_{context}".encode('utf-8')
         question_id = hashlib.md5(unique_string).hexdigest()
 
         question_data = {
@@ -113,6 +113,7 @@ class Question:
             "context": context,
             "answers": answers,
             "valid_answer":valid_answer,
+            "evidence":evidence,
             "responses":[]
         }
         try:
