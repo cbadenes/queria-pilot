@@ -568,7 +568,7 @@ const Dashboard = () => {
                       Valorar Pregunta
                     </Typography>
                     <Typography component="div" gutterBottom>
-                      Redacción:
+                      Calidad en la Redacción:
                       <Slider
                         value={rating.writing || 2}
                         onChange={(event, newValue) => setRating({...rating, writing: newValue})}
@@ -584,7 +584,7 @@ const Dashboard = () => {
                       />
                     </Typography>
                     <Typography component="div" gutterBottom>
-                      Dificultad:
+                      Ajuste de Dificultad:
                       <Slider
                         value={rating.difficulty || 2}
                         onChange={(event, newValue) => setRating({...rating, difficulty: newValue})}
@@ -600,7 +600,7 @@ const Dashboard = () => {
                       />
                     </Typography>
                     <Typography component="div" gutterBottom>
-                      Relevancia:
+                      Relevancia del Contenido:
                       <Slider
                         value={rating.relevance ||2}
                         onChange={(event, newValue) => setRating({...rating, relevance: newValue})}

@@ -1,4 +1,4 @@
-db = db.getSiblingDB('mydatabase');
+db = db.getSiblingDB('queria');
 
 db.createUser({
   user: "myuser",
@@ -6,7 +6,7 @@ db.createUser({
   roles: [
     {
       role: "readWrite",
-      db: "mydatabase"
+      db: "queria"
     }
   ]
 });

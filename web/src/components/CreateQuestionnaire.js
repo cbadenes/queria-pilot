@@ -51,7 +51,7 @@ const CreateQuestionnaire = () => {
       });
 
       if (response.ok) {
-        setSnackbarMessage('Cuestionario creado con éxito.');
+        setSnackbarMessage('Cuestionario solicitado con éxito.');
         setSnackbarSeverity('success');
         setOpenSnackbar(true);
         setTimeout(() => {

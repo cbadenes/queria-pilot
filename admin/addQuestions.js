@@ -3,7 +3,7 @@ const fs = require('fs');
 
 // Conectar a la base de datos
 async function connectDB() {
-    const uri = "mongodb://myuser:mypassword@localhost:27017/mydatabase"; // Ajusta con tus credenciales
+    const uri = "mongodb://myuser:mypassword@localhost:27017/queria"; // Ajusta con tus credenciales
     const client = new MongoClient(uri);
     try {
         await client.connect();

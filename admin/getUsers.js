@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 
 // Cambiar la URI para usar el usuario específico de la base de datos
 async function connectDB() {
-    const uri = "mongodb://myuser:mypassword@localhost:27017/mydatabase"; // Usa el usuario y contraseña de la base de datos
+    const uri = "mongodb://myuser:mypassword@localhost:27017/queria"; // Usa el usuario y contraseña de la base de datos
     const client = new MongoClient(uri);
     try {
         await client.connect();

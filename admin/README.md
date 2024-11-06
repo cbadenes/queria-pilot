@@ -36,7 +36,7 @@ async function connectDB() {
 }
 
 async function addUser(client, userData) {
-    const usersCollection = client.db("mydatabase").collection("users");
+    const usersCollection = client.db("queria").collection("users");
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const userDocument = {
         email: userData.email,
