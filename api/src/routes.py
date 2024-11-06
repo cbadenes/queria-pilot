@@ -3,7 +3,6 @@ from flask import current_app as app
 from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
 import os
-from .utils import extract_questions
 from .models import User, Questionnaire, Question, Comment
 from .chats import Conversation
 from .events import Ticket
@@ -14,6 +13,7 @@ import dicttoxml
 from PyPDF2 import PdfReader
 import random
 from pika import BlockingConnection, ConnectionParameters
+import xml.etree.ElementTree as ET
 
 
 
@@ -206,9 +206,32 @@ def handle_comments():
 def export_moodle():
     data = request.json
     questionnaire_id = data.get('questionnaireId')
+    questionnaire = Questionnaire.get_questionnaire(questionnaire_id)
     questions = Question.get_questions(questionnaire_id)
-    xml = dicttoxml.dicttoxml(questions)
-    response = make_response(xml)
+
+    quiz = ET.Element("quiz")
+
+    comment_name = ET.Comment(f' Cuestionario: {questionnaire.get("name")} ')
+    quiz.append(comment_name)
+
+    # Añadir cada pregunta al XML
+    for question in questions:
+        question_element = ET.SubElement(quiz, "question", type="multichoice")
+
+        name = ET.SubElement(question_element, "name")
+        ET.SubElement(name, "text").text = question.get("question")
+
+        questiontext = ET.SubElement(question_element, "questiontext", format="html")
+        ET.SubElement(questiontext, "text").text = f"<![CDATA[<p>{question.get('question')}</p>]]>"
+
+        # Añadir respuestas
+        for answer in question.get("answers", []):
+            answer_element = ET.SubElement(question_element, "answer", fraction="100" if answer == question.get("valid_answer") else "0", format="html")
+            ET.SubElement(answer_element, "text").text = f"<![CDATA[<p>{answer}</p>]]>"
+
+    # Convertir a string el XML
+    xml_str = ET.tostring(quiz, encoding='utf8', method='xml').decode()
+    response = make_response(xml_str)
     response.headers['Content-Type'] = 'application/xml'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
