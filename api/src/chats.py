@@ -2,6 +2,7 @@ from pathlib import Path
 import requests
 from flask import current_app as app
 import json
+from json.decoder import JSONDecodeError
 import random
 import logging
 from datetime import datetime
@@ -182,11 +183,30 @@ class Conversation:
         level = difficulty_mapping.get(difficulty, "easy")
         model = "llama3_evaluator"
         content = context.strip()[:max_size]
-        prompt_user= Path("src/prompts/evaluator_format_template.txt").read_text().strip()
+        prompt_user = Path("src/prompts/evaluator_format_template.txt").read_text().strip()
         prompt_user = prompt_user.replace('{question}', question).replace('{answer}', answer).replace('{context}', content)
 
-        logger.debug(f"Prompt: {prompt_user}")
-        response = Conversation.chat("user", prompt_user, model)
-        logger.debug(f"Response: {response}")
-        return Conversation.parse_response(response)
+        #logger.debug(f"Prompt: {prompt_user}")
+        #response = Conversation.chat("user", prompt_user, model)
+        #logger.debug(f"Response: {response}")
+        #return Conversation.parse_response(response)
+
+        max_retries = 3
+        attempts = 0
+
+        while attempts < max_retries:
+            try:
+                logger.debug(f"Prompt: {prompt_user}")
+                response = Conversation.chat("user", prompt_user, model)
+                logger.debug(f"Response: {response}")
+                return Conversation.parse_response(response)
+            except JSONDecodeError:
+                logger.error("JSON decoding failed, retrying...")
+                prompt_user +="\nAsegurate de cumplir el formato JSON, ya que he tenido que volver a pedírtelo."
+                attempts += 1
+                if attempts == max_retries:
+                    logger.error("Maximum retry attempts reached, failing with exception.")
+                    raise
+
+        raise Exception("Failed to process response after retries.")
 

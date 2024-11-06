@@ -6,6 +6,7 @@ import { CssBaseline, Drawer, List, ListItem, Box, Snackbar, Menu, Fab, IconButt
 import CheckIcon from '@mui/icons-material/Check';
 import HelpIcon from '@mui/icons-material/Help';
 import SendIcon from '@mui/icons-material/Send';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -23,6 +24,8 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Slider } from '@mui/material';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import { deepOrange } from '@mui/material/colors';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+
 
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
@@ -58,6 +61,7 @@ const Dashboard = () => {
   const [allValidated, setAllValidated] = useState(false);
   const [evaluationMessage, setEvaluationMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
 
   useEffect(() => {
@@ -192,6 +196,42 @@ const Dashboard = () => {
     }
   };
 
+  const confirmDelete = (questionnaireId) => {
+      setSelectedQuestionnaireId(questionnaireId); // Guarda el ID del cuestionario que se desea borrar
+      setOpenConfirmDialog(true); // Abre el diálogo de confirmación
+    };
+
+  const handleDeleteQuestionnaire = async (questionnaireId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/questionnaires/${questionnaireId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        setSnackbarMessage(`Cuestionario borrado correctamente. Preguntas eliminadas: ${data.deleted_questions}`);
+        setOpenSnackbar(true);
+
+        setQuestionnaires(prevQuestionnaires => prevQuestionnaires.filter(q => q.id !== questionnaireId));
+        setSelectedQuestionnaireId(null); // Limpia la selección actual
+        setTimeout(() => {
+                setSelectedQuestions([]);
+              }, 500); // Retrasa la limpieza de preguntas
+      } else {
+        throw new Error('Error al borrar el cuestionario.');
+      }
+    } catch (error) {
+      console.error('Error en la petición al backend:', error);
+      setSnackbarMessage('Error al borrar el cuestionario.');
+      setOpenSnackbar(true);
+    }
+  };
+
+
+
   const exportPDF = async () => {
       const input = document.getElementById("questionsContainer");
       const iconsContainer = document.getElementById("iconsContainer");
@@ -256,35 +296,6 @@ const Dashboard = () => {
         return <HelpIcon />;
     }
   };
-
-  const handleSubmitResults = async () => {
-    const payload = {
-      questionnaireId: selectedQuestionnaireId,
-      answers: selectedAnswer
-    };
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/results`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSnackbarMessage(data.message);
-        setOpenSnackbar(true);
-        // Actualizar el estado en el frontend si es necesario
-        const updatedQuestionnaires = questionnaires.map(q =>
-          q.id === selectedQuestionnaireId ? { ...q, status: 'completed' } : q
-        );
-        setQuestionnaires(updatedQuestionnaires);
-      } else {
-        console.error("Error al enviar los resultados:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error en la petición al backend:", error);
-    }
-  };
-
 
   const handleValidate = async (question) => {
       const selected = selectedAnswer[question.id];
@@ -661,40 +672,53 @@ const Dashboard = () => {
                 </Box>
               </Box>
             ))}
-            {/* Icono para exportar a PDF, colocado a la derecha */}
               <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2 }}>
-                <IconButton
-                  onClick={handleSubmitResults}
-                  disabled={!allValidated}
-                  sx={{
-                    color: allValidated ? orangeColor : grey[500],
-                    '&:hover': {
-                      backgroundColor: allValidated ? '#e6b28e' : 'inherit'
-                    },
-                    ml: 2
-                  }}
-                >
-                  <PublishedWithChangesIcon fontSize="normal" />
-                </IconButton>
                   <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
                     <PictureAsPdfIcon />
                   </IconButton>
                   <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
                     <ImportExportIcon />
                   </IconButton>
+                  <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
+                    <DeleteIcon />
+                  </IconButton>
               </Box>
-            <Snackbar
-              open={openSnackbar}
-              autoHideDuration={6000}
-              onClose={handleCloseSnackbar}
-              message={snackbarMessage}
-            />
+              <Dialog
+                open={openConfirmDialog}
+                onClose={() => setOpenConfirmDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">{"Confirmar Borrado"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                    ¿Estás seguro de que deseas borrar este cuestionario y todas sus preguntas asociadas?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpenConfirmDialog(false)} color="primary">
+                    Cancelar
+                  </Button>
+                  <Button onClick={() => {
+                    handleDeleteQuestionnaire(selectedQuestionnaireId);
+                    setOpenConfirmDialog(false);
+                  }} color="primary" autoFocus>
+                    Confirmar
+                  </Button>
+                </DialogActions>
+              </Dialog>
           </Box>
         ) : (
           <Typography variant="h6" sx={{ color: '#888' }}>
             Selecciona un cuestionario para ver las preguntas
           </Typography>
         )}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+        />
       </Box>
     </Box>
   );

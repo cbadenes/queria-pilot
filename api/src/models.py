@@ -49,9 +49,18 @@ class Questionnaire:
         return questionnaires
 
     @staticmethod
-    def get_questionnaire(email, id):
+    def get_questionnaire(id):
         # Buscar cuestionarios por email
-        return list(mongo_db.db.questionnaires.find({"email": email, "_id":id}))
+        return mongo_db.db.questionnaires.find_one({"_id":id})
+
+    @staticmethod
+    def delete_questionnaire(id):
+        questions_result = mongo_db.db.questions.delete_many({"qid":id})
+        questionnaire_result = mongo_db.db.questionnaires.delete_one({"_id":id})
+        return {
+            "deleted_questions": questions_result.deleted_count,
+            "questionnaire_deleted": questionnaire_result.deleted_count > 0
+        }
 
     @staticmethod
     def update_status(qid, new_status):

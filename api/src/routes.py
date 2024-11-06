@@ -73,6 +73,16 @@ def get_questions(id):
     else:
         return jsonify({"error": "Cuestionario Inválido"}), 404, headers
 
+@api_blueprint.route('/questionnaires/<id>', methods=['DELETE'])
+def delete_questionnaire(id):
+
+    response = Questionnaire.delete_questionnaire(id)
+
+    if response['questionnaire_deleted']:
+        return jsonify(response), 200, headers
+    else:
+        return jsonify({"error": "Cuestionario Inválido"}), 404, headers
+
 @api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
     try:
@@ -184,35 +194,3 @@ def export_moodle():
     response.headers['Content-Type'] = 'application/xml'
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
-
-@api_blueprint.route('/results', methods=['POST'])
-def evaluate_results():
-    data = request.get_json()
-    questionnaire_id = data.get('questionnaireId')
-    answers = data.get('answers')
-    # cambiar estado de cuestionario a "completed"
-    app.logger.debug(f"QuestionnaireID: {questionnaire_id}" )
-    app.logger.debug(f"Answers: {answers}")
-
-
-    # Lógica para evaluar las respuestas
-    # Por ejemplo, comprobar respuestas correctas y calcular una puntuación
-    correct_answers = {
-        'question1': 'respuesta1',
-        'question2': 'respuesta2',
-        # Asumir que 'correct_answers' contiene las respuestas correctas de cada pregunta
-    }
-
-    score = 0
-    total_questions = len(answers)
-    for question_id, user_answer in answers.items():
-        if user_answer == correct_answers.get(question_id):
-            score += 1
-
-    result_score = (score / total_questions) * 100  # Calcular la puntuación como un porcentaje
-
-    # Devolver el resultado de la evaluación
-    if result_score > 50:
-        return jsonify({"message": "¡Buen trabajo! Has aprobado el cuestionario.", "score": result_score}), 200
-    else:
-        return jsonify({"message": "Necesitas mejorar. Intenta nuevamente el cuestionario.", "score": result_score}), 200

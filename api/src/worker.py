@@ -62,9 +62,8 @@ def start_consumer(config):
             questions = Question.get_questions(data['id'])
             logger.info(f"Questions: {questions}")
 
-            questionnaires = Questionnaire.get_questionnaire(data['email'],data['id'])
-            if (len(questionnaires)>0):
-                questionnaire = questionnaires[0]
+            questionnaire = Questionnaire.get_questionnaire(data['id'])
+            if (questionnaire):
                 logger.info(f"Questionnaire: {questionnaire}")
                 logger.info(f"Num Questions in DB: {len(questions)}")
                 logger.info(f"Num Questions in Questionnaire: {questionnaire}")
@@ -72,6 +71,8 @@ def start_consumer(config):
                     logger.info("Updating questionnaire ..")
                     Questionnaire.update_status(data['id'], "in_progress")
                     logger.info("questionnaire updated")
+            else:
+                logger.error(f"No questionnaire found with the given ID: {data['id']}")
 
 
         except Exception as e:
