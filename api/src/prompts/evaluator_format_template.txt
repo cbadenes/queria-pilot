@@ -11,7 +11,7 @@ Valor 100: Cuando la respuesta es casi correcta o totalmente correcta.
     La respuesta del estudiante es: {answer}
     --------------------------
 No menciones el término 'contexto', en todo caso puedes referirte a partes concretas del contexto que te he facilitado. Tampoco menciones explícitamente la puntuación numérica en la explicación.
-Es obligatorio que tu respuesta sea en español castellano y tenga el siguiente formato JSON con los campos VALOR y TEXTO:
+Es obligatorio que tu respuesta sea en español castellano y se ajuste al siguiente formato JSON con los campos VALOR y TEXTO. Asegurate de poner correctamente las comillas:
     
 ```json
 {{

@@ -1,5 +1,5 @@
 Debes usar el texto que tienes más abajo para generar una pregunta en español de nivel fácil y relacionada al texto. Después deberás generar 4 posibles respuestas para esta pregunta y solo una respuesta debe ser correcta.
-    La respuesta correcta es única y siempre debe ser la 'OPCION 4'. Solo la respuesta de la "OPCION 4" debe ser correcta. La 'OPCION 1' 'OPCION 2' y 'OPCION 3' deben ser respuestas incorrectas. Asegurate de que no hay respuestas repetidas.
+    La respuesta correcta es única y siempre debe ser la 'OPCION 4'. Solo la respuesta de la "OPCION 4" debe ser correcta. La 'OPCION 1' 'OPCION 2' y 'OPCION 3' deben ser respuestas incorrectas y no deben coincidir entre ellas. Además  deberían tener una extensión parecida a la respuesta correcta. Asegurate de que no hay respuestas repetidas.
     La pregunta debe ser de nivel fácil. Para generar una pregunta fácil tendrás que enfocarte en los datos factuales del texto.
     Una pregunta fácil deberá ser una pregunta sobre información general del texto, hechos o acontecimientos relacionados o deberá preguntar sobre la terminología usada en el texto o deberá ser una pregunta sobre una idea general del texto.
     La pregunta y las respuestas deben tener menos de 10 palabras. Es obligatorio redactes todo el texto en español.
