@@ -133,3 +133,32 @@ class Question:
         except DuplicateKeyError:
             logger.error(f"Error por pregunta duplicada: {question_id}")
             return {}
+
+
+class Comment:
+
+    @staticmethod
+    def create_comment(qid, question, comment, difficulty, writing, relevance):
+        # Generar un identificador único para el comentario
+        current_time = datetime.now()
+        unique_string = f"{qid}_{question}_{current_time}".encode('utf-8')
+        comment_id = hashlib.md5(unique_string).hexdigest()
+
+        comment_data = {
+            "_id": comment_id,
+            "qid": qid,
+            "question": question,
+            "date": current_time,
+            "difficulty": difficulty,
+            "writing": writing,
+            "relevance": relevance,
+            "comment": comment
+        }
+        try:
+            result = mongo_db.db.comments.insert_one(comment_data)
+            comment_data["id"] = str(comment_data["_id"])
+            logger.info(f"New comment created : {comment_data}")
+            return comment_data
+        except DuplicateKeyError:
+            logger.error(f"Error por comentario duplicado: {comment_id}")
+            return {}

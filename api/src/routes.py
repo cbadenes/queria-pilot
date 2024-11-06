@@ -4,7 +4,7 @@ from flask_jwt_extended import create_access_token
 from werkzeug.utils import secure_filename
 import os
 from .utils import extract_questions
-from .models import User, Questionnaire, Question
+from .models import User, Questionnaire, Question, Comment
 from .chats import Conversation
 from .events import Ticket
 import bcrypt
@@ -160,29 +160,47 @@ def create_questionnaire():
 
 @api_blueprint.route('/evaluate', methods=['POST'])
 def evaluate():
-    # Se reciben los datos de la pregunta y respuesta del frontend
-    data = request.json
-    app.logger.debug(f"Evaluate the following response: {data}")
-    question_id = data.get('questionId')
-    question_text = data.get('question')
-    difficulty = data.get('difficulty')
-    user_response = data.get('response')
-    context = data.get('context')
+    try:
+        # Se reciben los datos de la pregunta y respuesta del frontend
+        data = request.json
+        app.logger.debug(f"Evaluate the following response: {data}")
+        question_id = data.get('questionId')
+        question_text = data.get('question')
+        difficulty = data.get('difficulty')
+        user_response = data.get('response')
+        context = data.get('context')
 
-    # lógica de evaluación de la respuesta
-    evaluation = Conversation.evaluate(context, difficulty, question_text, user_response)
+        # lógica de evaluación de la respuesta
+        evaluation = Conversation.evaluate(context, difficulty, question_text, user_response)
 
-    # Devolver puntuación y explicación como respuesta
-    return jsonify({"score": evaluation['VALOR'], "explanation": evaluation['TEXTO'], "message": "Evaluación completada."}), 200, headers
+        # Devolver puntuación y explicación como respuesta
+        return jsonify({"score": evaluation['VALOR'], "explanation": evaluation['TEXTO'], "message": "Evaluación completada."}), 200, headers
+    except Exception as e:
+        app.logger.error(f"Error durante la evaluación: {str(e)}")
+        app.logger.error(f"Detalles del error:\n {traceback.format_exc()}")
+        # eliminar cuestionario en bbdd
+        return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():
-    data = request.get_json()
-    app.logger.debug(f"Comentario recibido: {data}")  # Imprime el comentario para fines de depuración
-    # Aquí puedes agregar código para procesar y almacenar el comentario en tu base de datos o sistema de archivos
+    try:
+        data = request.get_json()
+        app.logger.debug(f"Comentario recibido: {data}")  # Imprime el comentario para fines de depuración
 
-    # Devuelve un mensaje de confirmación
-    return jsonify({"message": "Tu comentario ha quedado registrado"}), 200, headers
+        question_id = data['id']
+        questionnaire_id = data['qid']
+        level_difficulty = data['ratings']['difficulty']
+        level_writing = data['ratings']['writing']
+        level_relevance = data['ratings']['relevance']
+        comment = data['comment']
+
+        Comment.create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance)
+        return jsonify({"message": "¡Muchas Gracias! Tu comentario ha quedado registrado"}), 200, headers
+    except Exception as e:
+        app.logger.error(f"Error durante la creación del comentario: {str(e)}")
+        app.logger.error(f"Detalles del error:\n {traceback.format_exc()}")
+        # eliminar cuestionario en bbdd
+        return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/export/moodle', methods=['POST'])
 def export_moodle():

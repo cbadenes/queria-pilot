@@ -81,6 +81,7 @@ const Dashboard = () => {
   const handleCloseRatingMenu = () => {
     setRatingMenuAnchorEl(null);
     setTextRating('');
+    setRating({ writing: 2, difficulty: 2, relevance: 2 });
   };
 
   const QuestionRating = ({ onRatingChange }) => {
@@ -381,6 +382,7 @@ const Dashboard = () => {
           setSnackbarMessage(data.message);
           setOpenSnackbar(true);
           setRatingSubmitted(prev => ({...prev, [currentQuestion.id]: true}));  // Marca como enviada para esta pregunta específica
+          setRating({ writing: 2, difficulty: 2, relevance: 2 });
         } else {
           console.error("Error al enviar la valoración:", response.statusText);
         }
