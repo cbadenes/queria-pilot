@@ -1,15 +1,17 @@
 Teniendo en cuenta el siguiente contexto: {context}
 
+Evalua la calidad de la respuesta proporcionada por el estudiante. Ten en cuenta que el objetivo es que descubra la respuesta correcta en caso de no haberlo hecho, así que construye comentarios constructivos, no demasiado sencillos, que ayuden al estudiante a alcanzar la respuesta correcta.
 Valor 0: en caso que la respuesta sea irrelevante, sea incorrecta, esté vacía. También se dara un valor de 0 si el estudiante responde únicamente con la palabra 'si', 'no' o 'no sé'. 
-Valor 0.5: en caso que el estudiante mencione en su respuesta partes o fragmentos del texto correctamente y sea coherente. 
-Valor 1: Cuando la respuesta es totalmente o casi correcta. 
+Valor 40: en caso que el estudiante mencione en su respuesta partes o fragmentos del texto correctamente.
+Valor 60: en caso que el estudiante mencione en su respuesta partes o fragmentos del texto correctamente y sea coherente.
+Valor 100: Cuando la respuesta es casi correcta o totalmente correcta.
 
     --------------------------
     La pregunta es: {question}
     La respuesta del estudiante es: {answer}
     --------------------------
-
-Es obligatorio que tu respuesta sea en español y tenga el siguiente formato JSON con los campos VALOR y TEXTO:
+No menciones el término 'contexto', en todo caso puedes referirte a partes concretas del contexto que te he facilitado. Tampoco menciones explícitamente la puntuación numérica en la explicación.
+Es obligatorio que tu respuesta sea en español castellano y tenga el siguiente formato JSON con los campos VALOR y TEXTO:
     
 ```json
 {{

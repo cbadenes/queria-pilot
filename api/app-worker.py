@@ -6,7 +6,10 @@ from src.chats import llm
 from src.worker import  start_consumer
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
+
+os.environ['QUERIA_MODE'] = 'worker'
 
 def create_app():
     app = Flask(__name__)

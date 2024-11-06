@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import os
 from .utils import extract_questions
 from .models import User, Questionnaire, Question
+from .chats import Conversation
 from .events import Ticket
 import bcrypt
 import uuid
@@ -108,7 +109,7 @@ def create_questionnaire():
         # Almacenar cuestionario en BBDD
         questionnaire = Questionnaire.create_questionnaire(questionnaire_name, user_email, pdf_file.filename, difficulty, num_questions, percentage_free_response)
         if 'id' not in questionnaire:
-            return jsonify({"error": "el nombre del cuestionario ya existe"}), 400, headers
+            return jsonify({"error": "El nombre del cuestionario ya existe"}), 400, headers
         # Procesar el archivo PDF
         parts = []
         try:
@@ -117,8 +118,8 @@ def create_questionnaire():
             for page in reader.pages:
                 text += page.extract_text() if page.extract_text() else ''
 
-            # Dividir el texto en partes de 512 caracteres
-            parts = [text[i:i+512] for i in range(0, len(text), 512)]
+            # Dividir el texto en partes de 1024 caracteres
+            parts = [text[i:i+1024] for i in range(0, len(text), 1024)]
         except Exception as e:
             app.logger.error(f"Error procesando el PDF: {e}")
             return jsonify({"error": "No se pudo procesar el PDF"}), 500, headers
@@ -151,16 +152,18 @@ def create_questionnaire():
 def evaluate():
     # Se reciben los datos de la pregunta y respuesta del frontend
     data = request.json
+    app.logger.debug(f"Evaluate the following response: {data}")
     question_id = data.get('questionId')
+    question_text = data.get('question')
+    difficulty = data.get('difficulty')
     user_response = data.get('response')
     context = data.get('context')
 
     # lógica de evaluación de la respuesta
-    score = 75  # Este valor es un ejemplo
-    explanation = "Bien hecho, tu respuesta es parcialmente correcta."
+    evaluation = Conversation.evaluate(context, difficulty, question_text, user_response)
 
     # Devolver puntuación y explicación como respuesta
-    return jsonify({"score": score, "explanation": explanation, "message": "Evaluación completada."}), 200, headers
+    return jsonify({"score": evaluation['VALOR'], "explanation": evaluation['TEXTO'], "message": "Evaluación completada."}), 200, headers
 
 @api_blueprint.route('/comments', methods=['POST'])
 def handle_comments():

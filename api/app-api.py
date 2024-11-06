@@ -3,10 +3,14 @@ from flask_cors import CORS
 from src.routes import api_blueprint
 from src.models import mongo_db
 from src.events import rabbitmq
+from src.chats import llm
 from flask_jwt_extended import JWTManager
 import logging
 from logging.handlers import RotatingFileHandler
+import os
 
+
+os.environ['QUERIA_MODE'] = 'api'
 
 def create_app():
     app = Flask(__name__)
@@ -49,6 +53,7 @@ def create_app():
     with app.app_context():
         mongo_db.init_app()
         rabbitmq.connect()
+        llm.init_app()
 
     app.register_blueprint(api_blueprint, url_prefix='/api')
 

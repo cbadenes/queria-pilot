@@ -41,6 +41,7 @@ const Dashboard = () => {
   const [selectedAnswer, setSelectedAnswer] = useState({});  // Almacena las respuestas seleccionadas por el usuario
   const [openSnackbar, setOpenSnackbar] = useState(false);  // Estado para controlar el Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState('');  // Almacena el mensaje a mostrar en el Snackbar
+  const [snackbarDuration, setSnackbarDuration] = useState(6000);
   const [anchorEl, setAnchorEl] = useState(null);
   const [comment, setComment] = useState('');
   const [likeDislike, setLikeDislike] = useState(null);
@@ -55,6 +56,8 @@ const Dashboard = () => {
   });
   const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [allValidated, setAllValidated] = useState(false);
+  const [evaluationMessage, setEvaluationMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
 
   useEffect(() => {
@@ -287,14 +290,18 @@ const Dashboard = () => {
       const selected = selectedAnswer[question.id];
       const newEvaluationResult = { ...evaluationResult };  // Copia del estado actual
 
-      if (question.type === 'multi') {
-          if (selected === question.valid_answer) {
-              newEvaluationResult[question.id] = { correct: true, color: 'green' };
-              setSnackbarMessage('Respuesta correcta!');
-          } else {
-              newEvaluationResult[question.id] = { correct: false, color: 'red' };
-              setSnackbarMessage('Respuesta incorrecta. Inténtalo de nuevo.');
-          }
+      // Mostrar mensaje de evaluación en progreso
+      setSnackbarMessage('Evaluando respuesta...');
+      setOpenSnackbar(true);
+      setIsLoading(true);
+      setTimeout(() => setOpenSnackbar(false), 3000);  // Asegura que se cierre el snackbar de progreso
+
+
+       if (question.type === 'multi') {
+          const isCorrect = selected === question.valid_answer;
+          newEvaluationResult[question.id] = { correct: isCorrect, color: isCorrect ? 'green' : 'red' };
+          setEvaluationMessage(isCorrect ? `Respuesta correcta! ${question.evidence}` : 'Respuesta incorrecta. Inténtalo de nuevo.');
+          setIsLoading(false);
       } else if (question.type === 'open') {
           try {
               const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
@@ -302,6 +309,8 @@ const Dashboard = () => {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                       questionId: question.id,
+                      question: question.question,
+                      difficulty: question.difficulty,
                       context: question.context,
                       response: selected
                   })
@@ -309,20 +318,31 @@ const Dashboard = () => {
 
               if (response.ok) {
                   const data = await response.json();
-                  const resultColor = data.score > 50 ? 'green' : 'red';
-                  newEvaluationResult[question.id] = { correct: data.score > 50, color: resultColor };
-                  setSnackbarMessage(`Respuesta ${resultColor === 'green' ? 'correcta' : 'incorrecta'}. Puntuación: ${data.score}`);
+                  const score = data.score;
+                  let color = 'red';  // Por defecto es rojo
+                  if (score > 75) {
+                      color = 'green';  // Verde para puntuaciones superiores a 75
+                  } else if (score > 25) {
+                      color = 'orange';  // Naranja para puntuaciones entre 25 y 75
+                  }
+                  newEvaluationResult[question.id] = { correct: score > 50, color: color };
+                  setEvaluationMessage(`${data.explanation}`);
               } else {
                   setSnackbarMessage('Error al validar la respuesta.');
+                  setOpenSnackbar(true);
+                  setTimeout(() => setOpenSnackbar(false), 2000);  // Asegura que se cierre el snackbar de progreso
               }
           } catch (error) {
               console.error('Error en la petición al backend:', error);
               setSnackbarMessage('Error en la comunicación con el servidor.');
+              setOpenSnackbar(true);
+              setTimeout(() => setOpenSnackbar(false), 2000);  // Asegura que se cierre el snackbar de progreso
           }
+          setIsLoading(false);
       }
 
-      setEvaluationResult(newEvaluationResult);  // Actualiza el estado con la copia modificada
-      setOpenSnackbar(true);
+      setEvaluationResult(newEvaluationResult);
+
   };
 
 
@@ -538,6 +558,11 @@ const Dashboard = () => {
                       ))}
                     </RadioGroup>
                   </FormControl>
+                )}
+                {!isLoading && evaluationMessage && (
+                  <Typography color={evaluationResult[question.id]?.color || 'default'} sx={{ mt: 2 }}>
+                    {evaluationMessage}
+                  </Typography>
                 )}
                 <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
                   <IconButton
