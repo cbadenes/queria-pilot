@@ -67,8 +67,7 @@ def start_consumer(config):
                 logger.info(f"Questionnaire: {questionnaire}")
                 logger.info(f"Num Questions in DB: {len(questions)}")
                 logger.info(f"Num Questions in Questionnaire: {questionnaire}")
-                #if (len(questions) == questionnaire['num_questions']):
-                if (len(questions) > 0):
+                if (len(questions) == questionnaire['num_questions']):
                     logger.info("Updating questionnaire ..")
                     Questionnaire.update_status(data['id'], "in_progress")
                     logger.info("questionnaire updated")

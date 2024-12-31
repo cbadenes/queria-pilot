@@ -130,28 +130,27 @@ def create_questionnaire():
             for page in reader.pages:
                 text += page.extract_text() if page.extract_text() else ''
 
-            # Dividir el texto en partes de 1024 caracteres
-            parts = [text[i:i+1024] for i in range(0, len(text), 1024)]
+            # Determinar el tamaño de cada parte dinámicamente
+            total_length = len(text)
+            if num_questions > 0:
+                part_size = max(1, total_length // num_questions)  # Ajustar el tamaño para generar suficientes partes
+            else:
+                raise ValueError("El número de preguntas debe ser mayor que cero.")
+
+            # Crear las partes dividiendo el texto en fragmentos más pequeños
+            parts = [text[i:i + part_size] for i in range(0, total_length, part_size)]
+
+            # Selección aleatoria si hay más partes que preguntas solicitadas
+            if len(parts) > num_questions:
+                selected_parts = random.sample(parts, k=num_questions)  # Selección aleatoria
+            else:
+                selected_parts = parts  # Si hay partes justas, usarlas directamente
+
         except Exception as e:
             app.logger.error(f"Error procesando el PDF: {e}")
             return jsonify({"error": "No se pudo procesar el PDF"}), 500, headers
 
-        app.logger.debug(f"{len(parts)} parts created")
-
-        # Verificar si el número de preguntas supera las partes disponibles
-        if num_questions > len(parts):
-                app.logger.warning(
-                    f"El número de preguntas solicitadas ({num_questions}) es mayor que las partes disponibles ({len(parts)}). "
-                    f"Se permitirá repetición de partes para completar el cuestionario."
-                )
-                # Generar las preguntas permitiendo repetición (muestreo con reemplazo)
-                selected_parts = random.choices(parts, k=num_questions)
-        else:
-                # Si hay suficientes partes, seleccionarlas sin repetición
-                selected_parts = random.sample(parts, k=num_questions)
-
-        # Log para depurar el número final de preguntas seleccionadas
-        app.logger.debug(f"{len(selected_parts)} preguntas seleccionadas")
+        app.logger.debug(f"{len(selected_parts)} preguntas seleccionadas después de dividir el texto dinámicamente")
 
         # Enviar eventos a ActiveMQ
         for part in selected_parts:
