@@ -138,12 +138,20 @@ def create_questionnaire():
 
         app.logger.debug(f"{len(parts)} parts created")
 
-        # Seleccionar aleatoriamente `num_questions` partes de texto
+        # Verificar si el número de preguntas supera las partes disponibles
         if num_questions > len(parts):
-            app.logger.warning(f"El número de preguntas solicitadas ({num_questions}) es mayor que las partes disponibles ({len(parts)}). Se ajustará.")
-            num_questions = len(parts)  # Limita el número de preguntas al tamaño máximo disponible.
-        selected_parts = random.sample(parts, k=num_questions)
-        app.logger.debug(f"Parts selected: {selected_parts}")
+                app.logger.warning(
+                    f"El número de preguntas solicitadas ({num_questions}) es mayor que las partes disponibles ({len(parts)}). "
+                    f"Se permitirá repetición de partes para completar el cuestionario."
+                )
+            # Generar las preguntas permitiendo repetición (muestreo con reemplazo)
+            selected_parts = random.choices(parts, k=num_questions)
+        else:
+            # Si hay suficientes partes, seleccionarlas sin repetición
+            selected_parts = random.sample(parts, k=num_questions)
+
+        # Log para depurar el número final de preguntas seleccionadas
+        app.logger.debug(f"{len(selected_parts)} preguntas seleccionadas")
 
         # Enviar eventos a ActiveMQ
         for part in selected_parts:
