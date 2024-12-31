@@ -144,11 +144,11 @@ def create_questionnaire():
                     f"El número de preguntas solicitadas ({num_questions}) es mayor que las partes disponibles ({len(parts)}). "
                     f"Se permitirá repetición de partes para completar el cuestionario."
                 )
-            # Generar las preguntas permitiendo repetición (muestreo con reemplazo)
-            selected_parts = random.choices(parts, k=num_questions)
+                # Generar las preguntas permitiendo repetición (muestreo con reemplazo)
+                selected_parts = random.choices(parts, k=num_questions)
         else:
-            # Si hay suficientes partes, seleccionarlas sin repetición
-            selected_parts = random.sample(parts, k=num_questions)
+                # Si hay suficientes partes, seleccionarlas sin repetición
+                selected_parts = random.sample(parts, k=num_questions)
 
         # Log para depurar el número final de preguntas seleccionadas
         app.logger.debug(f"{len(selected_parts)} preguntas seleccionadas")
