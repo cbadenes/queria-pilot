@@ -134,7 +134,7 @@ def create_questionnaire():
             app.logger.error(f"Error procesando el PDF: {e}")
             return jsonify({"error": "No se pudo procesar el PDF"}), 500, headers
 
-        app.logger.debug(len(parts)," parts created")
+        app.logger.debug(f"{len(parts)} parts created")
 
         # Seleccionar aleatoriamente `num_questions` partes de texto
         selected_parts = random.sample(parts, k=num_questions)
