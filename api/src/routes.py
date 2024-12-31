@@ -14,6 +14,8 @@ from PyPDF2 import PdfReader
 import random
 from pika import BlockingConnection, ConnectionParameters
 import xml.etree.ElementTree as ET
+import traceback
+
 
 
 
@@ -137,6 +139,9 @@ def create_questionnaire():
         app.logger.debug(f"{len(parts)} parts created")
 
         # Seleccionar aleatoriamente `num_questions` partes de texto
+        if num_questions > len(parts):
+            app.logger.warning(f"El número de preguntas solicitadas ({num_questions}) es mayor que las partes disponibles ({len(parts)}). Se ajustará.")
+            num_questions = len(parts)  # Limita el número de preguntas al tamaño máximo disponible.
         selected_parts = random.sample(parts, k=num_questions)
         app.logger.debug(f"Parts selected: {selected_parts}")
 
