@@ -25,6 +25,8 @@ import { Slider } from '@mui/material';
 import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import { deepOrange } from '@mui/material/colors';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import Footer from './Footer';
+
 
 
 
@@ -751,6 +753,7 @@ const Dashboard = () => {
           message={snackbarMessage}
         />
       </Box>
+      <Footer />
     </Box>
   );
 };

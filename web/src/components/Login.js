@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Container, CssBaseline } from '@mui/material';
 import logo from '../assets/images/queria-logo.png';
 import API_BASE_URL from './config';
+import Footer from './Footer';
 
 const orangeColor = '#FFD5B4';
 const darkGrayColor = '#333333';
@@ -130,6 +131,7 @@ const Login = () => {
             </Typography>
           )}
         </Box>
+        <Footer />
       </Box>
     </Container>
   );
