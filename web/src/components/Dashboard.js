@@ -27,6 +27,7 @@ import { deepOrange } from '@mui/material/colors';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 
 
+
 const orangeColor = '#FFD5B4';  // Color for the "Create" button
 const darkGrayColor = '#333333';  // Color for the text
 const lightBackground = '#fafafa';  // Lighter background for the questionnaire list
@@ -62,6 +63,11 @@ const Dashboard = () => {
   const [evaluationMessage, setEvaluationMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState(null); // Estado para el índice en hover
+  const [openDialog, setOpenDialog] = useState(false); // Estado para controlar el diálogo de confirmación
+  const [deleteId, setDeleteId] = useState(null); // Estado para el ID del cuestionario a borrar
+
+
 
 
   useEffect(() => {
@@ -171,7 +177,6 @@ const Dashboard = () => {
     // Función de limpieza para asegurar que el intervalo se limpie correctamente
     return () => clearInterval(intervalId);
     }, []);
-
 
   // Disable scrolling on page
   useEffect(() => {
@@ -478,16 +483,27 @@ const Dashboard = () => {
         {/* Questionnaire List */}
         <List>
           {questionnaires.map((questionnaire, index) => (
-            <ListItem key={index} disablePadding>
+            <ListItem
+              key={questionnaire.id}
+              disablePadding
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
               <Button
-                fullWidth
-                onClick={() => handleQuestionnaireClick(questionnaire.id)}
-                sx={getButtonStyle(questionnaire.status)} // Aplica estilos refinados
-                startIcon={renderIcon(questionnaire.status)} // Icono para cada estado
-                style={{ justifyContent: 'flex-start' }} // Justifica el icono a la izquierda
-              >
+                  fullWidth
+                  onClick={() => handleQuestionnaireClick(questionnaire.id)}
+                  sx={getButtonStyle(questionnaire.status)} // Aplica estilos refinados
+                  startIcon={renderIcon(questionnaire.status)} // Icono para cada estado
+                  style={{ justifyContent: 'flex-start' }} // Justifica el icono a la izquierda
+                >
                 {questionnaire.name}
               </Button>
+              {hoveredIndex === index && (
+                <IconButton onClick={() => confirmDelete(questionnaire.id)} size="small">
+                  <DeleteIcon />
+                </IconButton>
+              )}
             </ListItem>
           ))}
         </List>
@@ -514,7 +530,30 @@ const Dashboard = () => {
         </Box>
 
       </Drawer>
-
+       <Dialog
+          open={openConfirmDialog}
+          onClose={() => setOpenConfirmDialog(false)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Confirmar Borrado"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              ¿Estás seguro de que deseas borrar este cuestionario y todas sus preguntas asociadas?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenConfirmDialog(false)} color="primary">
+              Cancelar
+            </Button>
+            <Button onClick={() => {
+              handleDeleteQuestionnaire(selectedQuestionnaireId);
+              setOpenConfirmDialog(false);
+            }} color="primary" autoFocus>
+              Confirmar
+            </Button>
+          </DialogActions>
+        </Dialog>
       {/* Main Content - Show list of questions on the right */}
       <Box
         component="main"
