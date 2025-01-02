@@ -506,28 +506,18 @@ const Dashboard = () => {
               )}
             </ListItem>
           ))}
+          <ListItem sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <Fab sx={{
+                                 backgroundColor: orangeColor,
+                                 color: darkGrayColor,
+                                 pointerEvents: 'auto',
+                                 marginLeft: 8
+                               }}
+                               aria-label="add" onClick={() => navigate('/create-questionnaire')}>
+                <AddIcon />
+              </Fab>
+            </ListItem>
         </List>
-
-        {/* Add new questionnaire button */}
-        <Box sx={{
-            p: 2,
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            pointerEvents: 'none'
-        }}>
-          <Fab
-            sx={{
-              backgroundColor: orangeColor,
-              color: darkGrayColor,
-              pointerEvents: 'auto'
-            }}
-            aria-label="add"
-            onClick={() => navigate('/create-questionnaire')}
-          >
-            <AddIcon />
-          </Fab>
-        </Box>
 
       </Drawer>
        <Dialog
