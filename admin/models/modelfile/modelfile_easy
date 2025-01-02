@@ -1,6 +1,6 @@
 # Modelfile generated for making an easy MCQ generator 
 
-FROM llama3.3:latest
+FROM llama3.1:8b
 TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
 
 {{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>
