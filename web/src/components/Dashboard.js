@@ -13,16 +13,13 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
-import { grey } from '@mui/material/colors';  // Importa los colores
 import API_BASE_URL from './config';  // Base URL for API requests
 import logo from '../assets/images/queria-logo.png';  // Logo
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import axios from 'axios';
-import EditIcon from '@mui/icons-material/Edit';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import { Slider } from '@mui/material';
-import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 import { deepOrange } from '@mui/material/colors';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import Footer from './Footer';
@@ -297,7 +294,8 @@ const Dashboard = () => {
       case 'scheduled':
         return <ScheduleIcon />;
       case 'in_progress':
-        return <EditIcon />;
+        //return <EditIcon />;
+        return <CheckCircleOutlineIcon />;
       case 'completed':
         return <CheckCircleOutlineIcon />;
       default:
