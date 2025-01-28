@@ -563,6 +563,17 @@ const Dashboard = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
               Preguntas del Cuestionario
             </Typography>
+            <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2 }}>
+              <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
+                <PictureAsPdfIcon />
+              </IconButton>
+              <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
+                <ImportExportIcon />
+              </IconButton>
+              <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
             {selectedQuestions.map((question, index) => (
               <Box key={index} sx={{ mb: 3 }}>
                 <Typography variant="h6" sx={{ mb: 1 }}>
@@ -703,17 +714,6 @@ const Dashboard = () => {
                 </Box>
               </Box>
             ))}
-              <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2 }}>
-                  <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
-                    <PictureAsPdfIcon />
-                  </IconButton>
-                  <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
-                    <ImportExportIcon />
-                  </IconButton>
-                  <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
-                    <DeleteIcon />
-                  </IconButton>
-              </Box>
               <Dialog
                 open={openConfirmDialog}
                 onClose={() => setOpenConfirmDialog(false)}
