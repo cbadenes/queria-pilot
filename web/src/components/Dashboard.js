@@ -563,7 +563,7 @@ const Dashboard = () => {
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
               Preguntas del Cuestionario
             </Typography>
-            <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2 }}>
+            <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
               <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
                 <PictureAsPdfIcon />
               </IconButton>
@@ -575,7 +575,7 @@ const Dashboard = () => {
               </IconButton>
             </Box>
             {selectedQuestions.map((question, index) => (
-              <Box key={index} sx={{ mb: 3 }}>
+              <Box key={index} sx={{ mb: 3, border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
                 <Typography variant="h6" sx={{ mb: 1 }}>
                   {question.question}
                 </Typography>
