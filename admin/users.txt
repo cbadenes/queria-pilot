@@ -1,0 +1,3 @@
+usuario1@queria.es,Usuario Uno,new
+usuario2@queria.es,Usuario Dos,reset
+usuario3@queria.es,Usuario Tres,remove
