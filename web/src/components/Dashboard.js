@@ -23,6 +23,9 @@ import { Slider } from '@mui/material';
 import { deepOrange } from '@mui/material/colors';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import Footer from './Footer';
+import { Tooltip } from '@mui/material';
+import SchoolIcon from '@mui/icons-material/School';
+
 
 
 
@@ -434,19 +437,21 @@ const Dashboard = () => {
 
       {/* Logout icon at the top-right corner */}
      <Box sx={{ position: 'fixed', top: 16, right: 20 }}>
-       <Fab
-         color="primary"
-         onClick={() => navigate('/')}
-         sx={{
-           backgroundColor: orangeColor, // Asumimos que orangeColor está definido correctamente
-           color: darkGrayColor,  // Asumimos que darkGrayColor también está definido
-           '&:hover': {
-             backgroundColor: deepOrange[700]  // Asegúrate de que este color está disponible en tu tema
-           }
-         }}
-       >
-         <LogoutIcon />
-       </Fab>
+       <Tooltip title="Cerrar sesión" arrow placement="left">
+         <Fab
+           color="primary"
+           onClick={() => navigate('/')}
+           sx={{
+             backgroundColor: orangeColor,
+             color: darkGrayColor,
+             '&:hover': {
+               backgroundColor: deepOrange[700]
+             }
+           }}
+         >
+           <LogoutIcon />
+         </Fab>
+       </Tooltip>
      </Box>
 
 
@@ -507,16 +512,24 @@ const Dashboard = () => {
             </ListItem>
           ))}
           <ListItem sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <Fab sx={{
-                                 backgroundColor: orangeColor,
-                                 color: darkGrayColor,
-                                 pointerEvents: 'auto',
-                                 marginLeft: 8
-                               }}
-                               aria-label="add" onClick={() => navigate('/create-questionnaire')}>
+            <Tooltip title="Crear nuevo cuestionario" arrow placement="right">
+              <Fab
+                sx={{
+                  backgroundColor: orangeColor,
+                  color: darkGrayColor,
+                  pointerEvents: 'auto',
+                  marginLeft: 8,
+                  '&:hover': {
+                    backgroundColor: '#e6b28e'
+                  }
+                }}
+                aria-label="add"
+                onClick={() => navigate('/create-questionnaire')}
+              >
                 <AddIcon />
               </Fab>
-            </ListItem>
+            </Tooltip>
+          </ListItem>
         </List>
 
       </Drawer>
@@ -564,15 +577,53 @@ const Dashboard = () => {
               Preguntas del Cuestionario
             </Typography>
             <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
-              <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
-                <PictureAsPdfIcon />
-              </IconButton>
-              <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
-                <ImportExportIcon />
-              </IconButton>
-              <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', ml: 1, '&:hover': { backgroundColor: '#e6b28e' }, ml:2 }}>
-                <DeleteIcon />
-              </IconButton>
+              <Tooltip title="Exportar a PDF" arrow>
+                  <IconButton
+                    onClick={exportPDF}
+                    sx={{
+                      backgroundColor: orangeColor,
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#e6b28e'
+                      },
+                      ml: 2
+                    }}
+                  >
+                    <PictureAsPdfIcon />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Exportar a formato Moodle" arrow>
+                  <IconButton
+                    onClick={exportToMoodleXML}
+                    sx={{
+                      backgroundColor: orangeColor,
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#e6b28e'
+                      },
+                      ml: 2
+                    }}
+                  >
+                    <SchoolIcon />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Eliminar cuestionario" arrow>
+                  <IconButton
+                    onClick={() => confirmDelete(selectedQuestionnaireId)}
+                    sx={{
+                      backgroundColor: orangeColor,
+                      color: '#fff',
+                      '&:hover': {
+                        backgroundColor: '#e6b28e'
+                      },
+                      ml: 2
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
             </Box>
             {selectedQuestions.map((question, index) => (
               <Box key={index} sx={{ mb: 3, border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
@@ -612,19 +663,23 @@ const Dashboard = () => {
                     </Typography>
                 )}
                 <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                  <IconButton
-                    aria-label="validate"
-                    onClick={() => handleValidate(question)}
-                    sx={{ color: evaluationResult[question.id]?.color || 'default' }}  // Use color based on evaluation result
-                  >
-                    <CheckIcon />
-                  </IconButton>
-                 <IconButton
-                   onClick={(event) => handleOpenRatingMenu(event, question)}
-                   sx={{ color: ratingSubmitted[question.id] ? orangeColor : 'default' }}  // Utiliza el ID de la pregunta para verificar si ha sido valorada
-                 >
-                   <RateReviewIcon />
-                 </IconButton>
+                  <Tooltip title="Validar respuesta" arrow>
+                      <IconButton
+                        aria-label="validate"
+                        onClick={() => handleValidate(question)}
+                        sx={{ color: evaluationResult[question.id]?.color || 'default' }}
+                      >
+                        <CheckIcon />
+                      </IconButton>
+                    </Tooltip>
+                 <Tooltip title="Valorar pregunta" arrow>
+                     <IconButton
+                       onClick={(event) => handleOpenRatingMenu(event, question)}
+                       sx={{ color: ratingSubmitted[question.id] ? orangeColor : 'default' }}
+                     >
+                       <RateReviewIcon />
+                     </IconButton>
+                   </Tooltip>
                   <Menu
                     anchorEl={ratingMenuAnchorEl}
                     open={Boolean(ratingMenuAnchorEl)}
@@ -697,19 +752,21 @@ const Dashboard = () => {
                       onChange={(e) => setTextRating(e.target.value)}
                       sx={{ mt: 2 }}
                     />
-                    <IconButton
-                      onClick={handleRatingSubmit}
-                      sx={{
-                        color: 'primary',
-                        backgroundColor: orangeColor, // Asume que orangeColor es el color de tus otros botones
-                        '&:hover': {
-                          backgroundColor: '#e6b28e', // Un color más claro en hover
-                        },
-                        mt: 2
-                      }}
-                    >
-                      <SendIcon />
-                    </IconButton>
+                    <Tooltip title="Enviar valoración" arrow>
+                        <IconButton
+                          onClick={handleRatingSubmit}
+                          sx={{
+                            color: 'primary',
+                            backgroundColor: orangeColor,
+                            '&:hover': {
+                              backgroundColor: '#e6b28e',
+                            },
+                            mt: 2
+                          }}
+                        >
+                          <SendIcon />
+                        </IconButton>
+                      </Tooltip>
                   </Menu>
                 </Box>
               </Box>
