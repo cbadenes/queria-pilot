@@ -221,29 +221,95 @@ def export_moodle():
     questionnaire = Questionnaire.get_questionnaire(questionnaire_id)
     questions = Question.get_questions(questionnaire_id)
 
+    # Create the root quiz element
     quiz = ET.Element("quiz")
 
-    comment_name = ET.Comment(f' Cuestionario: {questionnaire.get("name")} ')
-    quiz.append(comment_name)
+    # Add questionnaire metadata as a comment
+    comment_text = f' Questionnaire: {questionnaire.get("name")} - Difficulty: {questionnaire.get("difficulty")} '
+    quiz.append(ET.Comment(comment_text))
 
-    # Añadir cada pregunta al XML
-    for question in questions:
-        question_element = ET.SubElement(quiz, "question", type="multichoice")
+    # Process each question
+    for idx, question in enumerate(questions, 1):
+        # Determine question type based on presence of answers
+        answers = question.get("answers", [])
+        is_essay = not answers or len(answers) == 0
 
+        # Create question element with appropriate type
+        question_element = ET.SubElement(quiz, "question",
+                                         type="essay" if is_essay else "multichoice")
+
+        # Add name element (required by Moodle)
         name = ET.SubElement(question_element, "name")
-        ET.SubElement(name, "text").text = question.get("question")
+        ET.SubElement(name, "text").text = f"Question {idx}"
 
+        # Add questiontext with proper CDATA wrapping
         questiontext = ET.SubElement(question_element, "questiontext", format="html")
-        ET.SubElement(questiontext, "text").text = f"<![CDATA[<p>{question.get('question')}</p>]]>"
+        text_content = f"<![CDATA[<p>{question.get('question')}</p>"
+        if question.get('context'):
+            text_content += f"<p><strong>Context:</strong></p><p>{question.get('context')}</p>"
+        text_content += "]]>"
+        ET.SubElement(questiontext, "text").text = text_content
 
-        # Añadir respuestas
-        for answer in question.get("answers", []):
-            answer_element = ET.SubElement(question_element, "answer", fraction="100" if answer == question.get("valid_answer") else "0", format="html")
-            ET.SubElement(answer_element, "text").text = f"<![CDATA[<p>{answer}</p>]]>"
+        # Add general feedback
+        generalfeedback = ET.SubElement(question_element, "generalfeedback", format="html")
+        ET.SubElement(generalfeedback, "text").text = "<![CDATA[<p>Please review the course materials if you had trouble with this question.</p>]]>"
 
-    # Convertir a string el XML
-    xml_str = ET.tostring(quiz, encoding='utf8', method='xml').decode()
-    response = make_response(xml_str)
+        # Add default grade
+        ET.SubElement(question_element, "defaultgrade").text = "1.0"
+
+        # Add penalty for multiple attempts
+        ET.SubElement(question_element, "penalty").text = "0.3333333"
+
+        # Add hidden flag
+        ET.SubElement(question_element, "hidden").text = "0"
+
+        if not is_essay:
+            # Add multiple choice specific elements
+            ET.SubElement(question_element, "single").text = "true"
+            ET.SubElement(question_element, "shuffleanswers").text = "true"
+            ET.SubElement(question_element, "answernumbering").text = "abc"
+
+            # Add answers with proper formatting
+            valid_answer = question.get("valid_answer")
+
+            for answer in answers:
+                is_correct = answer == valid_answer
+                fraction = "100" if is_correct else "0"
+
+                answer_element = ET.SubElement(question_element, "answer",
+                                               fraction=fraction,
+                                               format="html")
+                ET.SubElement(answer_element, "text").text = f"<![CDATA[<p>{answer}</p>]]>"
+
+                # Add feedback for the answer
+                feedback = ET.SubElement(answer_element, "feedback", format="html")
+                if is_correct:
+                    feedback_text = "<![CDATA[<p>Correct!</p>]]>"
+                else:
+                    feedback_text = "<![CDATA[<p>This is not the correct answer. Please review the material.</p>]]>"
+                ET.SubElement(feedback, "text").text = feedback_text
+        else:
+            # Essay-specific elements
+            ET.SubElement(question_element, "responseformat").text = "editor"
+            ET.SubElement(question_element, "responserequired").text = "1"
+            ET.SubElement(question_element, "responsefieldlines").text = "10"
+            ET.SubElement(question_element, "attachments").text = "0"
+            ET.SubElement(question_element, "attachmentsrequired").text = "0"
+            ET.SubElement(question_element, "graderinfo", format="html").text = "<![CDATA[<p>Grade based on accuracy and completeness of the response.</p>]]>"
+            ET.SubElement(question_element, "responsetemplate", format="html").text = "<![CDATA[]]>"
+
+    # Convert to string without XML declaration
+    xml_str = ET.tostring(quiz, encoding='utf8', method='xml', xml_declaration=False).decode('utf-8')
+
+    # Add XML declaration and DOCTYPE manually
+    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    doctype = '<!DOCTYPE quiz SYSTEM "moodle_quiz.dtd">\n'
+    complete_xml = xml_declaration + doctype + xml_str
+
+    # Create response with proper headers
+    response = make_response(complete_xml)
     response.headers['Content-Type'] = 'application/xml'
+    response.headers['Content-Disposition'] = f'attachment; filename="{questionnaire.get("name", "quiz")}.xml"'
     response.headers['Access-Control-Allow-Origin'] = '*'
+
     return response
