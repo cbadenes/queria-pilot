@@ -574,11 +574,6 @@ const Dashboard = () => {
       >
         {selectedQuestions.length > 0 ? (
           <Box id="questionsContainer" sx={{ p: 4, width: '80%', textAlign: 'left', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)' }}>
-            {/* Título y acciones */}
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
-              Preguntas del Cuestionario
-            </Typography>
-
             {/* Meta-información del cuestionario */}
             {questionnaires.map(q => q.id === selectedQuestionnaireId && (
               <Box key={q.id} sx={{
