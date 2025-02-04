@@ -25,6 +25,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} f
 import Footer from './Footer';
 import { Tooltip } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
+import { Grid } from '@mui/material';
 
 
 
@@ -573,58 +574,67 @@ const Dashboard = () => {
       >
         {selectedQuestions.length > 0 ? (
           <Box id="questionsContainer" sx={{ p: 4, width: '80%', textAlign: 'left', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)' }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+            {/* Título y acciones */}
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
               Preguntas del Cuestionario
             </Typography>
+
+            {/* Meta-información del cuestionario */}
+            {questionnaires.map(q => q.id === selectedQuestionnaireId && (
+              <Box key={q.id} sx={{
+                mb: 4,
+                p: 3,
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #e9ecef'
+              }}>
+                <Typography variant="h6" sx={{ mb: 2, color: darkGrayColor }}>
+                  Información del Cuestionario
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Nombre:</strong> {q.name}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Archivo Original:</strong> {q.filename}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Fecha de Creación:</strong> {new Date(q.date).toLocaleString()}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Dificultad:</strong> {q.difficulty}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Número de Preguntas:</strong> {q.num_questions}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Ratio de Preguntas Abiertas:</strong> {q.ratio}%
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+
             <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
-              <Tooltip title="Exportar a PDF" arrow>
-                  <IconButton
-                    onClick={exportPDF}
-                    sx={{
-                      backgroundColor: orangeColor,
-                      color: '#fff',
-                      '&:hover': {
-                        backgroundColor: '#e6b28e'
-                      },
-                      ml: 2
-                    }}
-                  >
-                    <PictureAsPdfIcon />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Exportar a formato Moodle" arrow>
-                  <IconButton
-                    onClick={exportToMoodleXML}
-                    sx={{
-                      backgroundColor: orangeColor,
-                      color: '#fff',
-                      '&:hover': {
-                        backgroundColor: '#e6b28e'
-                      },
-                      ml: 2
-                    }}
-                  >
-                    <SchoolIcon />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Eliminar cuestionario" arrow>
-                  <IconButton
-                    onClick={() => confirmDelete(selectedQuestionnaireId)}
-                    sx={{
-                      backgroundColor: orangeColor,
-                      color: '#fff',
-                      '&:hover': {
-                        backgroundColor: '#e6b28e'
-                      },
-                      ml: 2
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-            </Box>
+                  <Tooltip title="Exportar a PDF" arrow>
+                    <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
+                      <PictureAsPdfIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Exportar a formato Moodle" arrow>
+                    <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
+                      <SchoolIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Eliminar cuestionario" arrow>
+                    <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+             </Box>
             {selectedQuestions.map((question, index) => (
               <Box key={index} sx={{ mb: 3, border: '1px solid #ccc', padding: '10px', borderRadius: '5px' }}>
                 <Typography variant="h6" sx={{ mb: 1 }}>
