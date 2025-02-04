@@ -48,7 +48,7 @@ def login():
 
     if user and 'password' in user:
         password_encoded = user_data['password'].encode('utf-8')
-        hashed_password = user['password'].encode('utf-8')
+        hashed_password = user['password']  # La contraseña ya está en bytes en la base de datos
 
         if bcrypt.checkpw(password_encoded, hashed_password):
             access_token = create_access_token(identity=user['email'])
@@ -277,8 +277,8 @@ def export_moodle():
                 fraction = "100" if is_correct else "0"
 
                 answer_element = ET.SubElement(question_element, "answer",
-                                               fraction=fraction,
-                                               format="html")
+                                                               fraction=fraction,
+                                                               format="html")
                 ET.SubElement(answer_element, "text").text = f"<![CDATA[<p>{answer}</p>]]>"
 
                 # Add feedback for the answer
