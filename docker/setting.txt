@@ -1,0 +1,5 @@
+# Dar permisos de ejecución
+chmod +x backup_mongodb.sh
+
+# Añadir al crontab (ejecutar cada día a las 3 AM)
+0 3 * * * /ruta/al/backup_mongodb.sh
