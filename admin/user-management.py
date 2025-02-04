@@ -159,8 +159,8 @@ def main():
     smtp_config = {
         'server': 'smtp.gmail.com',  # Ajusta según tu servidor SMTP
         'port': 587,
-        'user': 'tu_email@gmail.com',
-        'password': 'tu_password_app'
+        'user': 'noreply.queria@gmail.com',
+        'password': 'femg agbk jakr uzah'
     }
     users_file = "users.txt"
 
