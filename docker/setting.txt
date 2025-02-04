@@ -3,3 +3,42 @@ chmod +x backup_mongodb.sh
 
 # Añadir al crontab (ejecutar cada día a las 3 AM)
 0 3 * * * /ruta/al/backup_mongodb.sh
+
+
+
+Para añadir esa tarea al crontab y que se ejecute cada día a las 3:00 AM, sigue estos pasos:
+
+Asegúrate de que el script es ejecutable:
+Ejecuta el siguiente comando para darle permisos de ejecución, en caso de que aún no los tenga:
+
+bash
+Copy
+chmod +x /ruta/al/backup_mongodb.sh
+Edita el crontab del usuario:
+Abre el editor del crontab con el comando:
+
+bash
+Copy
+crontab -e
+Esto abrirá el archivo de configuración en el editor predeterminado.
+
+Añade la línea de programación:
+Dentro del archivo, añade la siguiente línea:
+
+cron
+Copy
+0 3 * * * /ruta/al/backup_mongodb.sh
+Esto indica que el script se ejecutará todos los días a las 3:00 AM.
+
+Guarda y cierra el editor:
+Dependiendo del editor que estés utilizando (por ejemplo, nano, vi, etc.), guarda los cambios y cierra el editor. Con nano, por ejemplo, se hace pulsando Ctrl + O para guardar y Ctrl + X para salir.
+
+Verifica que la tarea se haya añadido:
+Puedes listar las tareas programadas con:
+
+bash
+Copy
+crontab -l
+Deberías ver la línea que acabas de añadir.
+
+Con estos pasos, tu script backup_mongodb.sh se ejecutará automáticamente cada día a las 3:00 AM.
