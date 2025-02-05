@@ -16,7 +16,12 @@ const Footer = () => {
       <Typography variant="body2" color="text.secondary">
         © {new Date().getFullYear()} QuerIA
         {' | '}
-        <Link color="inherit" href="https://innovacioneducativa.upm.es/proyectos-ie/informacion?anyo=2023-2024&id=1196">
+        <Link
+          color="inherit"
+          href="https://innovacioneducativa.upm.es/proyectos-ie/informacion?anyo=2023-2024&id=1196"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Proyecto de innovación educativa de la UPM IE24.6109
         </Link>
       </Typography>
