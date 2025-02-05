@@ -15,7 +15,8 @@ os.environ['QUERIA_MODE'] = 'api'
 def create_app():
     app = Flask(__name__)
     app.config.from_object('instance.config.Config')
-    app.config['JWT_SECRET_KEY'] = 'super-secret'  # Cambia esto por una clave real en producción
+    app.config['JWT_SECRET_KEY'] = 'super-secret'
+    app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024  # 20MB en bytes
 
     file_handler = RotatingFileHandler(
         "queria-api.log",

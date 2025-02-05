@@ -50,6 +50,13 @@ const CreateQuestionnaire = () => {
         body: formData,
       });
 
+      if (response.status === 413) {
+        setSnackbarMessage('El archivo PDF es demasiado grande. Por favor, utiliza un archivo más pequeño (máximo 20MB).');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        return;
+      }
+
       if (response.ok) {
         setSnackbarMessage('Cuestionario solicitado con éxito.');
         setSnackbarSeverity('success');
