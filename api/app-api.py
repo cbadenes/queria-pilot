@@ -47,6 +47,7 @@ def create_app():
 
     # Aplica CORS a todas las rutas
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+    #CORS(app, resources={r"/api/*": {"origins": "http://queria.etsisi.upm.es"}})
 
     JWTManager(app)
 
