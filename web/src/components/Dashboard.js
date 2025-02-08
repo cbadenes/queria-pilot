@@ -26,7 +26,7 @@ import Footer from './Footer';
 import { Tooltip } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { Grid } from '@mui/material';
-
+import AboutButton from './AboutButton';
 
 
 
@@ -437,6 +437,7 @@ const Dashboard = () => {
       <CssBaseline />
 
       {/* Logout icon at the top-right corner */}
+      <AboutButton />
      <Box sx={{ position: 'fixed', top: 16, right: 20 }}>
        <Tooltip title="Cerrar sesión" arrow placement="left">
          <Fab
