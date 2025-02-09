@@ -35,6 +35,10 @@ const AboutModal = ({ open, onClose }) => {
           QuerIA nace como una iniciativa innovadora en la Universidad Politécnica de Madrid (UPM) que busca transformar la forma en que se crean y evalúan los cuestionarios educativos. Utilizando tecnologías de Inteligencia Artificial, nuestro sistema permite generar preguntas personalizadas y adaptativas que se ajustan a las necesidades individuales de cada estudiante.
         </Typography>
 
+        <Typography paragraph>
+          Todo el procesamiento de QuerIA se ejecuta en servidores propios de la Universidad Politécnica de Madrid, utilizando modelos de IA desarrollados específicamente para funcionar de manera local. Esto garantiza que toda la información proporcionada se mantiene dentro de nuestros servidores y no se comparte con servicios externos, asegurando así la privacidad y seguridad de los datos.
+        </Typography>
+
         <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
           El Equipo QuerIA
         </Typography>
