@@ -6,6 +6,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from './config';
+import { Tooltip } from '@mui/material';
 
 const orangeColor = '#FFD5B4';
 const grayColor = '#f0f0f0';
@@ -35,6 +36,11 @@ const CreateQuestionnaire = () => {
         setOpenSnackbar(true);
         return;
     }
+
+    // Mostrar mensaje de archivo recibido inmediatamente
+    setSnackbarMessage('Archivo PDF recibido. Procesando cuestionario...');
+    setSnackbarSeverity('info');
+    setOpenSnackbar(true);
 
     const formData = new FormData();
     formData.append('pdf', file);
@@ -89,14 +95,16 @@ const CreateQuestionnaire = () => {
       <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 600, backgroundColor: '#ffffff', borderRadius: '10px' }}>
 
         {/* Botón para volver al Dashboard */}
-        <IconButton
-          color="primary"
-          aria-label="back"
-          onClick={() => navigate('/dashboard')}
-          sx={{ fontSize: 30, mb: 2 }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
+        <Tooltip title="Cancelar la creación del cuestionario" arrow>
+          <IconButton
+            color="primary"
+            aria-label="back"
+            onClick={() => navigate('/dashboard')}
+            sx={{ fontSize: 30, mb: 2 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+        </Tooltip>
 
         <Typography
           variant="h4"
@@ -182,15 +190,17 @@ const CreateQuestionnaire = () => {
           </Grid>
 
           <Grid item xs={12} display="flex" justifyContent="center">
-            <IconButton
-              color="primary"
-              aria-label="generate"
-              onClick={handleGenerate}
-              sx={{ fontSize: 30, backgroundColor: orangeColor, color: darkGrayColor }}
-              disabled={!file || !questionnaireName}
-            >
-              <SendIcon />
-            </IconButton>
+            <Tooltip title="Crear nuevo cuestionario" arrow>
+                <IconButton
+                  color="primary"
+                  aria-label="generate"
+                  onClick={handleGenerate}
+                  sx={{ fontSize: 30, backgroundColor: orangeColor, color: darkGrayColor }}
+                  disabled={!file || !questionnaireName}
+                >
+                  <SendIcon />
+                </IconButton>
+             </Tooltip>
           </Grid>
         </Grid>
 
