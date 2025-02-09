@@ -136,24 +136,48 @@ class Question:
 
 
 class Comment:
-
     @staticmethod
-    def create_comment(qid, question, comment, difficulty, writing, relevance):
+    def create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance,
+                       questionnaire_name, questionnaire_difficulty, questionnaire_date,
+                       question_text, question_type, question_difficulty, question_context,
+                       question_answers, question_valid_answer, question_evidence, question_date):
         # Generar un identificador único para el comentario
         current_time = datetime.now()
-        unique_string = f"{qid}_{question}_{current_time}".encode('utf-8')
+        unique_string = f"{questionnaire_id}_{question_id}_{current_time}".encode('utf-8')
         comment_id = hashlib.md5(unique_string).hexdigest()
 
         comment_data = {
             "_id": comment_id,
-            "qid": qid,
-            "question": question,
+            # Información del comentario
+            "comment": comment,
             "date": current_time,
-            "difficulty": difficulty,
-            "writing": writing,
-            "relevance": relevance,
-            "comment": comment
+            "ratings": {
+                "difficulty": level_difficulty,
+                "writing": level_writing,
+                "relevance": level_relevance
+            },
+            # Referencia a IDs originales (por si acaso)
+            "questionnaire_id": questionnaire_id,
+            "question_id": question_id,
+            # Información completa del cuestionario
+            "questionnaire": {
+                "name": questionnaire_name,
+                "difficulty": questionnaire_difficulty,
+                "date": questionnaire_date
+            },
+            # Información completa de la pregunta
+            "question": {
+                "text": question_text,
+                "type": question_type,
+                "difficulty": question_difficulty,
+                "context": question_context,
+                "answers": question_answers,
+                "valid_answer": question_valid_answer,
+                "evidence": question_evidence,
+                "date": question_date
+            }
         }
+
         try:
             result = mongo_db.db.comments.insert_one(comment_data)
             comment_data["id"] = str(comment_data["_id"])

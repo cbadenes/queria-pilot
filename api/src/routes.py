@@ -55,6 +55,7 @@ def login():
             return jsonify(access_token=access_token), 200, headers
         else:
             app.logger.info(f"Invalid password for: {user_data}")
+            return jsonify({"message": "Contraseña incorrecta"}), 401, headers
     else:
         return jsonify({"message": "Usuario Desconocido"}), 401, headers
 
@@ -197,8 +198,9 @@ def evaluate():
 def handle_comments():
     try:
         data = request.get_json()
-        app.logger.debug(f"Comentario recibido: {data}")  # Imprime el comentario para fines de depuración
+        app.logger.debug(f"Comentario recibido: {data}")
 
+        # Obtener datos del comentario
         question_id = data['id']
         questionnaire_id = data['qid']
         level_difficulty = data['ratings']['difficulty']
@@ -206,12 +208,44 @@ def handle_comments():
         level_relevance = data['ratings']['relevance']
         comment = data['comment']
 
-        Comment.create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance)
+        # Obtener información completa del cuestionario
+        questionnaire = Questionnaire.get_questionnaire(questionnaire_id)
+        if not questionnaire:
+            return jsonify({"error": "Cuestionario no encontrado"}), 404, headers
+
+        # Obtener información completa de la pregunta
+        questions = Question.get_questions(questionnaire_id)
+        question = next((q for q in questions if q['id'] == question_id), None)
+        if not question:
+            return jsonify({"error": "Pregunta no encontrada"}), 404, headers
+
+        # Crear un comentario con toda la información contextual
+        comment_data = Comment.create_comment(
+            questionnaire_id=questionnaire_id,
+            question_id=question_id,
+            comment=comment,
+            level_difficulty=level_difficulty,
+            level_writing=level_writing,
+            level_relevance=level_relevance,
+            # Información del cuestionario
+            questionnaire_name=questionnaire.get('name'),
+            questionnaire_difficulty=questionnaire.get('difficulty'),
+            questionnaire_date=questionnaire.get('date'),
+            # Información de la pregunta
+            question_text=question.get('question'),
+            question_type=question.get('type'),
+            question_difficulty=question.get('difficulty'),
+            question_context=question.get('context'),
+            question_answers=question.get('answers'),
+            question_valid_answer=question.get('valid_answer'),
+            question_evidence=question.get('evidence'),
+            question_date=question.get('date')
+        )
+
         return jsonify({"message": "¡Muchas Gracias! Tu comentario ha quedado registrado"}), 200, headers
     except Exception as e:
         app.logger.error(f"Error durante la creación del comentario: {str(e)}")
         app.logger.error(f"Detalles del error:\n {traceback.format_exc()}")
-        # eliminar cuestionario en bbdd
         return jsonify({"error": str(e)}), 500, headers
 
 @api_blueprint.route('/export/moodle', methods=['POST'])

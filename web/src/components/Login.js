@@ -15,31 +15,31 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    const loginData = { email, password };
-    console.log('Datos de login:', loginData);
+      e.preventDefault();
+      setErrorMessage(''); // Limpiar mensaje de error previo
+      const loginData = { email, password };
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData)
-      });
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(loginData)
+        });
 
-      if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('userToken', data.access_token);
-        localStorage.setItem('userEmail', email);
-        navigate('/dashboard');
-        setErrorMessage('');  // Limpia el mensaje de error si el login es exitoso
-      } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || 'Credenciales incorrectas');  // Actualiza el mensaje de error
+
+        if (response.ok) {
+          localStorage.setItem('userToken', data.access_token);
+          localStorage.setItem('userEmail', email);
+          navigate('/dashboard');
+        } else {
+          // Mostrar el mensaje de error que viene del backend
+          setErrorMessage(data.message || 'Error al iniciar sesión');
+        }
+      } catch (error) {
+        setErrorMessage('Error de conexión. Por favor, inténtelo de nuevo más tarde.');
       }
-    } catch (error) {
-      setErrorMessage('Error al intentar iniciar sesión. Por favor, inténtelo de nuevo.');
-    }
-  };
+    };
 
   return (
     <Container component="main" maxWidth="xs">
