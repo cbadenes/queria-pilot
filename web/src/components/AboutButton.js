@@ -27,24 +27,16 @@ const AboutModal = ({ open, onClose }) => {
       </Box>
       
       <DialogContent>
-        <Typography variant="h4" sx={{ mb: 4, color: darkGrayColor, fontWeight: 'bold' }}>
-          Quienes Somos
+         <Typography variant="h4" sx={{ mb: 4, color: darkGrayColor, fontWeight: 'bold' }}>
+          Acerca de QuerIA
         </Typography>
 
         <Typography paragraph>
-          QuerIA nace como una iniciativa innovadora en la Universidad Politécnica de Madrid (UPM) que busca transformar la forma en que se crean y evalúan los cuestionarios educativos. Utilizando tecnologías de Inteligencia Artificial, nuestro sistema permite generar preguntas personalizadas y adaptativas que se ajustan a las necesidades individuales de cada estudiante.
+          QuerIA es una iniciativa de innovación educativa desarrollada por investigadores y docentes del <Link href="https://blogs.upm.es/gietema/" target="_blank" rel="noopener noreferrer">Grupo de Innovación Educativa GIETEMA</Link> de la Universidad Politécnica de Madrid (UPM). Nuestro objetivo es transformar la evaluación educativa mediante tecnologías de Inteligencia Artificial (IA), generando cuestionarios personalizados que se adaptan a las necesidades de cada estudiante. Esta investigación forma parte del <Link href="https://innovacioneducativa.upm.es/proyectos-ie/informacion?anyo=2023-2024&id=1196" target="_blank" rel="noopener noreferrer">Proyecto de Innovación Educativa IE24.6109</Link>.
         </Typography>
 
         <Typography paragraph>
-          Todo el procesamiento de QuerIA se ejecuta en servidores propios de la Universidad Politécnica de Madrid, utilizando modelos de IA desarrollados específicamente para funcionar de manera local. Esto garantiza que toda la información proporcionada se mantiene dentro de nuestros servidores y no se comparte con servicios externos, asegurando así la privacidad y seguridad de los datos.
-        </Typography>
-
-        <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
-          El Equipo QuerIA
-        </Typography>
-
-        <Typography paragraph>
-          El desarrollo principal de QuerIA ha sido llevado a cabo con la colaboración de investigadores y docentes del <Link href="https://innovacioneducativa.upm.es/grupos-de-innovacion-educativa/grupo-tecnologias-educativas-y-metodos-activos-de-aprendizaje" target="_blank" rel="noopener noreferrer">Grupo de Innovación Educativa GIETEMA</Link> de la UPM. El proyecto se enmarca dentro del <Link href="https://innovacioneducativa.upm.es/proyectos-ie/informacion?anyo=2023-2024&id=1196" target="_blank" rel="noopener noreferrer">Proyecto de Innovación Educativa IE24.6109</Link>, donde profesores e investigadores aportan su experiencia en innovación docente y evaluación educativa.
+          Priorizando la privacidad y seguridad, todo el procesamiento se realiza en servidores locales de la UPM mediante modelos de IA desarrollados específicamente para este propósito. El sistema es capaz de procesar documentos en español, inglés, francés, alemán, italiano y portugués, aunque los cuestionarios generados se proporcionan en español para garantizar la coherencia pedagógica.
         </Typography>
 
         <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
@@ -52,19 +44,36 @@ const AboutModal = ({ open, onClose }) => {
         </Typography>
 
         <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4' }}>
-          Eyzaguirre, P., & Badenes-Olmedo, C. (2024). QuerIA: Contextual Learning-Driven Questionnaire Generation and Assessment based on Large Language Models. In Proceedings of the 24th International Conference on Knowledge Engineering and Knowledge Management (EKAW 2024). Springer Nature Switzerland.
+          Badenes-Olmedo, C., Eyzaguirre, P., & Martín-Nuñez, L. (2024). <Link href="https://repositorio.uam.es/bitstream/handle/10486/715973/IDUM_2.pdf?sequence=1&isAllowed=y" target="_blank" rel="noopener noreferrer">QuerIA: Automatización y Personalización de Cuestionarios</Link>. En I Congreso en Innovación Docente de las Universidades Madrileñas: MadrID (pp. 16-26). Universidad Autónoma de Madrid.
         </Typography>
 
         <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4' }}>
-          Eyzaguirre, P., Badenes-Olmedo, C., & Martín-Nuñez, L. (2024). QuerIA: Automatización y Personalización de Cuestionarios. En I Congreso en Innovación Docente de las Universidades Madrileñas: MadrID (pp. 16-26). Universidad Autónoma de Madrid.
+          Eyzaguirre, P., & Badenes-Olmedo, C. (2024).<Link href="https://short.upm.es/p1eky" target="_blank" rel="noopener noreferrer">QuerIA: Contextual Learning-Driven Questionnaire Generation and Assessment based on Large Language Models</Link>. In Proceedings of the 24th International Conference on Knowledge Engineering and Knowledge Management (EKAW 2024). Springer Nature Switzerland.
         </Typography>
+
+        <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
+          Premios y Reconocimientos
+        </Typography>
+
+        <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4' }}>
+          🏆 <strong>Premio a la Innovación Educativa ETSISI 2024</strong>
+          <br />
+          Reconocimiento en la categoría de Aprendizaje Potenciado mediante Inteligencia Artificial por el trabajo <Link href="https://oa.upm.es/84120/2/ACTAS.pdf" target="_blank" rel="noopener noreferrer">"QuerIA: Sistema de Aprendizaje Personalizado mediante Cuestionarios Inteligentes"</Link>.
+        </Typography>
+
+        <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4' }}>
+          🎯 <strong>Finalista EKAW 2024 Best Demo Award</strong>
+          <br />
+          Seleccionado entre los 4 mejores <Link href="https://event.cwi.nl/ekaw2024/accepted-posters-demos.html" target="_blank" rel="noopener noreferrer">demo-paper</Link> en el 24th International Conference on Knowledge Engineering and Knowledge Management (EKAW).
+        </Typography>
+
 
         <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
           Contacto
         </Typography>
 
         <Typography>
-          📧 carlos.badenes@upm.es
+          📧 <Link href="mailto:carlos.badenes@upm.es" target="_blank" rel="noopener noreferrer">carlos.badenes@upm.es</Link>
         </Typography>
         <Typography>
           📞 +34 910 67 35 20
@@ -87,7 +96,7 @@ const AboutButton = () => {
   return (
     <>
       <Box sx={{ position: 'fixed', top: 16, right: 90 }}>
-        <Tooltip title="Sobre nosotros" arrow placement="left">
+        <Tooltip title="Sobre QuerIA" arrow placement="left">
           <Fab
             onClick={() => setOpen(true)}
             sx={{
