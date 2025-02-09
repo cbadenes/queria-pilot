@@ -33,7 +33,9 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_BASICAUTH_USERNAME: queria_admin
       ME_CONFIG_BASICAUTH_PASSWORD: Qu3r1@_2024
-      ME_CONFIG_SITE_BASEURL: /database/
+      ME_CONFIG_SITE_BASEURL: /database
+      ME_CONFIG_SITE_SSL_ENABLED: "true"
+      ME_CONFIG_REQUEST_SIZE: "100kb"
     depends_on:
       mongo:
         condition: service_healthy
