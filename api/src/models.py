@@ -138,6 +138,7 @@ class Question:
 class Comment:
     @staticmethod
     def create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance,
+                       level_refinement, level_exam_utility,
                        questionnaire_name, questionnaire_difficulty, questionnaire_date,
                        question_text, question_type, question_difficulty, question_context,
                        question_answers, question_valid_answer, question_evidence, question_date):
@@ -154,7 +155,9 @@ class Comment:
             "ratings": {
                 "difficulty": level_difficulty,
                 "writing": level_writing,
-                "relevance": level_relevance
+                "relevance": level_relevance,
+                "refinement": level_refinement,
+                "examUtility": level_exam_utility
             },
             # Referencia a IDs originales (por si acaso)
             "questionnaire_id": questionnaire_id,

@@ -57,9 +57,11 @@ const Dashboard = () => {
   const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
   const [textRating, setTextRating] = useState('');
   const [rating, setRating] = useState({
-    writing: 2,  // Valor inicial definido
-    difficulty: 2,  // Valor inicial definido
-    relevance: 2  // Valor inicial definido
+    writing: 2,
+    difficulty: 2,
+    relevance: 2,
+    refinement: 2,
+    examUtility: 2
   });
   const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [allValidated, setAllValidated] = useState(false);
@@ -97,7 +99,13 @@ const Dashboard = () => {
   const handleCloseRatingMenu = () => {
     setRatingMenuAnchorEl(null);
     setTextRating('');
-    setRating({ writing: 2, difficulty: 2, relevance: 2 });
+    setRating({
+        writing: 2,
+        difficulty: 2,
+        relevance: 2,
+        refinement: 2,
+        examUtility: 2
+      });
   };
 
   const QuestionRating = ({ onRatingChange }) => {
@@ -749,7 +757,7 @@ const Dashboard = () => {
                     }}
                   >
                     <Typography variant="h6" gutterBottom>
-                      Valorar Pregunta
+                      Valora la Pregunta
                     </Typography>
                     <Typography component="div" gutterBottom>
                       Calidad en la Redacción:
@@ -757,14 +765,25 @@ const Dashboard = () => {
                         value={rating.writing || 2}
                         onChange={(event, newValue) => setRating({...rating, writing: newValue})}
                         aria-labelledby="writing-slider"
+                        valueLabelFormat={(value) => {
+                          switch(value) {
+                            case 1: return 'Baja';
+                            case 2: return 'Media';
+                            case 3: return 'Alta';
+                            default: return '';
+                          }
+                        }}
                         valueLabelDisplay="auto"
                         step={1}
                         marks
                         min={1}
                         max={3}
                         sx={{
-                            color: orangeColor, // Utiliza el color anaranjado de tu tema
-                          }}
+                          color: orangeColor,
+                          '& .MuiSlider-markLabel': {
+                            fontSize: '0.875rem',
+                          }
+                        }}
                       />
                     </Typography>
                     <Typography component="div" gutterBottom>
@@ -773,14 +792,25 @@ const Dashboard = () => {
                         value={rating.difficulty || 2}
                         onChange={(event, newValue) => setRating({...rating, difficulty: newValue})}
                         aria-labelledby="difficulty-slider"
+                        valueLabelFormat={(value) => {
+                          switch(value) {
+                            case 1: return 'Baja';
+                            case 2: return 'Media';
+                            case 3: return 'Alta';
+                            default: return '';
+                          }
+                        }}
                         valueLabelDisplay="auto"
                         step={1}
                         marks
                         min={1}
                         max={3}
                         sx={{
-                            color: orangeColor, // Utiliza el color anaranjado de tu tema
-                          }}
+                          color: orangeColor,
+                          '& .MuiSlider-markLabel': {
+                            fontSize: '0.875rem',
+                          }
+                        }}
                       />
                     </Typography>
                     <Typography component="div" gutterBottom>
@@ -789,14 +819,77 @@ const Dashboard = () => {
                         value={rating.relevance ||2}
                         onChange={(event, newValue) => setRating({...rating, relevance: newValue})}
                         aria-labelledby="relevance-slider"
+                        valueLabelFormat={(value) => {
+                          switch(value) {
+                            case 1: return 'Baja';
+                            case 2: return 'Media';
+                            case 3: return 'Alta';
+                            default: return '';
+                          }
+                        }}
                         valueLabelDisplay="auto"
                         step={1}
                         marks
                         min={1}
                         max={3}
                         sx={{
-                            color: orangeColor, // Utiliza el color anaranjado de tu tema
-                          }}
+                          color: orangeColor,
+                          '& .MuiSlider-markLabel': {
+                            fontSize: '0.875rem',
+                          }
+                        }}
+                      />
+                    </Typography>
+                    <Typography component="div" gutterBottom>
+                      Refinamiento Necesario:
+                      <Slider
+                        value={rating.refinement || 2}
+                        onChange={(event, newValue) => setRating({...rating, refinement: newValue})}
+                        aria-labelledby="refinement-slider"
+                        valueLabelFormat={(value) => {
+                          switch(value) {
+                            case 1: return 'Baja';
+                            case 2: return 'Media';
+                            case 3: return 'Alta';
+                            default: return '';
+                          }
+                        }}
+                        valueLabelDisplay="auto"
+                        step={1}
+                        min={1}
+                        max={3}
+                        sx={{
+                          color: orangeColor,
+                          '& .MuiSlider-markLabel': {
+                            fontSize: '0.875rem',
+                          }
+                        }}
+                      />
+                    </Typography>
+                    <Typography component="div" gutterBottom>
+                      Utilidad para Examen:
+                      <Slider
+                        value={rating.examUtility || 2}
+                        onChange={(event, newValue) => setRating({...rating, examUtility: newValue})}
+                        aria-labelledby="exam-utility-slider"
+                        valueLabelFormat={(value) => {
+                          switch(value) {
+                            case 1: return 'Baja';
+                            case 2: return 'Media';
+                            case 3: return 'Alta';
+                            default: return '';
+                          }
+                        }}
+                        valueLabelDisplay="auto"
+                        step={1}
+                        min={1}
+                        max={3}
+                        sx={{
+                          color: orangeColor,
+                          '& .MuiSlider-markLabel': {
+                            fontSize: '0.875rem',
+                          }
+                        }}
                       />
                     </Typography>
                     <TextField

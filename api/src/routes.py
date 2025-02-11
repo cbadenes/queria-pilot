@@ -206,6 +206,8 @@ def handle_comments():
         level_difficulty = data['ratings']['difficulty']
         level_writing = data['ratings']['writing']
         level_relevance = data['ratings']['relevance']
+        level_refinement = data['ratings']['refinement']
+        level_exam_utility = data['ratings']['examUtility']
         comment = data['comment']
 
         # Obtener información completa del cuestionario
@@ -227,6 +229,8 @@ def handle_comments():
             level_difficulty=level_difficulty,
             level_writing=level_writing,
             level_relevance=level_relevance,
+            level_refinement=level_refinement,
+            level_exam_utility=level_exam_utility,
             # Información del cuestionario
             questionnaire_name=questionnaire.get('name'),
             questionnaire_difficulty=questionnaire.get('difficulty'),
