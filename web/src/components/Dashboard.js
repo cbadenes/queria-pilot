@@ -69,6 +69,9 @@ const Dashboard = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null); // Estado para el índice en hover
   const [openDialog, setOpenDialog] = useState(false); // Estado para controlar el diálogo de confirmación
   const [deleteId, setDeleteId] = useState(null); // Estado para el ID del cuestionario a borrar
+  const [commentedQuestions, setCommentedQuestions] = useState({});
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+  const [showExportAlert, setShowExportAlert] = useState(false);
 
 
 
@@ -80,6 +83,10 @@ const Dashboard = () => {
     });
     setAllValidated(allValid);
   }, [selectedQuestions, evaluationResult]);
+
+   const allQuestionsHaveComments = () => {
+     return selectedQuestions.every(question => commentedQuestions[question.id]);
+   };
 
 
    const handleOpenRatingMenu = (event, question) => {
@@ -242,6 +249,14 @@ const Dashboard = () => {
 
 
   const exportPDF = async () => {
+      if (!allQuestionsHaveComments()) {
+          setShowExportAlert(true);
+          setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
+          setSnackbarSeverity('warning');
+          setOpenSnackbar(true);
+          return;
+      }
+
       const input = document.getElementById("questionsContainer");
       const iconsContainer = document.getElementById("iconsContainer");
 
@@ -276,6 +291,13 @@ const Dashboard = () => {
 
 
   const exportToMoodleXML = async () => {
+    if (!allQuestionsHaveComments()) {
+        setShowExportAlert(true);
+        setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
+        setSnackbarSeverity('warning');
+        setOpenSnackbar(true);
+        return;
+    }
     try {
       const response = await axios.post(`${API_BASE_URL}/api/export/moodle`, { questionnaireId: selectedQuestionnaireId });
       const xmlData = response.data; // Suponiendo que el backend responde con el XML en el cuerpo de la respuesta
@@ -391,6 +413,11 @@ const Dashboard = () => {
           setSnackbarMessage(data.message);
           setOpenSnackbar(true);
           setRatingSubmitted(prev => ({...prev, [currentQuestion.id]: true}));  // Marca como enviada para esta pregunta específica
+          // Actualizar el estado de comentarios
+          setCommentedQuestions(prev => ({
+            ...prev,
+            [currentQuestion.id]: true
+          }));
           setRating({ writing: 2, difficulty: 2, relevance: 2 });
         } else {
           console.error("Error al enviar la valoración:", response.statusText);
@@ -615,15 +642,39 @@ const Dashboard = () => {
             ))}
 
             <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
-                  <Tooltip title="Exportar a PDF" arrow>
-                    <IconButton onClick={exportPDF} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
-                      <PictureAsPdfIcon />
-                    </IconButton>
+                  <Tooltip title={allQuestionsHaveComments() ? "Exportar a PDF" : "Necesitas comentar todas las preguntas antes de exportar a PDF"} arrow>
+                      <span>
+                        <IconButton
+                          onClick={exportPDF}
+                          sx={{
+                            backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
+                            color: '#fff',
+                            '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
+                            ml: 2,
+                            cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
+                          }}
+                          disabled={!allQuestionsHaveComments()}
+                        >
+                          <PictureAsPdfIcon />
+                        </IconButton>
+                      </span>
                   </Tooltip>
-                  <Tooltip title="Exportar a formato Moodle" arrow>
-                    <IconButton onClick={exportToMoodleXML} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
-                      <SchoolIcon />
-                    </IconButton>
+                  <Tooltip title={allQuestionsHaveComments() ? "Exportar a formato Moodle" : "Necesitas comentar todas las preguntas antes de exportar a Moodle"} arrow>
+                      <span>
+                        <IconButton
+                          onClick={exportToMoodleXML}
+                          sx={{
+                            backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
+                            color: '#fff',
+                            '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
+                            ml: 2,
+                            cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
+                          }}
+                          disabled={!allQuestionsHaveComments()}
+                        >
+                          <SchoolIcon />
+                        </IconButton>
+                      </span>
                   </Tooltip>
                   <Tooltip title="Eliminar cuestionario" arrow>
                     <IconButton onClick={() => confirmDelete(selectedQuestionnaireId)} sx={{ backgroundColor: orangeColor, color: '#fff', '&:hover': { backgroundColor: '#e6b28e' }, ml: 2 }}>
