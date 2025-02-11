@@ -351,3 +351,20 @@ def export_moodle():
     response.headers['Access-Control-Allow-Origin'] = '*'
 
     return response
+
+
+@api_blueprint.route('/comments/<question_id>', methods=['GET'])
+def get_comment(question_id):
+    try:
+        comment = Comment.get_comment(question_id)
+
+        if comment:
+            app.logger.info(f"Comentario encontrado para la pregunta {question_id}")
+            return jsonify(comment), 200, headers
+        else:
+            app.logger.info(f"No se encontró comentario para la pregunta {question_id}")
+            return jsonify({"message": "No comment found"}), 404, headers
+
+    except Exception as e:
+        app.logger.error(f"Error getting comment: {str(e)}")
+        return jsonify({"error": str(e)}), 500, headers

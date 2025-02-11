@@ -136,6 +136,18 @@ class Question:
 
 
 class Comment:
+
+    @staticmethod
+    def get_comment(question_id):
+        # Buscar el comentario más reciente para una pregunta
+        comment = mongo_db.db.comments.find_one(
+            {"question_id": question_id},
+            sort=[("date", -1)]  # Ordenar por fecha descendente para obtener el más reciente
+        )
+        if comment:
+            comment['id'] = str(comment.pop('_id'))
+        return comment
+
     @staticmethod
     def create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance,
                        level_refinement, level_exam_utility,

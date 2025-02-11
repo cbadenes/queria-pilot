@@ -74,6 +74,7 @@ const Dashboard = () => {
   const [commentedQuestions, setCommentedQuestions] = useState({});
   const [snackbarSeverity, setSnackbarSeverity] = useState('info');
   const [showExportAlert, setShowExportAlert] = useState(false);
+  const [currentComment, setCurrentComment] = useState(null);
 
 
 
@@ -91,21 +92,62 @@ const Dashboard = () => {
    };
 
 
-   const handleOpenRatingMenu = (event, question) => {
-    setRatingMenuAnchorEl(event.currentTarget);
-    setCurrentQuestion(question);  // Establece la pregunta actual al abrir el menú
-  };
+   const handleOpenRatingMenu = async (event, question) => {
+     setRatingMenuAnchorEl(event.currentTarget);
+     setCurrentQuestion(question);
+
+     try {
+       const response = await fetch(`${API_BASE_URL}/api/comments/${question.id}`);
+       if (response.ok) {
+         const data = await response.json();
+         // Cargar los valores previos
+         setRating({
+           writing: data.ratings.writing,
+           difficulty: data.ratings.difficulty,
+           relevance: data.ratings.relevance,
+           refinement: data.ratings.refinement,
+           examUtility: data.ratings.examUtility
+         });
+         setTextRating(data.comment);
+         setCurrentComment(data);
+       } else if (response.status === 404) {
+         // Si no hay comentario previo, establecer valores por defecto
+         setRating({
+           writing: 2,
+           difficulty: 2,
+           relevance: 2,
+           refinement: 2,
+           examUtility: 2
+         });
+         setTextRating('');
+         setCurrentComment(null);
+       }
+     } catch (error) {
+       console.error('Error fetching comment:', error);
+       // En caso de error, establecer valores por defecto
+       setRating({
+         writing: 2,
+         difficulty: 2,
+         relevance: 2,
+         refinement: 2,
+         examUtility: 2
+       });
+       setTextRating('');
+       setCurrentComment(null);
+     }
+   };
 
   const handleCloseRatingMenu = () => {
     setRatingMenuAnchorEl(null);
+    setCurrentComment(null);
     setTextRating('');
     setRating({
-        writing: 2,
-        difficulty: 2,
-        relevance: 2,
-        refinement: 2,
-        examUtility: 2
-      });
+      writing: 2,
+      difficulty: 2,
+      relevance: 2,
+      refinement: 2,
+      examUtility: 2
+    });
   };
 
   const QuestionRating = ({ onRatingChange }) => {
@@ -210,8 +252,23 @@ const Dashboard = () => {
       const response = await fetch(`${API_BASE_URL}/api/questionnaires/${id}/questions`);
       if (response.ok) {
         const data = await response.json();
-        setSelectedQuestions(data);  // Store the list of questions
+        setSelectedQuestions(data);
         setSelectedQuestionnaireId(`${id}`);
+
+        // Inicializar el estado de los comentarios
+        const commentStatus = {};
+        for (const question of data) {
+          try {
+            const commentResponse = await fetch(`${API_BASE_URL}/api/comments/${question.id}`);
+            if (commentResponse.ok) {
+              commentStatus[question.id] = true;
+            }
+          } catch (error) {
+            console.error('Error checking comment status:', error);
+          }
+        }
+        setRatingSubmitted(commentStatus);
+        setCommentedQuestions(commentStatus);
       } else {
         console.error('Failed to fetch questionnaire details:', response.statusText);
       }
@@ -757,7 +814,7 @@ const Dashboard = () => {
                     }}
                   >
                     <Typography variant="h6" gutterBottom>
-                      Valora la Pregunta
+                      {currentComment ? 'Editar Valoración' : 'Nueva Valoración'}
                     </Typography>
                     <Typography component="div" gutterBottom>
                       Calidad en la Redacción:
@@ -902,21 +959,21 @@ const Dashboard = () => {
                       onChange={(e) => setTextRating(e.target.value)}
                       sx={{ mt: 2 }}
                     />
-                    <Tooltip title="Enviar valoración" arrow>
-                        <IconButton
-                          onClick={handleRatingSubmit}
-                          sx={{
-                            color: 'primary',
-                            backgroundColor: orangeColor,
-                            '&:hover': {
-                              backgroundColor: '#e6b28e',
-                            },
-                            mt: 2
-                          }}
-                        >
-                          <SendIcon />
-                        </IconButton>
-                      </Tooltip>
+                    <Tooltip title={currentComment ? "Actualizar valoración" : "Enviar valoración"} arrow>
+                      <IconButton
+                        onClick={handleRatingSubmit}
+                        sx={{
+                          color: 'primary',
+                          backgroundColor: orangeColor,
+                          '&:hover': {
+                            backgroundColor: '#e6b28e',
+                          },
+                          mt: 2
+                        }}
+                      >
+                        <SendIcon />
+                      </IconButton>
+                    </Tooltip>
                   </Menu>
                 </Box>
               </Box>
