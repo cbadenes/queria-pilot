@@ -27,6 +27,7 @@ import { Tooltip } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { Grid } from '@mui/material';
 import AboutButton from './AboutButton';
+import QuestionRatingForm from './QuestionRatingForm';
 
 
 
@@ -57,11 +58,14 @@ const Dashboard = () => {
   const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
   const [textRating, setTextRating] = useState('');
   const [rating, setRating] = useState({
-    writing: 2,
-    difficulty: 2,
-    relevance: 2,
-    refinement: 2,
-    examUtility: 2
+    clarity: 2,
+    complexity: 2,
+    alignment: 2,
+    quality: 2,
+    pedagogical: 2,
+    cognitive: 2,
+    contextual: 2,
+    originality: 2
   });
   const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [allValidated, setAllValidated] = useState(false);
@@ -100,37 +104,34 @@ const Dashboard = () => {
        const response = await fetch(`${API_BASE_URL}/api/comments/${question.id}`);
        if (response.ok) {
          const data = await response.json();
-         // Cargar los valores previos
-         setRating({
-           writing: data.ratings.writing,
-           difficulty: data.ratings.difficulty,
-           relevance: data.ratings.relevance,
-           refinement: data.ratings.refinement,
-           examUtility: data.ratings.examUtility
-         });
+         setRating(data.ratings);
          setTextRating(data.comment);
          setCurrentComment(data);
        } else if (response.status === 404) {
-         // Si no hay comentario previo, establecer valores por defecto
          setRating({
-           writing: 2,
-           difficulty: 2,
-           relevance: 2,
-           refinement: 2,
-           examUtility: 2
+           clarity: 2,
+           complexity: 2,
+           alignment: 2,
+           quality: 2,
+           pedagogical: 2,
+           cognitive: 2,
+           contextual: 2,
+           originality: 2
          });
          setTextRating('');
          setCurrentComment(null);
        }
      } catch (error) {
        console.error('Error fetching comment:', error);
-       // En caso de error, establecer valores por defecto
        setRating({
-         writing: 2,
-         difficulty: 2,
-         relevance: 2,
-         refinement: 2,
-         examUtility: 2
+         clarity: 2,
+         complexity: 2,
+         alignment: 2,
+         quality: 2,
+         pedagogical: 2,
+         cognitive: 2,
+         contextual: 2,
+         originality: 2
        });
        setTextRating('');
        setCurrentComment(null);
@@ -808,172 +809,19 @@ const Dashboard = () => {
                     onClose={handleCloseRatingMenu}
                     PaperProps={{
                       style: {
-                        padding: '20px',
-                        width: '300px'
+                        maxHeight: '90vh',
                       }
                     }}
                   >
-                    <Typography variant="h6" gutterBottom>
-                      {currentComment ? 'Editar Valoración' : 'Nueva Valoración'}
-                    </Typography>
-                    <Typography component="div" gutterBottom>
-                      Calidad en la Redacción:
-                      <Slider
-                        value={rating.writing || 2}
-                        onChange={(event, newValue) => setRating({...rating, writing: newValue})}
-                        aria-labelledby="writing-slider"
-                        valueLabelFormat={(value) => {
-                          switch(value) {
-                            case 1: return 'Baja';
-                            case 2: return 'Media';
-                            case 3: return 'Alta';
-                            default: return '';
-                          }
-                        }}
-                        valueLabelDisplay="auto"
-                        step={1}
-                        marks
-                        min={1}
-                        max={3}
-                        sx={{
-                          color: orangeColor,
-                          '& .MuiSlider-markLabel': {
-                            fontSize: '0.875rem',
-                          }
-                        }}
-                      />
-                    </Typography>
-                    <Typography component="div" gutterBottom>
-                      Ajuste de Dificultad:
-                      <Slider
-                        value={rating.difficulty || 2}
-                        onChange={(event, newValue) => setRating({...rating, difficulty: newValue})}
-                        aria-labelledby="difficulty-slider"
-                        valueLabelFormat={(value) => {
-                          switch(value) {
-                            case 1: return 'Baja';
-                            case 2: return 'Media';
-                            case 3: return 'Alta';
-                            default: return '';
-                          }
-                        }}
-                        valueLabelDisplay="auto"
-                        step={1}
-                        marks
-                        min={1}
-                        max={3}
-                        sx={{
-                          color: orangeColor,
-                          '& .MuiSlider-markLabel': {
-                            fontSize: '0.875rem',
-                          }
-                        }}
-                      />
-                    </Typography>
-                    <Typography component="div" gutterBottom>
-                      Relevancia del Contenido:
-                      <Slider
-                        value={rating.relevance ||2}
-                        onChange={(event, newValue) => setRating({...rating, relevance: newValue})}
-                        aria-labelledby="relevance-slider"
-                        valueLabelFormat={(value) => {
-                          switch(value) {
-                            case 1: return 'Baja';
-                            case 2: return 'Media';
-                            case 3: return 'Alta';
-                            default: return '';
-                          }
-                        }}
-                        valueLabelDisplay="auto"
-                        step={1}
-                        marks
-                        min={1}
-                        max={3}
-                        sx={{
-                          color: orangeColor,
-                          '& .MuiSlider-markLabel': {
-                            fontSize: '0.875rem',
-                          }
-                        }}
-                      />
-                    </Typography>
-                    <Typography component="div" gutterBottom>
-                      Refinamiento Necesario:
-                      <Slider
-                        value={rating.refinement || 2}
-                        onChange={(event, newValue) => setRating({...rating, refinement: newValue})}
-                        aria-labelledby="refinement-slider"
-                        valueLabelFormat={(value) => {
-                          switch(value) {
-                            case 1: return 'Baja';
-                            case 2: return 'Media';
-                            case 3: return 'Alta';
-                            default: return '';
-                          }
-                        }}
-                        valueLabelDisplay="auto"
-                        step={1}
-                        min={1}
-                        max={3}
-                        sx={{
-                          color: orangeColor,
-                          '& .MuiSlider-markLabel': {
-                            fontSize: '0.875rem',
-                          }
-                        }}
-                      />
-                    </Typography>
-                    <Typography component="div" gutterBottom>
-                      Utilidad para Examen:
-                      <Slider
-                        value={rating.examUtility || 2}
-                        onChange={(event, newValue) => setRating({...rating, examUtility: newValue})}
-                        aria-labelledby="exam-utility-slider"
-                        valueLabelFormat={(value) => {
-                          switch(value) {
-                            case 1: return 'Baja';
-                            case 2: return 'Media';
-                            case 3: return 'Alta';
-                            default: return '';
-                          }
-                        }}
-                        valueLabelDisplay="auto"
-                        step={1}
-                        min={1}
-                        max={3}
-                        sx={{
-                          color: orangeColor,
-                          '& .MuiSlider-markLabel': {
-                            fontSize: '0.875rem',
-                          }
-                        }}
-                      />
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      label="Comentarios adicionales"
-                      variant="outlined"
-                      multiline
-                      rows={3}
-                      value={textRating}
-                      onChange={(e) => setTextRating(e.target.value)}
-                      sx={{ mt: 2 }}
+                    <QuestionRatingForm
+                      rating={rating}
+                      setRating={setRating}
+                      textRating={textRating}
+                      setTextRating={setTextRating}
+                      orangeColor={orangeColor}
+                      onClose={handleRatingSubmit}
+                      questionType={currentQuestion?.type} 
                     />
-                    <Tooltip title={currentComment ? "Actualizar valoración" : "Enviar valoración"} arrow>
-                      <IconButton
-                        onClick={handleRatingSubmit}
-                        sx={{
-                          color: 'primary',
-                          backgroundColor: orangeColor,
-                          '&:hover': {
-                            backgroundColor: '#e6b28e',
-                          },
-                          mt: 2
-                        }}
-                      >
-                        <SendIcon />
-                      </IconButton>
-                    </Tooltip>
                   </Menu>
                 </Box>
               </Box>

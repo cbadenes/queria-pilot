@@ -203,11 +203,7 @@ def handle_comments():
         # Obtener datos del comentario
         question_id = data['id']
         questionnaire_id = data['qid']
-        level_difficulty = data['ratings']['difficulty']
-        level_writing = data['ratings']['writing']
-        level_relevance = data['ratings']['relevance']
-        level_refinement = data['ratings']['refinement']
-        level_exam_utility = data['ratings']['examUtility']
+        ratings = data['ratings']
         comment = data['comment']
 
         # Obtener información completa del cuestionario
@@ -226,11 +222,14 @@ def handle_comments():
             questionnaire_id=questionnaire_id,
             question_id=question_id,
             comment=comment,
-            level_difficulty=level_difficulty,
-            level_writing=level_writing,
-            level_relevance=level_relevance,
-            level_refinement=level_refinement,
-            level_exam_utility=level_exam_utility,
+            level_clarity=ratings['clarity'],
+            level_complexity=ratings['complexity'],
+            level_alignment=ratings['alignment'],
+            level_quality=ratings['quality'],
+            level_pedagogical=ratings['pedagogical'],
+            level_cognitive=ratings['cognitive'],
+            level_contextual=ratings['contextual'],
+            level_originality=ratings['originality'],
             # Información del cuestionario
             questionnaire_name=questionnaire.get('name'),
             questionnaire_difficulty=questionnaire.get('difficulty'),

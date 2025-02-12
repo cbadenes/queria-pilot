@@ -149,12 +149,13 @@ class Comment:
         return comment
 
     @staticmethod
-    def create_comment(questionnaire_id, question_id, comment, level_difficulty, level_writing, level_relevance,
-                       level_refinement, level_exam_utility,
+    def create_comment(questionnaire_id, question_id, comment,
+                       level_clarity, level_complexity, level_alignment,
+                       level_quality, level_pedagogical, level_cognitive,
+                       level_contextual, level_originality,
                        questionnaire_name, questionnaire_difficulty, questionnaire_date,
                        question_text, question_type, question_difficulty, question_context,
                        question_answers, question_valid_answer, question_evidence, question_date):
-        # Generar un identificador único para el comentario
         current_time = datetime.now()
         unique_string = f"{questionnaire_id}_{question_id}_{current_time}".encode('utf-8')
         comment_id = hashlib.md5(unique_string).hexdigest()
@@ -165,13 +166,16 @@ class Comment:
             "comment": comment,
             "date": current_time,
             "ratings": {
-                "difficulty": level_difficulty,
-                "writing": level_writing,
-                "relevance": level_relevance,
-                "refinement": level_refinement,
-                "examUtility": level_exam_utility
+                "clarity": level_clarity,
+                "complexity": level_complexity,
+                "alignment": level_alignment,
+                "quality": level_quality,
+                "pedagogical": level_pedagogical,
+                "cognitive": level_cognitive,
+                "contextual": level_contextual,
+                "originality": level_originality
             },
-            # Referencia a IDs originales (por si acaso)
+            # Referencia a IDs originales
             "questionnaire_id": questionnaire_id,
             "question_id": question_id,
             # Información completa del cuestionario
