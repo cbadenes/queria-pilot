@@ -258,6 +258,15 @@ def export_moodle():
     questionnaire = Questionnaire.get_questionnaire(questionnaire_id)
     questions = Question.get_questions(questionnaire_id)
 
+    # Obtener el nombre del cuestionario y limpiarlo para usar como nombre de archivo
+    filename = questionnaire.get("name", "quiz")
+    # Reemplazar caracteres no válidos en nombres de archivo
+    filename = "".join(c for c in filename if c.isalnum() or c in (' ', '-', '_')).rstrip()
+    filename = filename.replace(' ', '_') # Reemplazar espacios con guiones bajos
+
+    # Añadir logging para debug
+    app.logger.debug(f"Generating Moodle export with filename: {filename}")
+
     # Create the root quiz element
     quiz = ET.Element("quiz")
 
@@ -346,8 +355,9 @@ def export_moodle():
     # Create response with proper headers
     response = make_response(complete_xml)
     response.headers['Content-Type'] = 'application/xml'
-    response.headers['Content-Disposition'] = f'attachment; filename="{questionnaire.get("name", "quiz")}.xml"'
+    response.headers['Content-Disposition'] = f'attachment; filename="{filename}.xml"'
     response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Expose-Headers'] = 'Content-Disposition'  # Importante!
 
     return response
 

@@ -357,27 +357,55 @@ const Dashboard = () => {
 
 
   const exportToMoodleXML = async () => {
-    if (!allQuestionsHaveComments()) {
-        setShowExportAlert(true);
-        setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
-        setSnackbarSeverity('warning');
-        setOpenSnackbar(true);
-        return;
-    }
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/export/moodle`, { questionnaireId: selectedQuestionnaireId });
-      const xmlData = response.data; // Suponiendo que el backend responde con el XML en el cuerpo de la respuesta
-      const blob = new Blob([xmlData], { type: 'application/xml' });
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.setAttribute('download', 'cuestionario_moodle.xml'); // Nombre del archivo XML
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (error) {
-      console.error('Error exporting to Moodle XML:', error);
-    }
+      if (!allQuestionsHaveComments()) {
+          setShowExportAlert(true);
+          setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
+          setSnackbarSeverity('warning');
+          setOpenSnackbar(true);
+          return;
+      }
+
+      try {
+          // Obtener el nombre del cuestionario
+          const currentQuestionnaire = questionnaires.find(q => q.id === selectedQuestionnaireId);
+
+          // Función para normalizar texto (quitar tildes manteniendo la letra)
+          const normalizeText = (text) => {
+              return text.normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos
+                        .trim()
+                        .replace(/\s+/g, '_')            // Espacios a guiones bajos
+                        .replace(/[^a-zA-Z0-9_-]/g, ''); // Elimina otros caracteres especiales
+          };
+
+          const filename = currentQuestionnaire?.name
+              ? normalizeText(currentQuestionnaire.name)
+              : 'cuestionario';
+
+          const response = await fetch(`${API_BASE_URL}/api/export/moodle`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ questionnaireId: selectedQuestionnaireId })
+          });
+
+          const blob = await response.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.setAttribute('download', `${filename}.xml`);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+
+      } catch (error) {
+          console.error('Error exporting to Moodle XML:', error);
+          setSnackbarMessage('Error al exportar el cuestionario');
+          setSnackbarSeverity('error');
+          setOpenSnackbar(true);
+      }
   };
 
   // Function to render the icon based on the status of the questionnaire
@@ -820,7 +848,7 @@ const Dashboard = () => {
                       setTextRating={setTextRating}
                       orangeColor={orangeColor}
                       onClose={handleRatingSubmit}
-                      questionType={currentQuestion?.type} 
+                      questionType={currentQuestion?.type}
                     />
                   </Menu>
                 </Box>
