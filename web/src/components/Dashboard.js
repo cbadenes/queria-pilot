@@ -79,6 +79,8 @@ const Dashboard = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('info');
   const [showExportAlert, setShowExportAlert] = useState(false);
   const [currentComment, setCurrentComment] = useState(null);
+  const [openExportDialog, setOpenExportDialog] = useState(false);
+
 
 
 
@@ -312,46 +314,154 @@ const Dashboard = () => {
     }
   };
 
+  const cleanText = (text) => {
+    if (!text) return '';
 
+    return text
+      .replace(/'/g, '') // Eliminar comillas simples
+      .replace(/\s*\n\s*/g, ' ') // Convertir saltos de línea en espacios
+      .replace(/\s+/g, ' ') // Normalizar espacios múltiples
+      .replace(/\s*([.,)])/g, '$1') // Eliminar espacios antes de puntuación
+      .replace(/['']$/, '') // Eliminar comillas simples al final del texto
+      .trim();
+  };
 
-  const exportPDF = async () => {
-      if (!allQuestionsHaveComments()) {
-          setShowExportAlert(true);
-          setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
-          setSnackbarSeverity('warning');
-          setOpenSnackbar(true);
-          return;
-      }
+  const normalizeText = (text) => {
+      return text
+          .normalize('NFD')  // Descomponer caracteres acentuados
+          .replace(/[\u0300-\u036f]/g, '')  // Eliminar diacríticos
+          .trim()
+          .replace(/\s+/g, '_')  // Reemplazar espacios con guiones bajos
+          .replace(/[^a-zA-Z0-9_-]/g, '')  // Eliminar caracteres no alfanuméricos
+          || 'cuestionario';  // Nombre por defecto si el resultado está vacío
+  };
 
-      const input = document.getElementById("questionsContainer");
-      const iconsContainer = document.getElementById("iconsContainer");
-
-      if (!input || !iconsContainer) {
-          console.error("Elementos necesarios no están disponibles.");
-          return;
-      }
-
-      // Guardar el estilo actual del contenedor y ocultarlo
-      const originalDisplay = iconsContainer.style.display;
-      iconsContainer.style.display = 'none';
-
-      const canvas = await html2canvas(input, {
-          backgroundColor: null,
-          scale: 2
-      });
-
-      const imgData = canvas.toDataURL('image/png');
+  const exportPDF = async (includeSolutions = false) => {
+    try {
       const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'px',
-          format: [canvas.width, canvas.height]
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save("cuestionario.pdf");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
 
-      // Restaurar el estilo original del contenedor de íconos
-      iconsContainer.style.display = originalDisplay;
+      const styles = {
+        title: {
+          fontSize: 16,
+          fontStyle: 'bold',
+          color: [0, 0, 0]
+        },
+        header: {
+          fontSize: 12,
+          fontStyle: 'normal',
+          color: [50, 50, 50]
+        },
+        question: {
+          fontSize: 12,
+          fontStyle: 'bold',
+          color: [0, 0, 0]
+        },
+        normal: {
+          fontSize: 11,
+          fontStyle: 'normal',
+          color: [0, 0, 0]
+        },
+        explanation: {
+          fontSize: 10,
+          fontStyle: 'italic',
+          color: [100, 100, 100]
+        },
+        correctAnswer: {
+          fontSize: 11,
+          fontStyle: 'bold',
+          color: [0, 100, 0] // Verde oscuro para respuestas correctas
+        }
+      };
+
+      const addPage = () => {
+        pdf.addPage();
+        pdf.setFontSize(styles.normal.fontSize);
+      };
+
+      const addText = (text, style = styles.normal, x = margin, y = null) => {
+        pdf.setFontSize(style.fontSize);
+        pdf.setFont(undefined, style.fontStyle);
+        pdf.setTextColor(...style.color);
+
+        const lines = pdf.splitTextToSize(cleanText(text), contentWidth);
+
+        if (y === null) {
+          y = pdf.getTextDimensions(lines[0]).h + (pdf.internal.pageSize.getHeight() * 0.1);
+        }
+
+        if (y + (lines.length * 7) > pageHeight - margin) {
+          addPage();
+          y = margin;
+        }
+
+        pdf.text(lines, x, y);
+        return y + (lines.length * 7);
+      };
+
+      // Questionnaire metadata
+      pdf.setFontSize(styles.title.fontSize);
+      const currentQuestionnaire = questionnaires.find(q => q.id === selectedQuestionnaireId);
+
+      let currentY = addText(currentQuestionnaire.name, styles.title);
+      currentY = addText(`Dificultad: ${currentQuestionnaire.difficulty}`, styles.header, margin, currentY + 10);
+      currentY = addText(`Fecha: ${new Date(currentQuestionnaire.date).toLocaleDateString()}`, styles.header, margin, currentY + 5);
+
+      // Question processing
+      selectedQuestions.forEach((question, index) => {
+        currentY = addText(`Pregunta ${index + 1}:`, styles.question, margin, currentY + 10);
+        currentY = addText(question.question, styles.normal, margin, currentY + 5);
+
+        if (question.type === 'multi') {
+          question.answers.forEach((answer, ansIndex) => {
+            const letter = String.fromCharCode(97 + ansIndex);
+            const isCorrect = answer === question.valid_answer;
+
+            // Usar estilo de respuesta correcta si es la respuesta correcta y se incluyen soluciones
+            const answerStyle = (includeSolutions && isCorrect) ? styles.correctAnswer : styles.normal;
+
+            const optionText = letter + ') ' + cleanText(answer);
+            currentY = addText(optionText, answerStyle, margin, currentY + 5);
+          });
+        }
+
+        // Explicaciones y soluciones
+        if (includeSolutions) {
+          if (question.evidence) {
+            currentY = addText('Explicación:', styles.explanation, margin, currentY + 5);
+            currentY = addText(question.evidence, styles.explanation, margin, currentY + 5);
+          }
+
+          // Para preguntas abiertas, mostrar respuesta sugerida
+          if (question.type === 'open' && question.valid_answer) {
+            currentY = addText('Respuesta sugerida:', styles.explanation, margin, currentY + 5);
+            currentY = addText(question.valid_answer, styles.correctAnswer, margin, currentY + 5);
+          }
+        }
+      });
+
+      const filename = normalizeText(currentQuestionnaire.name || 'cuestionario');
+      pdf.save(`${filename}${includeSolutions ? '_con_soluciones' : ''}.pdf`);
+
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setSnackbarMessage('Error al exportar el PDF');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+    }
+  };
+
+  // Función para manejar el inicio de la exportación
+  const handleExportPDF = () => {
+      setOpenExportDialog(true);
   };
 
 
@@ -738,19 +848,19 @@ const Dashboard = () => {
             <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
                   <Tooltip title={allQuestionsHaveComments() ? "Exportar a PDF" : "Necesitas comentar todas las preguntas antes de exportar a PDF"} arrow>
                       <span>
-                        <IconButton
-                          onClick={exportPDF}
-                          sx={{
-                            backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
-                            color: '#fff',
-                            '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
-                            ml: 2,
-                            cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
-                          }}
-                          disabled={!allQuestionsHaveComments()}
-                        >
-                          <PictureAsPdfIcon />
-                        </IconButton>
+                          <IconButton
+                              onClick={handleExportPDF}
+                              sx={{
+                                  backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
+                                  color: '#fff',
+                                  '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
+                                  ml: 2,
+                                  cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
+                              }}
+                              disabled={!allQuestionsHaveComments()}
+                          >
+                              <PictureAsPdfIcon />
+                          </IconButton>
                       </span>
                   </Tooltip>
                   <Tooltip title={allQuestionsHaveComments() ? "Exportar a formato Moodle" : "Necesitas comentar todas las preguntas antes de exportar a Moodle"} arrow>
@@ -890,6 +1000,55 @@ const Dashboard = () => {
           onClose={handleCloseSnackbar}
           message={snackbarMessage}
         />
+        <Dialog
+            open={openExportDialog}
+            onClose={() => setOpenExportDialog(false)}
+            aria-labelledby="export-dialog-title"
+            aria-describedby="export-dialog-description"
+        >
+            <DialogTitle id="export-dialog-title" sx={{
+                backgroundColor: orangeColor,
+                color: darkGrayColor
+            }}>
+                Exportar PDF
+            </DialogTitle>
+            <DialogContent sx={{ mt: 2 }}>
+                <DialogContentText id="export-dialog-description">
+                    ¿Desea incluir las soluciones y explicaciones en el PDF?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button
+                    onClick={() => {
+                        setOpenExportDialog(false);
+                        exportPDF(false);
+                    }}
+                    sx={{
+                        color: darkGrayColor,
+                        '&:hover': {
+                            backgroundColor: '#f0f0f0'
+                        }
+                    }}
+                >
+                    Sin soluciones
+                </Button>
+                <Button
+                    onClick={() => {
+                        setOpenExportDialog(false);
+                        exportPDF(true);
+                    }}
+                    sx={{
+                        backgroundColor: orangeColor,
+                        color: darkGrayColor,
+                        '&:hover': {
+                            backgroundColor: '#e6b28e'
+                        }
+                    }}
+                >
+                    Con soluciones
+                </Button>
+            </DialogActions>
+        </Dialog>
       </Box>
       <Footer />
     </Box>
