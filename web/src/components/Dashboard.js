@@ -28,6 +28,9 @@ import SchoolIcon from '@mui/icons-material/School';
 import { Grid } from '@mui/material';
 import AboutButton from './AboutButton';
 import QuestionRatingForm from './QuestionRatingForm';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import EditableTitle from './EditableTitle';
 
 
 
@@ -794,7 +797,37 @@ const Dashboard = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                      <strong>Nombre:</strong> {q.name}
+                      <strong>Nombre:</strong>{' '}
+                      <EditableTitle
+                        initialValue={q.name}
+                        onSave={async (newName) => {
+                          try {
+                            const response = await fetch(
+                              `${API_BASE_URL}/api/questionnaires/${q.id}/name`,
+                              {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ name: newName })
+                              }
+                            );
+
+                            if (response.ok) {
+                              setSnackbarMessage('Nombre actualizado correctamente');
+                              setSnackbarSeverity('success');
+                            } else {
+                              const data = await response.json();
+                              setSnackbarMessage(data.error || 'Error al actualizar el nombre');
+                              setSnackbarSeverity('error');
+                            }
+                            setOpenSnackbar(true);
+                          } catch (error) {
+                            console.error('Error:', error);
+                            setSnackbarMessage('Error de conexión');
+                            setSnackbarSeverity('error');
+                            setOpenSnackbar(true);
+                          }
+                        }}
+                      />
                     </Typography>
                     <Typography variant="body1" sx={{ mb: 1 }}>
                       <strong>Archivo Original:</strong> {q.filename}

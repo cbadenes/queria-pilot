@@ -96,6 +96,14 @@ class Questionnaire:
             app.logger.error(f"Error por cuestionario duplicado: {questionnaire_id}")
             return {}
 
+    @staticmethod
+    def update_name(id, new_name):
+        result = mongo_db.db.questionnaires.update_one(
+            {'_id': id},
+            {'$set': {'name': new_name}}
+        )
+        return result.modified_count > 0
+
 class Question:
 
     @staticmethod

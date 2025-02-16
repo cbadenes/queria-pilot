@@ -171,6 +171,26 @@ def create_questionnaire():
         # eliminar cuestionario en bbdd
         return jsonify({"error": str(e)}), 500, headers
 
+@api_blueprint.route('/questionnaires/<id>/name', methods=['PUT'])
+def update_questionnaire_name(id):
+    try:
+        data = request.get_json()
+        new_name = data.get('name')
+
+        if not new_name:
+            return jsonify({"error": "El nombre es requerido"}), 400, headers
+
+        result = Questionnaire.update_name(id, new_name)
+
+        if result:
+            return jsonify({"message": "Nombre actualizado correctamente"}), 200, headers
+        else:
+            return jsonify({"error": "Cuestionario no encontrado"}), 404, headers
+
+    except Exception as e:
+        app.logger.error(f"Error actualizando el nombre: {str(e)}")
+        return jsonify({"error": str(e)}), 500, headers
+
 @api_blueprint.route('/evaluate', methods=['POST'])
 def evaluate():
     try:
