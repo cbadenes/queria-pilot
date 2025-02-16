@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, TextField, IconButton, MenuItem, Typography, Paper, Snackbar, Alert } from '@mui/material';
-import StyledDropzone from './StyledDropzone';
+import { Box, Grid, TextField, IconButton, MenuItem, Typography, Paper, Snackbar, Alert, Button } from '@mui/material';import StyledDropzone from './StyledDropzone';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -23,6 +22,8 @@ const CreateQuestionnaire = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('info'); // Agregar estado para la severidad del snackbar
+  const [includeOpenQuestions, setIncludeOpenQuestions] = useState(false);
+  const [openQuestionsRatio, setOpenQuestionsRatio] = useState('balanced');
 
 
   const handleDiscard = () => {
@@ -30,12 +31,19 @@ const CreateQuestionnaire = () => {
   };
 
   const handleGenerate = async () => {
-    if (!file || !questionnaireName || !numQuestions || !difficulty || !percentageFreeResponse || !userEmail) {
-        setSnackbarMessage('Por favor, completa todos los campos y selecciona un archivo PDF.');
-        setSnackbarSeverity('error'); // Configurar la severidad a error
-        setOpenSnackbar(true);
-        return;
+    // Primero, validamos los campos obligatorios
+    if (!file || !questionnaireName || !numQuestions || !difficulty || !userEmail) {
+      setSnackbarMessage('Por favor, completa todos los campos y selecciona un archivo PDF.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
     }
+
+    // El porcentaje es 0 si no se quieren preguntas abiertas, o el valor según la selección si sí se quieren
+    const percentageFreeResponse = includeOpenQuestions ?
+      (openQuestionsRatio === 'few' ? 25 :
+       openQuestionsRatio === 'many' ? 75 : 50)
+      : 0;
 
     // Mostrar mensaje de archivo recibido inmediatamente
     setSnackbarMessage('Archivo PDF recibido. Procesando cuestionario...');
@@ -77,9 +85,9 @@ const CreateQuestionnaire = () => {
         setOpenSnackbar(true);
       }
     } catch (error) {
-        setSnackbarMessage('Error de conexión al servidor.');
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
+      setSnackbarMessage('Error de conexión al servidor.');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
     }
   };
 
@@ -178,16 +186,93 @@ const CreateQuestionnaire = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              type="number"
-              label="Porcentaje de Respuesta Libre"
-              variant="outlined"
-              value={percentageFreeResponse}
-              onChange={(e) => setPercentageFreeResponse(e.target.value)}
-              sx={{ fontFamily: '"Poppins", sans-serif' }}
-            />
+            <Typography variant="subtitle1" gutterBottom>
+              ¿Desea incluir preguntas de respuesta libre?
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant={includeOpenQuestions ? "contained" : "outlined"}
+                onClick={() => setIncludeOpenQuestions(true)}
+                sx={{
+                  backgroundColor: includeOpenQuestions ? orangeColor : 'transparent',
+                  color: includeOpenQuestions ? darkGrayColor : 'inherit',
+                  '&:hover': {
+                    backgroundColor: includeOpenQuestions ? '#e6b28e' : 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                Sí
+              </Button>
+              <Button
+                variant={!includeOpenQuestions ? "contained" : "outlined"}
+                onClick={() => {
+                  setIncludeOpenQuestions(false);
+                  setOpenQuestionsRatio('balanced');
+                }}
+                sx={{
+                  backgroundColor: !includeOpenQuestions ? orangeColor : 'transparent',
+                  color: !includeOpenQuestions ? darkGrayColor : 'inherit',
+                  '&:hover': {
+                    backgroundColor: !includeOpenQuestions ? '#e6b28e' : 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                No
+              </Button>
+            </Box>
           </Grid>
+
+          {includeOpenQuestions && (
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                ¿Qué proporción de preguntas de respuesta libre desea?
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  variant={openQuestionsRatio === 'few' ? "contained" : "outlined"}
+                  onClick={() => setOpenQuestionsRatio('few')}
+                  sx={{
+                    flex: 1,
+                    backgroundColor: openQuestionsRatio === 'few' ? orangeColor : 'transparent',
+                    color: openQuestionsRatio === 'few' ? darkGrayColor : 'inherit',
+                    '&:hover': {
+                      backgroundColor: openQuestionsRatio === 'few' ? '#e6b28e' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  Pocas (25%)
+                </Button>
+                <Button
+                  variant={openQuestionsRatio === 'balanced' ? "contained" : "outlined"}
+                  onClick={() => setOpenQuestionsRatio('balanced')}
+                  sx={{
+                    flex: 1,
+                    backgroundColor: openQuestionsRatio === 'balanced' ? orangeColor : 'transparent',
+                    color: openQuestionsRatio === 'balanced' ? darkGrayColor : 'inherit',
+                    '&:hover': {
+                      backgroundColor: openQuestionsRatio === 'balanced' ? '#e6b28e' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  Equilibrado (50%)
+                </Button>
+                <Button
+                  variant={openQuestionsRatio === 'many' ? "contained" : "outlined"}
+                  onClick={() => setOpenQuestionsRatio('many')}
+                  sx={{
+                    flex: 1,
+                    backgroundColor: openQuestionsRatio === 'many' ? orangeColor : 'transparent',
+                    color: openQuestionsRatio === 'many' ? darkGrayColor : 'inherit',
+                    '&:hover': {
+                      backgroundColor: openQuestionsRatio === 'many' ? '#e6b28e' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
+                  Mayoría (75%)
+                </Button>
+              </Box>
+            </Grid>
+          )}
 
           <Grid item xs={12} display="flex" justifyContent="center">
             <Tooltip title="Crear nuevo cuestionario" arrow>

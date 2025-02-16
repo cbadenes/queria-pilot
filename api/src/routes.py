@@ -88,8 +88,9 @@ def delete_questionnaire(id):
 
 @api_blueprint.route('/questionnaires', methods=['POST'])
 def create_questionnaire():
+    pdf_path = None
     try:
-        # Verificar si el archivo PDF fue enviado
+        # 1. Validación inicial de archivo
         if 'pdf' not in request.files:
             app.logger.error("No PDF file provided")
             return jsonify({"error": "No se ha adjuntado ningún PDF"}), 400, headers
@@ -99,31 +100,28 @@ def create_questionnaire():
             app.logger.error("No selected file")
             return jsonify({"error": "Nombre de archivo incorrecto"}), 400, headers
 
-        # Guardar el archivo PDF en una ubicación temporal
+        # 2. Extraer y validar parámetros
+        num_questions = request.form.get('numQuestions', type=int)
+        difficulty = request.form.get('difficulty')
+        percentage_free_response = request.form.get('percentageFreeResponse', type=int, default=0)
+        questionnaire_name = request.form.get('name')
+        user_email = request.form.get('email')
+
+        # 3. Validación de parámetros obligatorios
+        if not all([num_questions, difficulty, questionnaire_name, user_email]):
+            app.logger.error("Faltan datos en la solicitud")
+            return jsonify({"error": "Faltan datos obligatorios del cuestionario"}), 400, headers
+
+        if not (0 <= percentage_free_response <= 100):
+            return jsonify({"error": "El porcentaje de preguntas libres debe estar entre 0 y 100"}), 400, headers
+
+        # 4. Guardar archivo PDF temporalmente
         filename = secure_filename(pdf_file.filename)
         pdf_path = os.path.join('/tmp', filename)
         pdf_file.save(pdf_path)
         app.logger.info(f"Archivo PDF guardado temporalmente en: {pdf_path}")
 
-        # Extraer los datos enviados en la solicitud
-        num_questions = request.form.get('numQuestions', type=int)
-        difficulty = request.form.get('difficulty')
-        percentage_free_response = request.form.get('percentageFreeResponse', type=int)
-        questionnaire_name = request.form.get('name')
-        user_email = request.form.get('email')
-
-        app.logger.debug(f"Datos recibidos: numQuestions={num_questions}, difficulty={difficulty}, percentageFreeResponse={percentage_free_response}, name={questionnaire_name}, email={user_email}")
-
-        # Verificar que todos los campos sean válidos
-        if not all([num_questions, difficulty, percentage_free_response, questionnaire_name, user_email]):
-            app.logger.error("Faltan datos en la solicitud")
-            return jsonify({"error": "Faltan datos obligatorios del cuestionario"}), 400, headers
-
-        # Almacenar cuestionario en BBDD
-        questionnaire = Questionnaire.create_questionnaire(questionnaire_name, user_email, pdf_file.filename, difficulty, num_questions, percentage_free_response)
-        if 'id' not in questionnaire:
-            return jsonify({"error": "El nombre del cuestionario ya existe"}), 400, headers
-        # Procesar el archivo PDF
+        # 5. Procesar el PDF y preparar partes
         parts = []
         try:
             reader = PdfReader(pdf_path)
@@ -131,46 +129,73 @@ def create_questionnaire():
             for page in reader.pages:
                 text += page.extract_text() if page.extract_text() else ''
 
+            if not text.strip():
+                raise ValueError("El PDF no contiene texto que se pueda extraer")
+
             # Determinar el tamaño de cada parte dinámicamente
             total_length = len(text)
-            if num_questions > 0:
-                part_size = max(1, total_length // num_questions)  # Ajustar el tamaño para generar suficientes partes
-            else:
-                raise ValueError("El número de preguntas debe ser mayor que cero.")
+            if num_questions <= 0:
+                raise ValueError("El número de preguntas debe ser mayor que cero")
 
-            # Crear las partes dividiendo el texto en fragmentos más pequeños
+            part_size = max(1, total_length // num_questions)
             parts = [text[i:i + part_size] for i in range(0, total_length, part_size)]
 
             # Selección aleatoria si hay más partes que preguntas solicitadas
             if len(parts) > num_questions:
-                selected_parts = random.sample(parts, k=num_questions)  # Selección aleatoria
+                selected_parts = random.sample(parts, k=num_questions)
             else:
-                selected_parts = parts  # Si hay partes justas, usarlas directamente
+                selected_parts = parts
+
+            if not selected_parts:
+                raise ValueError("No se pudo extraer suficiente contenido del PDF")
 
         except Exception as e:
             app.logger.error(f"Error procesando el PDF: {e}")
-            return jsonify({"error": "No se pudo procesar el PDF"}), 500, headers
+            return jsonify({"error": "No se pudo procesar el PDF. Asegúrese de que contiene texto extraíble"}), 500, headers
 
-        app.logger.debug(f"{len(selected_parts)} preguntas seleccionadas después de dividir el texto dinámicamente")
+        # 6. Crear el cuestionario
+        questionnaire = Questionnaire.create_questionnaire(
+            questionnaire_name,
+            user_email,
+            pdf_file.filename,
+            difficulty,
+            num_questions,
+            percentage_free_response
+        )
 
-        # Enviar eventos a ActiveMQ
-        for part in selected_parts:
-            Ticket.create_question_event(
-                context=part,
-                difficulty=questionnaire['difficulty'],
-                percentage_free_response=questionnaire['ratio'],
-                id=questionnaire['id'],
-                email=questionnaire['email']
-            )
+        # 7. Verificar creación exitosa
+        if 'id' not in questionnaire:
+            return jsonify({"error": "Error al crear el cuestionario"}), 500, headers
+
+        # 8. Enviar eventos para generación de preguntas
+        try:
+            for part in selected_parts:
+                Ticket.create_question_event(
+                    context=part,
+                    difficulty=questionnaire['difficulty'],
+                    percentage_free_response=questionnaire['ratio'],
+                    id=questionnaire['id'],
+                    email=questionnaire['email']
+                )
+        except Exception as e:
+            # Si falla la creación de eventos, eliminar el cuestionario
+            Questionnaire.delete_questionnaire(questionnaire['id'])
+            raise e
 
         return jsonify(questionnaire), 200, headers
 
     except Exception as e:
         app.logger.error(f"Error durante la creación del cuestionario: {str(e)}")
         app.logger.error(f"Detalles del error:\n {traceback.format_exc()}")
-        # eliminar cuestionario en bbdd
         return jsonify({"error": str(e)}), 500, headers
 
+    finally:
+        # Limpiar archivo temporal
+        if pdf_path and os.path.exists(pdf_path):
+            try:
+                os.remove(pdf_path)
+            except Exception as e:
+                app.logger.error(f"Error eliminando archivo temporal: {e}")
 @api_blueprint.route('/questionnaires/<id>/name', methods=['PUT'])
 def update_questionnaire_name(id):
     try:
