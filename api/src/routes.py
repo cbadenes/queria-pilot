@@ -228,8 +228,6 @@ def handle_comments():
             level_quality=ratings['quality'],
             level_pedagogical=ratings['pedagogical'],
             level_cognitive=ratings['cognitive'],
-            level_contextual=ratings['contextual'],
-            level_originality=ratings['originality'],
             # Información del cuestionario
             questionnaire_name=questionnaire.get('name'),
             questionnaire_difficulty=questionnaire.get('difficulty'),

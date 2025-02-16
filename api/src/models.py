@@ -152,7 +152,6 @@ class Comment:
     def create_comment(questionnaire_id, question_id, comment,
                        level_clarity, level_complexity, level_alignment,
                        level_quality, level_pedagogical, level_cognitive,
-                       level_contextual, level_originality,
                        questionnaire_name, questionnaire_difficulty, questionnaire_date,
                        question_text, question_type, question_difficulty, question_context,
                        question_answers, question_valid_answer, question_evidence, question_date):
@@ -171,9 +170,7 @@ class Comment:
                 "alignment": level_alignment,
                 "quality": level_quality,
                 "pedagogical": level_pedagogical,
-                "cognitive": level_cognitive,
-                "contextual": level_contextual,
-                "originality": level_originality
+                "cognitive": level_cognitive
             },
             # Referencia a IDs originales
             "questionnaire_id": questionnaire_id,

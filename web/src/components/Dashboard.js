@@ -57,16 +57,7 @@ const Dashboard = () => {
   const [evaluationResult, setEvaluationResult] = useState({});
   const [ratingMenuAnchorEl, setRatingMenuAnchorEl] = useState(null);
   const [textRating, setTextRating] = useState('');
-  const [rating, setRating] = useState({
-    clarity: 2,
-    complexity: 2,
-    alignment: 2,
-    quality: 2,
-    pedagogical: 2,
-    cognitive: 2,
-    contextual: 2,
-    originality: 2
-  });
+  const [rating, setRating] = useState({});
   const [ratingSubmitted, setRatingSubmitted] = useState({});
   const [allValidated, setAllValidated] = useState(false);
   const [evaluationMessage, setEvaluationMessage] = useState('');
@@ -110,31 +101,13 @@ const Dashboard = () => {
          setTextRating(data.comment);
          setCurrentComment(data);
        } else if (response.status === 404) {
-         setRating({
-           clarity: 2,
-           complexity: 2,
-           alignment: 2,
-           quality: 2,
-           pedagogical: 2,
-           cognitive: 2,
-           contextual: 2,
-           originality: 2
-         });
+         setRating({});  // Reset a objeto vacío
          setTextRating('');
          setCurrentComment(null);
        }
      } catch (error) {
        console.error('Error fetching comment:', error);
-       setRating({
-         clarity: 2,
-         complexity: 2,
-         alignment: 2,
-         quality: 2,
-         pedagogical: 2,
-         cognitive: 2,
-         contextual: 2,
-         originality: 2
-       });
+       setRating({});  // Reset a objeto vacío
        setTextRating('');
        setCurrentComment(null);
      }

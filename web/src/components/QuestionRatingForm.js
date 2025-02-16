@@ -1,112 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Typography,
   TextField,
   Box,
   Paper,
   Button,
-  MobileStepper,
   ToggleButtonGroup,
-  ToggleButton
+  ToggleButton,
+  Divider
 } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import SchoolIcon from '@mui/icons-material/School';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const QuestionRatingForm = ({ rating, setRating, textRating, setTextRating, orangeColor = '#FFD5B4', onClose, questionType }) => {
-  const [activeStep, setActiveStep] = useState(0);
-
-  const ratingParams = [
-    {
-      id: 'clarity',
-      label: 'Claridad',
-      description: 'Evalúa como de clara y comprensible es la pregunta',
-      options: [
-        { value: 1, label: 'Confusa' },
-        { value: 2, label: 'Comprensible' },
-        { value: 3, label: 'Precisa' }
-      ]
-    },
-    {
-      id: 'complexity',
-      label: 'Complejidad',
-      description: 'Valora si el nivel de dificultad es adecuado',
-      options: [
-        { value: 1, label: 'Básica' },
-        { value: 2, label: 'Apropiada' },
-        { value: 3, label: 'Compleja' }
-      ]
-    },
-    {
-      id: 'alignment',
-      label: 'Alineación',
-      description: 'Indica cómo de bien se relaciona la pregunta con el material',
-      options: [
-        { value: 1, label: 'Poco' },
-        { value: 2, label: 'Bastante' },
-        { value: 3, label: 'Mucho' }
-      ]
-    },
-    {
-      id: 'quality',
-      label: 'Calidad',
-      description: questionType === 'multi'
-        ? 'Evalúa la calidad y pertinencia de las opciones de respuesta'
-        : 'Evalúa cómo de adecuada ha sido la respuesta sugerida por el sistema',
-      options: questionType === 'multi'
-        ? [
-            { value: 1, label: 'Mejorable' },
-            { value: 2, label: 'Aceptable' },
-            { value: 3, label: 'Excelente' }
-          ]
-        : [
-            { value: 1, label: 'Inadecuada' },
-            { value: 2, label: 'Aceptable' },
-            { value: 3, label: 'Precisa' }
-          ]
-    },
-    {
-      id: 'pedagogical',
-      label: 'Valor Pedagógico',
-      description: 'Valora la utilidad de la pregunta para el aprendizaje',
-      options: [
-        { value: 1, label: 'Limitado' },
-        { value: 2, label: 'Adecuado' },
-        { value: 3, label: 'Excepcional' }
-      ]
-    },
-    {
-      id: 'cognitive',
-      label: 'Nivel Cognitivo',
-      description: 'Evalúa el nivel de pensamiento requerido',
-      options: [
-        { value: 1, label: 'Memoria' },
-        { value: 2, label: 'Comprensión' },
-        { value: 3, label: 'Análisis' }
-      ]
-    },
-    {
-      id: 'contextual',
-      label: 'Contexto',
-      description: 'Valora si la pregunta proporciona suficiente contexto',
-      options: [
-        { value: 1, label: 'Insuficiente' },
-        { value: 2, label: 'Suficiente' },
-        { value: 3, label: 'Excelente' }
-      ]
-    },
-    {
-      id: 'originality',
-      label: 'Originalidad',
-      description: 'Evalúa cómo de única y creativa es la pregunta',
-      options: [
-        { value: 1, label: 'Común' },
-        { value: 2, label: 'Interesante' },
-        { value: 3, label: 'Innovadora' }
-      ]
-    }
-  ];
-
   const handleRatingChange = (paramId) => (event, newValue) => {
     if (newValue !== null) {
       setRating(prev => ({
@@ -116,127 +26,190 @@ const QuestionRatingForm = ({ rating, setRating, textRating, setTextRating, oran
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
+  const allCriteriaRated = () => {
+    const requiredFields = ['clarity', 'complexity', 'alignment', 'quality', 'pedagogical', 'cognitive'];
+    return requiredFields.every(field => rating[field] !== undefined);
   };
 
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
-
-  const isStepComplete = (step) => {
-    if (step < ratingParams.length) {
-      return rating[ratingParams[step].id] !== undefined;
-    }
-    return true; // El paso de comentarios es opcional
-  };
-
-  const canAdvance = isStepComplete(activeStep);
-
-  return (
-    <Paper elevation={0} sx={{ width: '500px', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 3, flex: 1 }}>
-        <Typography variant="h6" sx={{ mb: 3, textAlign: 'center' }}>
-          {activeStep === ratingParams.length ? 'Comentarios Adicionales' : `${activeStep + 1}. ${ratingParams[activeStep].label}`}
+  const BinaryCriterion = ({ id, label, description }) => (
+    <Box sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+        <Typography variant="subtitle2" fontWeight="bold">
+          {label}
         </Typography>
-
-        {activeStep === ratingParams.length ? (
-          <Box sx={{ height: '250px', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="subtitle1" sx={{ mb: 2 }}>
-              ¿Algún comentario adicional? (Opcional)
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={6}
-              variant="outlined"
-              value={textRating}
-              onChange={(e) => setTextRating(e.target.value)}
-              placeholder="Añade cualquier observación o sugerencia para mejorar esta pregunta..."
-            />
-          </Box>
-        ) : (
-          <Box sx={{ height: '250px' }}>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 4,
-                textAlign: 'center',
-                color: '#666',
-                px: 2
-              }}
-            >
-              {ratingParams[activeStep].description}
-            </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <ToggleButtonGroup
-                value={rating[ratingParams[activeStep].id] || null}
-                exclusive
-                onChange={handleRatingChange(ratingParams[activeStep].id)}
-                sx={{ mb: 2 }}
-              >
-                {ratingParams[activeStep].options.map((option) => (
-                  <ToggleButton
-                    key={option.value}
-                    value={option.value}
-                    sx={{
-                      px: 3,
-                      py: 1,
-                      '&.Mui-selected': {
-                        backgroundColor: `${orangeColor} !important`,
-                        color: '#333333'
-                      }
-                    }}
-                  >
-                    {option.label}
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </Box>
-          </Box>
-        )}
-
-        <MobileStepper
-          variant="progress"
-          steps={ratingParams.length + 1}
-          position="static"
-          activeStep={activeStep}
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+          {description}
+        </Typography>
+      </Box>
+      <ToggleButtonGroup
+        value={rating[id] || null}
+        exclusive
+        onChange={handleRatingChange(id)}
+        fullWidth
+        size="small"
+      >
+        <ToggleButton
+          value={1}
           sx={{
-            maxWidth: '100%',
-            flexGrow: 1,
-            '& .MuiLinearProgress-bar': {
-              backgroundColor: orangeColor
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: '#ffcdd2',
+              '&:hover': { backgroundColor: '#ef9a9a' }
             }
           }}
-          nextButton={
-            <Button
-              size="small"
-              onClick={activeStep === ratingParams.length ? onClose : handleNext}
-              disabled={!canAdvance}
-              endIcon={activeStep === ratingParams.length ? <CheckCircleIcon /> : <NavigateNextIcon />}
-              sx={{
-                backgroundColor: canAdvance ? orangeColor : 'transparent',
-                color: canAdvance ? '#333333' : '#bdbdbd',
-                '&:hover': {
-                  backgroundColor: canAdvance ? '#e6b28e' : 'transparent',
-                }
-              }}
-            >
-              {activeStep === ratingParams.length ? 'Finalizar' : 'Siguiente'}
-            </Button>
-          }
-          backButton={
-            <Button
-              size="small"
-              onClick={handleBack}
-              disabled={activeStep === 0}
-              startIcon={<NavigateBeforeIcon />}
-            >
-              Anterior
-            </Button>
-          }
+        >
+          <ThumbDownIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+          <Typography variant="caption">No Adecuado</Typography>
+        </ToggleButton>
+        <ToggleButton
+          value={3}
+          sx={{
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: '#c8e6c9',
+              '&:hover': { backgroundColor: '#a5d6a7' }
+            }
+          }}
+        >
+          <ThumbUpIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+          <Typography variant="caption">Adecuado</Typography>
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
+  );
+
+  const CognitiveCriterion = () => (
+    <Box sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+        <Typography variant="subtitle2" fontWeight="bold">
+          Nivel Cognitivo
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+          ¿Qué tipo de pensamiento requiere la pregunta?
+        </Typography>
+      </Box>
+      <ToggleButtonGroup
+        value={rating.cognitive || null}
+        exclusive
+        onChange={handleRatingChange('cognitive')}
+        fullWidth
+        size="small"
+      >
+        <ToggleButton
+          value={1}
+          sx={{
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: '#e3f2fd',
+              '&:hover': { backgroundColor: '#bbdefb' }
+            }
+          }}
+        >
+          <AutoStoriesIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+          <Typography variant="caption">Memorización</Typography>
+        </ToggleButton>
+        <ToggleButton
+          value={2}
+          sx={{
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: '#e8eaf6',
+              '&:hover': { backgroundColor: '#c5cae9' }
+            }
+          }}
+        >
+          <PsychologyIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+          <Typography variant="caption">Comprensión</Typography>
+        </ToggleButton>
+        <ToggleButton
+          value={3}
+          sx={{
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: '#fff3e0',
+              '&:hover': { backgroundColor: '#ffe0b2' }
+            }
+          }}
+        >
+          <SchoolIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+          <Typography variant="caption">Análisis</Typography>
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
+  );
+
+  return (
+    <Paper elevation={0} sx={{ width: '500px', p: 3 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Evalúa la Pregunta
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Valora cada aspecto seleccionando una opción.
+        </Typography>
+      </Box>
+
+      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 2 }}>
+        <BinaryCriterion
+          id="clarity"
+          label="Claridad"
+          description="¿La pregunta es clara y comprensible?"
         />
+        <BinaryCriterion
+          id="complexity"
+          label="Complejidad"
+          description="¿El nivel de dificultad es adecuado?"
+        />
+        <BinaryCriterion
+          id="alignment"
+          label="Alineación"
+          description="¿Se relaciona bien con el material?"
+        />
+        <BinaryCriterion
+          id="quality"
+          label="Calidad"
+          description={questionType === 'multi' ?
+            "¿Las opciones de respuesta son adecuadas?" :
+            "¿La respuesta sugerida es adecuada?"}
+        />
+        <BinaryCriterion
+          id="pedagogical"
+          label="Valor Pedagógico"
+          description="¿Es útil para el aprendizaje?"
+        />
+
+        <CognitiveCriterion />
+
+        <Divider sx={{ my: 3 }} />
+
+        <TextField
+          fullWidth
+          multiline
+          rows={3}
+          variant="outlined"
+          label="Comentarios Adicionales (Opcional)"
+          value={textRating}
+          onChange={(e) => setTextRating(e.target.value)}
+          placeholder="Añade cualquier observación o sugerencia..."
+          size="small"
+        />
+      </Box>
+
+      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          onClick={onClose}
+          disabled={!allCriteriaRated()}
+          endIcon={<CheckCircleIcon />}
+          sx={{
+            backgroundColor: allCriteriaRated() ? orangeColor : 'transparent',
+            color: allCriteriaRated() ? '#333333' : '#bdbdbd',
+            '&:hover': {
+              backgroundColor: allCriteriaRated() ? '#e6b28e' : 'transparent',
+            }
+          }}
+        >
+          Guardar Evaluación
+        </Button>
       </Box>
     </Paper>
   );
