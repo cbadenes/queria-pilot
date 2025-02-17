@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import logging
 import os
+import argparse
 from typing import Dict, Optional
 
 # Configuración de logging
@@ -153,22 +154,13 @@ class UserManager:
             logger.error(f"Error al procesar usuario {email}: {e}")
             return None
 
-def main():
-    # Configuración
-    mongo_uri = "mongodb://myuser:mypassword@localhost:27017/queria"
-    smtp_config = {
-        'server': 'smtp.gmail.com',  # Ajusta según tu servidor SMTP
-        'port': 587,
-        'user': 'noreply.queria@gmail.com',
-        'password': 'femg agbk jakr uzah'
-    }
-    users_file = "users.txt"
+def process_users_file(user_manager: UserManager, users_file: str):
+    """
+    Procesa el archivo de usuarios
 
-    # Inicializar gestor de usuarios
-    user_manager = UserManager(mongo_uri, smtp_config)
-    user_manager.connect_to_mongodb()
-
-    # Procesar archivo de usuarios
+    :param user_manager: Instancia de UserManager
+    :param users_file: Ruta al archivo de usuarios
+    """
     try:
         with open(users_file, 'r') as f:
             for line in f:
@@ -187,8 +179,43 @@ def main():
 
     except FileNotFoundError:
         logger.error(f"No se encontró el archivo: {users_file}")
+        raise
     except Exception as e:
         logger.error(f"Error al procesar el archivo de usuarios: {e}")
+        raise
+
+def main():
+    # Configurar el parser de argumentos
+    parser = argparse.ArgumentParser(description='Procesa usuarios desde un archivo CSV')
+    parser.add_argument('users_file', help='Ruta al archivo CSV con los usuarios')
+    parser.add_argument('--mongo-uri', default="mongodb://myuser:mypassword@localhost:27017/queria",
+                        help='URI de conexión a MongoDB')
+    parser.add_argument('--smtp-server', default='smtp.gmail.com',
+                        help='Servidor SMTP')
+    parser.add_argument('--smtp-port', type=int, default=587,
+                        help='Puerto SMTP')
+    parser.add_argument('--smtp-user', default='noreply.queria@gmail.com',
+                        help='Usuario SMTP')
+    parser.add_argument('--smtp-password', default='femg agbk jakr uzah',
+                        help='Contraseña SMTP')
+
+    args = parser.parse_args()
+
+    # Configuración SMTP
+    smtp_config = {
+        'server': args.smtp_server,
+        'port': args.smtp_port,
+        'user': args.smtp_user,
+        'password': args.smtp_password
+    }
+
+    # Inicializar gestor de usuarios
+    user_manager = UserManager(args.mongo_uri, smtp_config)
+    user_manager.connect_to_mongodb()
+
+    try:
+        # Procesar archivo de usuarios
+        process_users_file(user_manager, args.users_file)
     finally:
         if user_manager.client:
             user_manager.client.close()
