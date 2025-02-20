@@ -31,6 +31,7 @@ import QuestionRatingForm from './QuestionRatingForm';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import EditableTitle from './EditableTitle';
+import BetaBanner from './BetaBanner';
 
 
 
@@ -641,11 +642,14 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
+      <BetaBanner />
       <CssBaseline />
 
       {/* Logout icon at the top-right corner */}
-      <AboutButton />
-     <Box sx={{ position: 'fixed', top: 16, right: 20 }}>
+     <Box sx={{ position: 'fixed', top: 60, right: 90 }}>
+       <AboutButton />
+     </Box>
+     <Box sx={{ position: 'fixed', top: 60, right: 20 }}>
        <Tooltip title="Cerrar sesión" arrow placement="left">
          <Fab
            color="primary"
@@ -777,7 +781,8 @@ const Dashboard = () => {
           flexDirection: 'column',
           minHeight: '100vh',
           textAlign: 'center',
-          overflow: 'hidden',  // Prevent page scrolling
+          overflow: 'hidden',
+          marginTop: '40px', // Añadir este margen
         }}
       >
         {selectedQuestions.length > 0 ? (

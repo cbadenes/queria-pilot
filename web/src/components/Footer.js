@@ -16,23 +16,6 @@ const Footer = () => {
     }}>
       <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
         © {new Date().getFullYear()} QuerIA
-        <Tooltip title="Enviar feedback" placement="top" arrow>
-          <Link
-            color="inherit"
-            href="mailto:carlos.badenes@upm.es"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              opacity: 0.7,
-              '&:hover': {
-                color: '#FFD5B4',
-                opacity: 1
-              }
-            }}
-          >
-            <EmailIcon sx={{ fontSize: 13 }} />
-          </Link>
-        </Tooltip>
       </Typography>
     </Box>
   );
