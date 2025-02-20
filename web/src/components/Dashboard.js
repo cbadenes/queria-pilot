@@ -645,10 +645,7 @@ const Dashboard = () => {
       <BetaBanner />
       <CssBaseline />
 
-      {/* Logout icon at the top-right corner */}
-     <Box sx={{ position: 'fixed', top: 60, right: 90 }}>
-       <AboutButton />
-     </Box>
+     <AboutButton />
      <Box sx={{ position: 'fixed', top: 60, right: 20 }}>
        <Tooltip title="Cerrar sesión" arrow placement="left">
          <Fab
