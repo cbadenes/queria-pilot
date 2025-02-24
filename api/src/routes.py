@@ -15,6 +15,8 @@ import random
 from pika import BlockingConnection, ConnectionParameters
 import xml.etree.ElementTree as ET
 import traceback
+from .pdf_handler import process_pdf, verify_pdf
+
 
 
 
@@ -96,9 +98,7 @@ def create_questionnaire():
             return jsonify({"error": "No se ha adjuntado ningún PDF"}), 400, headers
 
         pdf_file = request.files['pdf']
-        if pdf_file.filename == '':
-            app.logger.error("No selected file")
-            return jsonify({"error": "Nombre de archivo incorrecto"}), 400, headers
+        verify_pdf(pdf_file)
 
         # 2. Extraer y validar parámetros
         num_questions = request.form.get('numQuestions', type=int)
@@ -122,15 +122,8 @@ def create_questionnaire():
         app.logger.info(f"Archivo PDF guardado temporalmente en: {pdf_path}")
 
         # 5. Procesar el PDF y preparar partes
-        parts = []
         try:
-            reader = PdfReader(pdf_path)
-            text = ''
-            for page in reader.pages:
-                text += page.extract_text() if page.extract_text() else ''
-
-            if not text.strip():
-                raise ValueError("El PDF no contiene texto que se pueda extraer")
+            text = process_pdf(pdf_path)
 
             # Determinar el tamaño de cada parte dinámicamente
             total_length = len(text)
