@@ -88,8 +88,8 @@ const Dashboard = () => {
     setAllValidated(allValid);
   }, [selectedQuestions, evaluationResult]);
 
-   const allQuestionsHaveComments = () => {
-     return selectedQuestions.every(question => commentedQuestions[question.id]);
+   const questionsHaveComments = () => {
+     return selectedQuestions.some(question => commentedQuestions[question.id]);
    };
 
 
@@ -444,7 +444,7 @@ const Dashboard = () => {
 
 
   const exportToMoodleXML = async () => {
-      if (!allQuestionsHaveComments()) {
+      if (!questionsHaveComments()) {
           setShowExportAlert(true);
           setSnackbarMessage('Por favor, proporciona comentarios para todas las preguntas antes de exportar.');
           setSnackbarSeverity('warning');
@@ -854,35 +854,35 @@ const Dashboard = () => {
             ))}
 
             <Box id="iconsContainer" sx={{ display: 'flex', justifyContent: 'flex-start', width: '100%', mt: 2, mb: 4 }}>
-                  <Tooltip title={allQuestionsHaveComments() ? "Exportar a PDF" : "Necesitas comentar todas las preguntas antes de exportar a PDF"} arrow>
+                  <Tooltip title={questionsHaveComments() ? "Exportar a PDF" : "Necesitas valorar al menos una pregunta antes de exportar a PDF"} arrow>
                       <span>
                           <IconButton
                               onClick={handleExportPDF}
                               sx={{
-                                  backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
+                                  backgroundColor: questionsHaveComments() ? orangeColor : '#e0e0e0',
                                   color: '#fff',
-                                  '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
+                                  '&:hover': { backgroundColor: questionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
                                   ml: 2,
-                                  cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
+                                  cursor: questionsHaveComments() ? 'pointer' : 'not-allowed'
                               }}
-                              disabled={!allQuestionsHaveComments()}
+                              disabled={!questionsHaveComments()}
                           >
                               <PictureAsPdfIcon />
                           </IconButton>
                       </span>
                   </Tooltip>
-                  <Tooltip title={allQuestionsHaveComments() ? "Exportar a formato Moodle" : "Necesitas comentar todas las preguntas antes de exportar a Moodle"} arrow>
+                  <Tooltip title={questionsHaveComments() ? "Exportar a formato Moodle" : "Necesitas valorar al menos una pregunta antes de exportar a Moodle"} arrow>
                       <span>
                         <IconButton
                           onClick={exportToMoodleXML}
                           sx={{
-                            backgroundColor: allQuestionsHaveComments() ? orangeColor : '#e0e0e0',
+                            backgroundColor: questionsHaveComments() ? orangeColor : '#e0e0e0',
                             color: '#fff',
-                            '&:hover': { backgroundColor: allQuestionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
+                            '&:hover': { backgroundColor: questionsHaveComments() ? '#e6b28e' : '#e0e0e0' },
                             ml: 2,
-                            cursor: allQuestionsHaveComments() ? 'pointer' : 'not-allowed'
+                            cursor: questionsHaveComments() ? 'pointer' : 'not-allowed'
                           }}
-                          disabled={!allQuestionsHaveComments()}
+                          disabled={!questionsHaveComments()}
                         >
                           <SchoolIcon />
                         </IconButton>
