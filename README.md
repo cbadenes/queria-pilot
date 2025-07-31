@@ -1,62 +1,59 @@
-
 # QuerIA - Questionnaire Generator
 
-QuerIA es una plataforma avanzada que utiliza tecnología de Procesamiento de Lenguaje Natural para generar cuestionarios automáticamente a partir de documentos PDF. Esta herramienta está diseñada para facilitar la creación de cuestionarios educativos, permitiendo a los usuarios cargar documentos, configurar parámetros y recibir cuestionarios listos para usar con validación en tiempo real de las respuestas.
+QuerIA is a platform designed to automatically generate educational questionnaires from PDF documents using Natural Language Processing (NLP) techniques. It simplifies the creation of customized assessments by allowing users to upload instructional documents, configure parameters, and receive ready-to-use quizzes with real-time validation.
 
-## Características Principales
+## Main Features
 
-- **Registro y autenticación de usuarios**: Acceso seguro y personalizado.
-- **Carga y análisis de documentos PDF**: Transforma contenido de documentos en cuestionarios interactivos.
-- **Personalización de cuestionarios**: Configura número de preguntas, dificultad y tipos.
-- **Validación en tiempo real**: Responde y obtén retroalimentación instantánea.
-- **Exportación de resultados**: Exporta tus cuestionarios y respuestas en formato PDF para fácil acceso y revisión.
+- **User registration and authentication**: Secure and personalized access.
+- **PDF upload and analysis**: Converts document content into interactive questionnaires.
+- **Questionnaire customization**: Set the number of questions, difficulty level, and response type.
+- **Real-time validation**: Answer and receive immediate feedback.
+- **Result export**: Export quizzes and responses in PDF format for review and storage.
 
-## Tecnologías Utilizadas
+## Technologies Used
 
-- **Frontend**: Desarrollado con React y React Router para una experiencia de usuario dinámica.
-- **Backend**: Python con Flask proporciona una API robusta y escalable.
-- **Base de datos**: Flexible integración con PostgreSQL o MongoDB.
-- **Autenticación**: Seguridad mediante JWT (JSON Web Tokens).
+- **Frontend**: Developed with React and React Router for a dynamic user experience.
+- **Backend**: Python with Flask provides a robust and scalable API.
+- **Database**: Compatible with PostgreSQL or MongoDB.
+- **Authentication**: Secure access via JWT (JSON Web Tokens).
 
-## Configuración y Ejecución
+## Setup and Execution
 
-### Prerrequisitos
+### Prerequisites
 
-Asegúrate de tener instalado Node.js, npm (o yarn), Python 3 y Pipenv para manejar las dependencias de Python.
+Ensure you have Node.js, npm (or yarn), Python 3, and Pipenv installed to manage dependencies.
 
-### Instalación y Configuración del Entorno
+### Environment Setup
 
-1. **Clonación del repositorio y configuración del backend**:
+1. **Clone the repository and configure the backend**:
     ```bash
-    git clone https://github.com/tu_usuario/QuerIA.git
-    cd QuerIA/backend
+    git clone https://github.com/cbadenes/queria-pilot.git
+    cd queria-pilot/backend
     pip install -r requirements.txt
     python app-api.py
     ```
 
-2. **Configuración del frontend**:
+2. **Configure the frontend**:
     ```bash
     cd ../frontend
     npm install
     npm start
     ```
 
-### Puesta en Marcha de los Servicios con Docker
+### Running Services with Docker
 
-Si prefieres usar Docker para la configuración del entorno:
+To use Docker for environment setup:
 ```bash
 docker-compose up -d
-```
-Visita `http://localhost:3000` para acceder a la aplicación.
+````
 
-## Uso
+Visit http://localhost:3000 to access the application.
 
-Regístrate y sigue las instrucciones para cargar un documento PDF y generar tu cuestionario. Puedes ajustar la configuración del cuestionario según tus necesidades antes de la generación.
+## Usage
+Sign up and follow the interface instructions to upload a PDF and generate your questionnaire. You can customize questionnaire parameters before generation as needed.
 
-## Contribuciones
+## Contributions
+Contributions are welcome. Please submit a pull request or open an issue to propose improvements or report problems.
 
-Contribuciones al proyecto son bienvenidas. Para contribuir, por favor realiza un pull request o abre un issue para discutir tus ideas o cambios propuestos.
-
-## Licencia
-
-Este proyecto está licenciado bajo MIT. Consulta el archivo `LICENSE` para más detalles.
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
