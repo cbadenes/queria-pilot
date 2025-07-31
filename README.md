@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/cbadenes/queria/blob/main/docs/logo.png" alt="Logo de QuerIA" width="200" height="200">
+</p>
+
 # QuerIA - Questionnaire Generator
 
 QuerIA is a platform designed to automatically generate educational questionnaires from PDF documents using Natural Language Processing (NLP) techniques. It simplifies the creation of customized assessments by allowing users to upload instructional documents, configure parameters, and receive ready-to-use quizzes with real-time validation.
