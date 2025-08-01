@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from dotenv import load_dotenv
 import bcrypt
 import secrets
 import string
@@ -185,18 +186,20 @@ def process_users_file(user_manager: UserManager, users_file: str):
         raise
 
 def main():
+    # Cargar variables de entorno
+    load_dotenv()
     # Configurar el parser de argumentos
     parser = argparse.ArgumentParser(description='Procesa usuarios desde un archivo CSV')
     parser.add_argument('users_file', help='Ruta al archivo CSV con los usuarios')
-    parser.add_argument('--mongo-uri', default="mongodb://myuser:mypassword@localhost:27017/queria",
+    parser.add_argument('--mongo-uri', default=os.getenv('MONGO_URI')
                         help='URI de conexión a MongoDB')
     parser.add_argument('--smtp-server', default='smtp.gmail.com',
                         help='Servidor SMTP')
     parser.add_argument('--smtp-port', type=int, default=587,
                         help='Puerto SMTP')
-    parser.add_argument('--smtp-user', default='noreply.queria@gmail.com',
+    parser.add_argument('--smtp-user', default=os.getenv('SMTP_USER'),
                         help='Usuario SMTP')
-    parser.add_argument('--smtp-password', default='femg agbk jakr uzah',
+    parser.add_argument('--smtp-password', default=os.getenv('SMTP_PASSWORD'),
                         help='Contraseña SMTP')
 
     args = parser.parse_args()
