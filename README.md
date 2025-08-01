@@ -79,6 +79,51 @@ After services are up, you **can manually launch** the following modules
 
 Then open `http://localhost:3000` in your browser to access the application.
 
+## User Management
+
+To create, reset or remove users in QuerIA, use the `user-management.py` script located in the `admin` directory.
+
+### User File Format
+The script processes a users.txt file with one line per user:
+   ```bash
+   email,name,action
+   ````
+
+- email: user's email
+- name: user's full name
+- action: new (create), reset (reset password), remove (delete user and their data)
+Example:
+   ```bash
+   jane.doe@example.com,Jane Doe,new
+   john.smith@example.com,John Smith,reset
+   ```
+
+### Secure Configuration with .env
+Store sensitive information in a .env file (do not commit it to Git):
+   ```bash
+   MONGO_URI=mongodb://myuser:mypassword@localhost:27017/queria
+   SMTP_USER=noreply.queria@gmail.com
+   SMTP_PASSWORD=your_smtp_password
+   ```
+
+Install the required package:
+   ```bash
+   pip install python-dotenv
+   ```
+
+### Running the Script
+
+   ```bash
+   python user-management.py users.txt
+   ```
+
+You can override any value with command-line options:
+   ```bash
+   python user-management.py users.txt \
+    --mongo-uri <your_uri> \
+    --smtp-user <your_email> \
+    --smtp-password <your_password>
+   ```
 
 ## Usage
 
