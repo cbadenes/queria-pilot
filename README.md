@@ -1,5 +1,6 @@
+
 <p align="center">
-  <img src="https://github.com/cbadenes/queria/blob/main/docs/logo.png" alt="Logo de QuerIA" width="200" height="200">
+  <img src="https://github.com/cbadenes/queria/blob/main/docs/logo.png" alt="QuerIA Logo" width="200" height="200">
 </p>
 
 # QuerIA - Questionnaire Generator
@@ -25,39 +26,67 @@ QuerIA is a platform designed to automatically generate educational questionnair
 
 ### Prerequisites
 
-Ensure you have Node.js, npm (or yarn), Python 3, and Pipenv installed to manage dependencies.
+Make sure you have the following installed:
 
-### Environment Setup
+- Node.js and npm (or yarn)
+- Python 3
+- Pipenv
+- Docker and Docker Compose (optional but recommended)
 
-1. **Clone the repository and configure the backend**:
-    ```bash
-    git clone https://github.com/cbadenes/queria-pilot.git
-    cd queria-pilot/backend
-    pip install -r requirements.txt
-    python app-api.py
-    ```
+### Manual Setup
 
-2. **Configure the frontend**:
-    ```bash
-    cd ../frontend
-    npm install
-    npm start
-    ```
 
-### Running Services with Docker
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/cbadenes/queria-pilot.git
+   cd queria-pilot
+   ```
 
-To use Docker for environment setup:
-```bash
-docker-compose up -d
-````
+2. **Running services with Docker Compose**:
+  ```bash
+  cd docker
+  docker-compose up -d
+  ```
+After services are up, you **can manually launch** the following modules
 
-Visit http://localhost:3000 to access the application.
+3. **Create a Python virtual environment and Install backend dependencies**:
+  ```bash
+  cd ..
+  cd api  
+  python3 -m venv .venv
+  source .venv/bin/activate   # On Windows use: .venv\\Scripts\\activate
+  pip install -r requirements.txt
+  ```
+
+4. **Start the LLM worker**:
+   ```bash
+   python app-worker.py
+   ```
+
+5. **Start the API** (in a separate terminal):
+   ```bash
+   python app-api.py
+   ```
+
+6. **Start the frontend** (in a separate terminal):
+   ```bash
+   cd ..
+   cd web
+   npm install
+   npm start
+   ```
+
+Then open `http://localhost:3000` in your browser to access the application.
+
 
 ## Usage
+
 Sign up and follow the interface instructions to upload a PDF and generate your questionnaire. You can customize questionnaire parameters before generation as needed.
 
 ## Contributions
+
 Contributions are welcome. Please submit a pull request or open an issue to propose improvements or report problems.
 
 ## License
+
 This project is licensed under the MIT License. See the LICENSE file for details.
