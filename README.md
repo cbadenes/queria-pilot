@@ -43,20 +43,21 @@ Make sure you have the following installed:
    ```
 
 2. **Running services with Docker Compose**:
-  ```bash
-  cd docker
-  docker-compose up -d
-  ```
+   ```bash
+   cd docker
+   docker-compose up -d
+   ```
+
 After services are up, you **can manually launch** the following modules
 
 3. **Create a Python virtual environment and Install backend dependencies**:
-  ```bash
-  cd ..
-  cd api  
-  python3 -m venv .venv
-  source .venv/bin/activate   # On Windows use: .venv\\Scripts\\activate
-  pip install -r requirements.txt
-  ```
+   ```bash
+   cd ..
+   cd api  
+   python3 -m venv .venv
+   source .venv/bin/activate   # On Windows use: .venv\\Scripts\\activate
+   pip install -r requirements.txt
+   ```
 
 4. **Start the LLM worker**:
    ```bash
