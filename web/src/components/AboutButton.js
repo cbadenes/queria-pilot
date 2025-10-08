@@ -33,11 +33,11 @@ const AboutModal = ({ open, onClose }) => {
         </Typography>
 
         <Typography paragraph sx={{ mb: 4, color: darkGrayColor, textAlign: 'justify' }}>
-          QuerIA es una iniciativa de innovación educativa desarrollada por investigadores y docentes del <Link href="https://blogs.upm.es/gietema/" target="_blank" rel="noopener noreferrer">Grupo de Innovación Educativa GIETEMA</Link> de la Universidad Politécnica de Madrid (UPM). Nuestro objetivo es transformar la evaluación educativa mediante tecnologías de Inteligencia Artificial (IA), generando cuestionarios personalizados que se adaptan a las necesidades de cada estudiante. Esta investigación forma parte del <Link href="https://innovacioneducativa.upm.es/proyectos-ie/informacion?anyo=2023-2024&id=1196" target="_blank" rel="noopener noreferrer">Proyecto de Innovación Educativa IE24.6109</Link>.
+          QuerIA es una iniciativa desarrollada por investigadores y docentes de la Universidad Politécnica de Madrid (UPM). Nuestro objetivo es transformar la evaluación educativa mediante tecnologías de Inteligencia Artificial (IA), generando cuestionarios personalizados que se adaptan a las necesidades de cada estudiante.
         </Typography>
 
         <Typography paragraph sx={{ textAlign: 'justify' }}>
-          Priorizando la privacidad y seguridad, todo el procesamiento se realiza en servidores locales de la UPM mediante modelos de IA desarrollados específicamente para este propósito. El sistema es capaz de procesar documentos en español, inglés, francés, alemán, italiano y portugués, aunque los cuestionarios generados se proporcionan en español para garantizar la coherencia pedagógica.
+          Priorizando la privacidad y seguridad, todo el procesamiento se realiza en servidores locales mediante modelos de IA desarrollados específicamente para este propósito. El sistema es capaz de procesar documentos en español, inglés, francés, alemán, italiano y portugués, aunque los cuestionarios generados se proporcionan en español para garantizar la coherencia pedagógica.
         </Typography>
 
         <Typography variant="h5" sx={{ mt: 4, mb: 2, color: darkGrayColor, fontWeight: 'bold' }}>
