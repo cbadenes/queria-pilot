@@ -31,7 +31,6 @@ import QuestionRatingForm from './QuestionRatingForm';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import EditableTitle from './EditableTitle';
-import BetaBanner from './BetaBanner';
 
 
 
@@ -642,7 +641,6 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
-      <BetaBanner />
       <CssBaseline />
 
      <AboutButton />

@@ -75,7 +75,7 @@ class UserManager:
 
             Tu contraseña de acceso al servicio de Queria es: {password}
 
-            Puedes acceder al servicio en: http://queria.etsisi.upm.es
+            Puedes acceder al servicio en: http://wiig.dia.fi.upm.es/queria
 
             Saludos,
             El equipo de Queria
@@ -191,7 +191,7 @@ def main():
     # Configurar el parser de argumentos
     parser = argparse.ArgumentParser(description='Procesa usuarios desde un archivo CSV')
     parser.add_argument('users_file', help='Ruta al archivo CSV con los usuarios')
-    parser.add_argument('--mongo-uri', default=os.getenv('MONGO_URI')
+    parser.add_argument('--mongo-uri', default=os.getenv('MONGO_URI'),
                         help='URI de conexión a MongoDB')
     parser.add_argument('--smtp-server', default='smtp.gmail.com',
                         help='Servidor SMTP')
