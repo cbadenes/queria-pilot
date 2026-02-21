@@ -1,5 +1,6 @@
 {
-  "name": "questionnaire-generator",
+  "name": "queria",
+  "homepage": "/queria",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
