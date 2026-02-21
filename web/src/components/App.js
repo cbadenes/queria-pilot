@@ -5,10 +5,9 @@ import Register from './Register';
 import Dashboard from './Dashboard';
 import CreateQuestionnaire from './CreateQuestionnaire';
 
-
 const App = () => {
   return (
-    <Router>
+    <Router basename="/queria">
       <div className="App">
         <Routes>
           <Route path="/" element={<Login />} />
