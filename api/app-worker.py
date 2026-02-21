@@ -44,7 +44,8 @@ def create_app():
     init_routes(app)
 
     # Aplica CORS a todas las rutas
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5000"}})
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    #CORS(app, resources={r"/api/*": {"origins": "http://localhost:5000"}})
 
     with app.app_context():
         mongo_db.init_app()
@@ -60,4 +61,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run()
+    app.run(host="0.0.0.0")
+    #app.run()

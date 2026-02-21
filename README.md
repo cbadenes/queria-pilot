@@ -24,14 +24,14 @@ QuerIA is a platform designed to automatically generate educational questionnair
 
 ## Setup and Execution
 
+QuerIA is fully containerized and can be deployed using Docker Compose. This is the recommended setup for both development and production environments.
+
 ### Prerequisites
 
 Make sure you have the following installed:
 
-- Node.js and npm (or yarn)
-- Python 3
-- Pipenv
-- Docker and Docker Compose (optional but recommended)
+- Docker
+- Docker Compose (v2+)
 
 ### Manual Setup
 
@@ -42,49 +42,57 @@ Make sure you have the following installed:
    cd queria-pilot
    ```
 
-2. **Running services with Docker Compose**:
+2. **Configure environment variables**:
+Create a .env file in the project root based on .env.example:
    ```bash
-   cd docker
-   docker-compose up -d
+   cp .env.example .env
+   ```
+Edit .env and configure:
+- MongoDB credentials
+- RabbitMQ credentials
+- SMTP configuration
+- LLM (Ollama) endpoint
+- Secret keys
+
+Do not commit .env to version control.
+
+3. **Build and start all services**:
+   ```bash
+   docker compose up --build
    ```
 
-After services are up, you **can manually launch** the following modules
+This will start:
+- MongoDB
+- Mongo Express (admin UI)
+- RabbitMQ
+- API (Flask)
+- Worker (LLM consumer)
+- Web frontend (React)
+- Admin CLI container
 
-3. **Create a Python virtual environment and Install backend dependencies**:
+4. **Access the services**:
+- Web application → http://localhost:3000
+- API → http://localhost:3500
+- RabbitMQ Management → http://localhost:15672
+- Mongo Express → http://localhost:8081   
+
+5. **Stop the services**:
    ```bash
-   cd ..
-   cd api  
-   python3 -m venv .venv
-   source .venv/bin/activate   # On Windows use: .venv\\Scripts\\activate
-   pip install -r requirements.txt
+   docker compose down
    ```
 
-4. **Start the LLM worker**:
+To remove volumes (database reset):
    ```bash
-   python app-worker.py
+   docker compose down -v
    ```
 
-5. **Start the API** (in a separate terminal):
-   ```bash
-   python app-api.py
-   ```
-
-6. **Start the frontend** (in a separate terminal):
-   ```bash
-   cd ..
-   cd web
-   npm install
-   npm start
-   ```
-
-Then open `http://localhost:3000` in your browser to access the application.
 
 ## User Management
 
-To create, reset or remove users in QuerIA, use the `user-management.py` script located in the `admin` directory.
+User creation, password reset, and removal are managed through the admin service.
 
 ### User File Format
-The script processes a users.txt file with one line per user:
+The users.txt file must contain one user per line:
    ```bash
    email,name,action
    ````
@@ -98,33 +106,17 @@ Example:
    john.smith@example.com,John Smith,reset
    ```
 
-### Secure Configuration with .env
-Store sensitive information in a .env file (do not commit it to Git):
+### Run the admin tool
+With Docker running:
    ```bash
-   MONGO_URI=mongodb://myuser:mypassword@localhost:27017/queria
-   SMTP_USER=noreply.queria@gmail.com
-   SMTP_PASSWORD=your_smtp_password
+   docker compose run --rm admin users.txt
    ```
 
-Install the required package:
-   ```bash
-   pip install python-dotenv
-   ```
-
-### Running the Script
-
-   ```bash
-   python user-management.py users.txt
-   ```
-
-You can override any value with command-line options:
-   ```bash
-   python user-management.py users.txt \
-    --mongo-uri <your_uri> \
-    --smtp-user <your_email> \
-    --smtp-password <your_password>
-   ```
-
+This command:
+- Connects to MongoDB inside the Docker network
+- Creates or updates users
+- Sends credentials via SMTP (if configured)
+  
 ## Usage
 
 Sign up and follow the interface instructions to upload a PDF and generate your questionnaire. You can customize questionnaire parameters before generation as needed.
