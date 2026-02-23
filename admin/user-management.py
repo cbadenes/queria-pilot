@@ -75,7 +75,7 @@ class UserManager:
 
             Tu contraseña de acceso al servicio de Queria es: {password}
 
-            Puedes acceder al servicio en: http://wiig.dia.fi.upm.es/queria
+            Puedes acceder al servicio en: https://wiig.dia.fi.upm.es/queria
 
             Saludos,
             El equipo de Queria
