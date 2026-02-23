@@ -58,7 +58,7 @@ Do not commit .env to version control.
 
 3. **Build and start all services**:
    ```bash
-   docker compose up --build
+   docker compose up --build --no-cache
    ```
 
 This will start:

@@ -45,6 +45,14 @@ const AboutModal = ({ open, onClose }) => {
         </Typography>
 
         <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4', textAlign: 'justify' }}>
+          Badenes-Olmedo, C., Eyzaguirre, P., Chu-Artz, N., & Gayoso-Cabada, J. (2026). <Link href="https://www.sciencedirect.com/science/article/pii/S0957417425037558" target="_blank" rel="noopener noreferrer">ESQAD: A curriculum-aligned dataset for question answer generation in Spanish</Link>. Knowledge-Based Systems, 335, 115255.
+        </Typography>
+        
+        <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4', textAlign: 'justify' }}>
+          Badenes-Olmedo, C., & Eyzaguirre, P. (2025). <Link href="https://www.sciencedirect.com/science/article/pii/S0957417425037558" target="_blank" rel="noopener noreferrer">QuerIA: adaptive question generation and evaluation in higher education using large language models and contextual learning</Link>. Expert Systems with Applications, 301, 130140.
+        </Typography>
+
+        <Typography paragraph sx={{ pl: 3, borderLeft: '3px solid #FFD5B4', textAlign: 'justify' }}>
           Badenes-Olmedo, C., Eyzaguirre, P., & Martín-Nuñez, L. (2024). <Link href="https://repositorio.uam.es/bitstream/handle/10486/715973/IDUM_2.pdf?sequence=1&isAllowed=y" target="_blank" rel="noopener noreferrer">QuerIA: Automatización y Personalización de Cuestionarios</Link>. En I Congreso en Innovación Docente de las Universidades Madrileñas: MadrID (pp. 16-26). Universidad Autónoma de Madrid.
         </Typography>
 
