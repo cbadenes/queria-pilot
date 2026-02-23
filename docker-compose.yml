@@ -96,7 +96,7 @@ services:
     depends_on:
       - api
     ports:
-      - "3000:3000"
+      - "3000:80"
     networks:
       - queria_network
     restart: always
