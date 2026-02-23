@@ -3,6 +3,11 @@ import { useDropzone } from 'react-dropzone';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import { pdfjs } from 'react-pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc =
+  `${process.env.PUBLIC_URL}/pdf.worker.min.js`;
+
 
 const StyledDropzone = ({ file, setFile }) => {
     const [fileUrl, setFileUrl] = useState(null);
