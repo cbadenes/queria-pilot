@@ -7,8 +7,8 @@ services:
       - mongo_data:/data/db
       - ./mongo-init:/docker-entrypoint-initdb.d
       - ./mongo-backups:/backups
-    ports:
-      - "127.0.0.1:27017:27017"
+    #ports:
+    #  - "127.0.0.1:27017:27017"
     env_file:
       - .env
     environment:
@@ -27,8 +27,8 @@ services:
 
   mongo-express:
     image: mongo-express:0.54.0
-    ports:
-      - "127.0.0.1:8081:8081"
+    #ports:
+    #  - "127.0.0.1:8081:8081"
     env_file:
       - .env
     environment:
@@ -47,9 +47,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.8-management
-    ports:
-      - "127.0.0.1:5672:5672"
-      - "127.0.0.1:15672:15672"
+    #ports:
+    #  - "127.0.0.1:5672:5672"
+    #  - "127.0.0.1:15672:15672"
     env_file:
       - .env
     environment:
@@ -70,8 +70,8 @@ services:
       - rabbitmq
     env_file:
       - .env   
-    ports:
-      - "3500:3500"
+    #ports:
+    #  - "3500:3500"
     networks:
       - queria_network
     command: python app-api.py
